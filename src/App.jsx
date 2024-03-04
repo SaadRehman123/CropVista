@@ -1,24 +1,38 @@
+import { useEffect, useState } from 'react'
+import { addEmployee, getAllEmployee } from './actions/testaction'
 import { useDispatch, useSelector } from 'react-redux'
+
 import './App.css'
-import { getWheather } from './actions/testaction'
-import { useEffect } from 'react'
 
 const App = () => {
-  const wheather = useSelector(state => state.test.wheather)
+  const employee = useSelector(state => state.test.employee)
+
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
 
   const dispatch = useDispatch()
+
+  const onChangeFirst = (e) => setFirstName(e.target.value)    
+  const onChangeLast = (e) => setLastName(e.target.value)
   
-  useEffect(() => {
-    console.log("wheather", wheather);
-  },[wheather])
+  const Name = { first_name: firstName, last_name: lastName }
 
   return (
     <div>
-      <button onClick={() => dispatch(getWheather())}>Get Wheather</button>
-      
-      {wheather && wheather.map(item => {
+
+      <div style={{ display:"flex", flexDirection: "column", padding: 10, width: "30%" }}>
+        First Name<input onChange={onChangeFirst} />
+        Last Name<input onChange={onChangeLast} />
+      </div>
+
+      <div style={{ display:"flex", padding: 10 }}>
+        <button onClick={() => dispatch(addEmployee(Name))}>Add Employee</button>
+        <button onClick={() => dispatch(getAllEmployee())}>Get Employees</button>  
+      </div>
+
+      {employee && employee.map(item => {
         return (
-          <p key={item.temperatureC}>{item.summary}</p>
+          <p key={item.id}>{item.first_name}{item.last_name}</p>
         )
       })}
     </div>

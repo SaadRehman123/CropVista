@@ -1,14 +1,14 @@
 const INITIAL_STATE = {
-	wheather : []
+	employee : []
 }
 
 const testreducer = (state = INITIAL_STATE, action) => {
 	switch (action.type) {
 
-		case "WHEATHER": {
+		case "GET_EMPLOYEE": {
             return {
                 ...state,
-                wheather: action.payload.data
+                employee: action.payload.data.result
             }
         }
 		default: return state;

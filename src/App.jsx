@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { addEmployee, getAllEmployee } from './actions/testaction'
 import { useDispatch, useSelector } from 'react-redux'
 

@@ -32,7 +32,7 @@ const App = () => {
 
       {employee && employee.map(item => {
         return (
-          <p key={item.id}>{item.first_name}{item.last_name}</p>
+          <p key={item.id}>{item.first_name} {item.last_name}</p>
         )
       })}
     </div>

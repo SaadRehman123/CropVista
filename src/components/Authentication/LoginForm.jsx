@@ -19,12 +19,17 @@ const LoginForm = () => {
         }))
     }
 
-    const hashPassword = "$2a$10$kkpKY1BIAd7fNsM5qMwLnOF6zR7alzkpWGVbVC9Pw305bV3VueWJO"
-
     const handleOnSubmit = (e) => {
         e.preventDefault()
         
-        
+        dispatch(loginUser(formData.email, formData.password)).then(res => {
+            if(res.payload.data.success && res.payload.data.result.isAuthorized){
+                alert("Login Success")
+            }
+            else{
+                alert("Incorrect Credentials")
+            }
+        })
     }
 
     return (

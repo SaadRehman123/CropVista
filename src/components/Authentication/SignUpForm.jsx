@@ -9,16 +9,13 @@ import styled from 'styled-components'
 
 const SignUpForm = () => {
     
-    const [ formData, setFormData ] = useState({ name : "" , email : "" , password : "" })
+    const [ formData, setFormData ] = useState({ name: "", email: "", password: "" })
 
     const dispatch = useDispatch()
 
     const handleOnChange = (e) => {
         const { name, value } = e.target
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }))
+        setFormData(prevState => ({ ...prevState, [name]: value }))
     }
 
     const handleOnSubmit = (e) => {

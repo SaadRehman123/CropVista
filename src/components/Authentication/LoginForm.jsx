@@ -1,22 +1,23 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import useSignIn from 'react-auth-kit/hooks/useSignIn'
+
+import { loginUser } from '../../actions/UserAction'
+
 import './styles.css'
 import styled from 'styled-components'
-import { loginUser } from '../../actions/UserAction'
 
 const LoginForm = () => {
 
-    const [ formData, setFormData ] = useState({ email : "" , password : "" })
+    const [ formData, setFormData ] = useState({ email: "", password: "" })
     
     const dispatch = useDispatch()
+    const login = useSignIn()
     
     const handleOnChange = (e) => {
         const { name, value } = e.target
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }))
+        setFormData(prevState => ({ ...prevState, [name]: value }))
     }
 
     const handleOnSubmit = (e) => {
@@ -24,7 +25,15 @@ const LoginForm = () => {
         
         dispatch(loginUser(formData.email, formData.password)).then(res => {
             if(res.payload.data.success && res.payload.data.result.isAuthorized){
-                alert("Login Success")
+                login({
+                    auth: {
+                        token: res.payload.data.result.tokken,
+                        tokenType: "Bearer"
+                    },
+                    userState:{
+                        email: formData.email 
+                    }          
+                })
             }
             else{
                 alert("Incorrect Credentials")

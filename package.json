@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@auth-kit/react-router": "^3.1.2",
     "@capacitor/android": "^5.7.1",
     "@capacitor/cli": "^5.7.1",
     "@capacitor/core": "^5.7.1",
@@ -13,6 +14,7 @@
     "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "react": "^18.2.0",
+    "react-auth-kit": "^3.1.2",
     "react-dom": "^18.2.0",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.22.2",

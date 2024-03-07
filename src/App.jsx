@@ -1,11 +1,26 @@
+import { Route, Routes } from 'react-router'
 import './App.css'
+import AuthRoutes from './routes/AuthRoutes'
 
 const App = () => {
-  return (
-    <div>
+	const _render = () => {
+		return(
+		<>
+			<Route
+				path='/auth/*'
+				element={<AuthRoutes />}>
+			</Route>
+		</>
+		)
+	}
 
-    </div>
-  )
+	return (
+		<>
+			<Routes>
+				{_render()}
+			</Routes>
+		</>
+	)
 }
 
 export default App

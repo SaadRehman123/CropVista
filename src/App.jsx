@@ -10,9 +10,9 @@ import Loading from './components/SupportComponents/Loading'
 
 import { getLoggedInUser } from './actions/UserActions'
 import { getCookie } from './utilities/CommonUtilities'
+import { renderLoadingView } from './actions/ViewActions'
 
 import './App.css'
-import { renderLoadingView } from './actions/ViewActions'
 
 const App = () => {
 
@@ -34,7 +34,7 @@ const App = () => {
 	
 		if(user){
 			dispatch(renderLoadingView(true))
-			setTimeout(() => {
+			setTimeout(() => { // remove this later 
 				dispatch(getLoggedInUser(user.userId)).then((response) => {
 					if(response.payload.data.success && response.payload.data.result !== null){
 						setAppReady(true)

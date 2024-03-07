@@ -2,11 +2,10 @@ import axios from "axios"
 
 import { Properties } from "../utilities/Properties"
 
-export const loginUser = (user, email, password) => {
+export const loginUser = (email, password) => {
     const result = axios({
         method: 'POST',
-        url: `rest/authenticateUserProfile/login/${email}/${password}`,
-        data: user,
+        url: `rest/authenticateUser/login/${email}/${password}`,
         ...Properties,
     })
     return {

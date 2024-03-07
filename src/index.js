@@ -5,18 +5,19 @@ import configureStore from './store/index'
 import reportWebVitals from './reportWebVitals'
 
 import { Provider } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
 
 import './index.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
-const store =  configureStore()
+export const store = configureStore()
 
 root.render(
-  <React.StrictMode>
+  <BrowserRouter>
     <Provider store={store}>	
       <App />
     </Provider>
-  </React.StrictMode>
+  </BrowserRouter>
 )
 
 reportWebVitals()

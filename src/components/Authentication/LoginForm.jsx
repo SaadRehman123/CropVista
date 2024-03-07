@@ -1,20 +1,29 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import useSignIn from 'react-auth-kit/hooks/useSignIn'
 
-import { loginUser } from '../../actions/UserAction'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { loginUser } from '../../actions/UserActions'
 
 import './styles.css'
 import styled from 'styled-components'
+import { renderLoadingView } from '../../actions/ViewActions'
+import { getCookie } from '../../utilities/CommonUtilities'
 
 const LoginForm = () => {
 
     const [ formData, setFormData ] = useState({ email: "", password: "" })
-    
-    const dispatch = useDispatch()
+
     const login = useSignIn()
-    
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        const cookie = getCookie("_auth")
+        if (cookie !== null) navigate('/app/dashboard')
+    }, [])
+
     const handleOnChange = (e) => {
         const { name, value } = e.target
         setFormData(prevState => ({ ...prevState, [name]: value }))
@@ -23,6 +32,7 @@ const LoginForm = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
         
+        dispatch(renderLoadingView(true))
         dispatch(loginUser(formData.email, formData.password)).then(res => {
             if(res.payload.data.success && res.payload.data.result.isAuthorized){
                 login({
@@ -31,9 +41,12 @@ const LoginForm = () => {
                         tokenType: "Bearer"
                     },
                     userState:{
-                        email: formData.email 
-                    }          
+                        userId: res.payload.data.result.userId,
+                        email: res.payload.data.result.email
+                    }
                 })
+                navigate('/app/dashboard')
+                dispatch(renderLoadingView(false))
             }
             else{
                 alert("Incorrect Credentials")

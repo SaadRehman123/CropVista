@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { hashSync } from 'bcryptjs'
-import { addUser } from '../../actions/UserAction'
+import { addUser } from '../../actions/UserActions'
 
 import './styles.css'
 import styled from 'styled-components'

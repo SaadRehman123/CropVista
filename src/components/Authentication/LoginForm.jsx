@@ -3,13 +3,13 @@ import { useDispatch } from 'react-redux'
 
 import useSignIn from 'react-auth-kit/hooks/useSignIn'
 
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { loginUser } from '../../actions/UserActions'
+import { getCookie } from '../../utilities/CommonUtilities'
+import { renderLoadingView } from '../../actions/ViewActions'
 
 import './styles.css'
 import styled from 'styled-components'
-import { renderLoadingView } from '../../actions/ViewActions'
-import { getCookie } from '../../utilities/CommonUtilities'
 
 const LoginForm = () => {
 
@@ -48,7 +48,7 @@ const LoginForm = () => {
                 
                 navigate('/app/dashboard')
 
-                setTimeout(() => {
+                setTimeout(() => { // remove this later 
                     dispatch(renderLoadingView(false))
                 }, 1000)
             }

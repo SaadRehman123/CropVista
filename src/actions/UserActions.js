@@ -1,6 +1,17 @@
 import axios from "axios"
-
 import { Properties } from "../utilities/Properties"
+
+export const getLoggedInUser = (userId) => {
+    const result = axios({
+        method: 'GET',
+        url: `/rest/authenticateUser/getLoggedInUser/${userId}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_LOGGED_IN_USER',
+        payload: result
+    }
+}
 
 export const loginUser = (email, password) => {
     const result = axios({

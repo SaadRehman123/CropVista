@@ -45,8 +45,12 @@ const LoginForm = () => {
                         email: res.payload.data.result.email
                     }
                 })
+                
                 navigate('/app/dashboard')
-                dispatch(renderLoadingView(false))
+
+                setTimeout(() => {
+                    dispatch(renderLoadingView(false))
+                }, 1000)
             }
             else{
                 alert("Incorrect Credentials")

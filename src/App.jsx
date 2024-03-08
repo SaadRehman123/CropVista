@@ -8,7 +8,7 @@ import AuthRoutes from './routes/AuthRoutes'
 import RequireAuth from '@auth-kit/react-router/RequireAuth'
 import Loading from './components/SupportComponents/Loading'
 
-import { getLoggedInUser } from './actions/UserActions'
+import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 import { getCookie } from './utilities/CommonUtilities'
 import { renderLoadingView } from './actions/ViewActions'
 
@@ -24,6 +24,7 @@ const App = () => {
     const navigate = useNavigate()
 
 	useEffect(() => {
+		dispatch(getAllUsers())
         setUpApplication()
     }, [])
 

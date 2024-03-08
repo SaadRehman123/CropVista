@@ -21,6 +21,10 @@
     "react-scripts": "5.0.1",
     "redux": "^4.0.1",
     "redux-promise": "^0.6.0",
+    "reactstrap": "^7.1.0",
+    "devextreme": "^21.2.6",
+    "devextreme-quill": "^1.5.16",
+    "devextreme-react": "^21.2.6",
     "styled-components": "^6.1.8",
     "web-vitals": "^2.1.4",
     "yarn": "^1.22.21"

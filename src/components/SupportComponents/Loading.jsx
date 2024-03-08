@@ -13,8 +13,10 @@ const Loading = () => {
     return (
         loading && (
             <Container>
-                <img className='cropvista-loader' src={loader} />
-                <span className='background-shadow-layer'></span>
+                <div style={{ transform: "rotate(20deg)" }}>
+                    <img className='cropvista-loader' src={loader} />
+                </div>
+                <span className='background-shadow-layer' />
             </Container>
         )
     )

@@ -41,6 +41,8 @@ const App = () => {
 						dispatch(renderLoadingView(false))
 						navigate("/app/dashboard")
 					}
+				}).catch((error) => {
+					console.error("Error fetching user data:", error);
 				})
 			}, 1000)
 		}
@@ -49,7 +51,7 @@ const App = () => {
 			navigate("/auth/login")
 		}
 	}
-	
+
 	const render = () => {
 		if(!loading && appReady){
 			return(

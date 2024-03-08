@@ -37,7 +37,7 @@ const LoginForm = () => {
             if(res.payload.data.success && res.payload.data.result.isAuthorized){
                 login({
                     auth: {
-                        token: res.payload.data.result.tokken,
+                        token: res.payload.data.result.token,
                         tokenType: "Bearer"
                     },
                     userState:{
@@ -53,7 +53,9 @@ const LoginForm = () => {
                 }, 1000)
             }
             else{
-                alert("Incorrect Credentials")
+                setTimeout(() => { // remove this later 
+                    dispatch(renderLoadingView(false))
+                }, 1000)
             }
         })
     }

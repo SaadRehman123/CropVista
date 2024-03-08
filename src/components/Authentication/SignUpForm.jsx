@@ -34,7 +34,7 @@ const SignUpForm = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
 
-        const isEmailPresent = user.some(item => item.email === formData.email);
+        const isEmailPresent = user.some(item => item.email === formData.email)
 
         if (formData.name.trim() === "" || formData.email.trim() === "" || formData.password.trim() === "" || isEmailPresent === true) {
             setIndicator({ 

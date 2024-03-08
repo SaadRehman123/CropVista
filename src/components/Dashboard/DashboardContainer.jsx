@@ -15,7 +15,7 @@ const DashboardContainer = () => {
     return (
         <div>
             <h1>Dashboard</h1>
-            <button className='auth-button' onClick={() => logout()}>logout</button>
+            <button onClick={() => logout()}>logout</button>
         </div>
     )
 }

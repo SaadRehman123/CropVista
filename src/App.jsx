@@ -24,7 +24,7 @@ const App = () => {
     const navigate = useNavigate()
 
 	useEffect(() => {
-		dispatch(getAllUsers())
+		dispatch(getAllUsers()).catch((error) => console.error(error))
         setUpApplication()
     }, [])
 
@@ -43,7 +43,7 @@ const App = () => {
 						navigate("/app/dashboard")
 					}
 				}).catch((error) => {
-					console.error("Error fetching user data:", error);
+					console.error(error)
 				})
 			}, 1000)
 		}

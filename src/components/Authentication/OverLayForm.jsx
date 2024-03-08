@@ -50,7 +50,7 @@ const OverLayForm = () => {
                 </div>
                 <div className="overlay-panel overlay-right">
                     <h1 className='auth-heading'>Hello, Friend!</h1>
-                    <p className='auth-paragraph'>Enter your personal details and start journey with us</p>
+                    <p className='auth-paragraph'>Enter your personal details and begin your agricultural journey with us</p>
                     <button className="auth-button ghost" id="signUp">Sign Up</button>
                 </div>
             </div>

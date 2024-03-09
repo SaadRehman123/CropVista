@@ -7,7 +7,7 @@ import useSignIn from 'react-auth-kit/hooks/useSignIn'
 import { useNavigate } from 'react-router-dom'
 import { loginUser } from '../../actions/UserActions'
 import { getCookie } from '../../utilities/CommonUtilities'
-import { renderLoadingView } from '../../actions/ViewActions'
+import { renderLoadingView, setLogin } from '../../actions/ViewActions'
 
 import './styles.css'
 import styled from 'styled-components'
@@ -55,9 +55,10 @@ const LoginForm = () => {
                             email: res.payload.data.result.email
                         }
                     })
-                    
+
+                    dispatch(setLogin(true))
                     navigate('/app/dashboard')
-    
+
                     setTimeout(() => { // remove this later
                         dispatch(renderLoadingView(false))
                     }, 1000)

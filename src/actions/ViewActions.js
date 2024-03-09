@@ -5,3 +5,10 @@ export const renderLoadingView = (obj) => {
 		payload : obj
 	}
 }
+
+export const setLogin = (obj) => {
+    return {
+		type : "SET_LOGIN",
+		payload : obj
+	}
+}

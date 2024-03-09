@@ -9,7 +9,9 @@ import RequireAuth from '@auth-kit/react-router/RequireAuth'
 import Loading from './components/SupportComponents/Loading'
 import PopupContainer from './components/Popups/PopupContainer'
 
+import { getSeasons } from './actions/SeasonsAction'
 import { getCookie } from './utilities/CommonUtilities'
+import { getPlannedCrops } from './actions/CropsActions'
 import { renderLoadingView } from './actions/ViewActions'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 
@@ -17,8 +19,8 @@ import './App.css'
 
 const App = () => {
 
-    const loading = useSelector(state => state.view.loading)
     const login = useSelector(state => state.view.login)
+    const loading = useSelector(state => state.view.loading)
 
     const [appReady, setAppReady] = useState(false)
 
@@ -26,7 +28,9 @@ const App = () => {
     const navigate = useNavigate()
 
 	useEffect(() => {
+		dispatch(getSeasons()).catch((error) => console.error(error))
 		dispatch(getAllUsers()).catch((error) => console.error(error))
+		dispatch(getPlannedCrops()).catch((error) => console.error(error))
         setUpApplication()
     }, [login])
 

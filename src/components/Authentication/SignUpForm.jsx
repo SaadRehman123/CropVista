@@ -23,7 +23,7 @@ const SignUpForm = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        setTimeout(() => setSuccess(false), 1000)
+        setTimeout(() => setSuccess(false), 2000)
     }, [success])
 
     const handleOnChange = (e) => {

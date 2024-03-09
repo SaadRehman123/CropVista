@@ -7,16 +7,18 @@ import AppRoutes from './routes/AppRoutes'
 import AuthRoutes from './routes/AuthRoutes'
 import RequireAuth from '@auth-kit/react-router/RequireAuth'
 import Loading from './components/SupportComponents/Loading'
+import PopupContainer from './components/Popups/PopupContainer'
 
-import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 import { getCookie } from './utilities/CommonUtilities'
 import { renderLoadingView } from './actions/ViewActions'
+import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 
 import './App.css'
 
 const App = () => {
 
     const loading = useSelector(state => state.view.loading)
+    const login = useSelector(state => state.view.login)
 
     const [appReady, setAppReady] = useState(false)
 
@@ -26,7 +28,7 @@ const App = () => {
 	useEffect(() => {
 		dispatch(getAllUsers()).catch((error) => console.error(error))
         setUpApplication()
-    }, [])
+    }, [login])
 
 	const setUpApplication = () => {
 		const cookie = getCookie("_auth_state")
@@ -78,6 +80,7 @@ const App = () => {
 				{render()}
 			</Routes>
 			<Loading />
+			<PopupContainer />
 		</>
 	)
 }

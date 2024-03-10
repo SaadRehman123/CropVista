@@ -37,3 +37,29 @@ export const addCropsPlan = (obj) => {
         payload: result
     }
 }
+
+export const updateCropsPlan = (id, obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/cropsplan/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_CROPS_PLAN',
+        payload: result
+    }
+}
+
+export const deleteCropsPlan = (id, obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/cropsplan/delete/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_CROPS_PLAN',
+        payload: result
+    }
+}

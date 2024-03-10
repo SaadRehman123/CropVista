@@ -7,7 +7,7 @@ import TreeList, { Button, Column, Editing, Scrolling, Selection } from 'devextr
 
 import notify from 'devextreme/ui/notify'
 
-import { addCropsPlan, getCropsBySeason, getPlannedCrops } from '../../actions/CropsActions'
+import { addCropsPlan, deleteCropsPlan, getCropsBySeason, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
 
 import styled from 'styled-components'
 import moment from 'moment/moment'
@@ -24,13 +24,53 @@ const CropsPlanning = () => {
     
     const [season, setSeason] = useState('')
     const [crop, setCrop] = useState('')
-    const [acre, setAcre] = useState(0)
+    const [acre, setAcre] = useState("")
     const [startDate, setStartDate] = useState('')
+    const [update, setUpdate] = useState(false)
     const [endDate, setEndDate] = useState('')
 
     const treeListRef = useRef(null)
 
     const dispatch = useDispatch()
+
+    const handleOnUpdate = () => {
+        const instance = treeListRef.current.instance
+        const selectedRow = instance.getSelectedRowsData()
+        
+        if(selectedRow.length > 0){
+
+            setUpdate(true)
+            
+            dispatch(getCropsBySeason(selectedRow[0].season))
+
+            setSeason(selectedRow[0].season)
+            setCrop(selectedRow[0].crop)
+            setAcre(selectedRow[0].acre)
+            setStartDate(selectedRow[0].startdate)
+            setEndDate(selectedRow[0].enddate)
+        }
+    }
+
+    const handleOnDelete = () => {
+        const instance = treeListRef.current.instance
+        const selectedRow = instance.getSelectedRowsData()
+        
+        let obj = {
+            season: selectedRow[0].season,
+            crop: selectedRow[0].crop,
+            acre: parseInt(selectedRow[0].acre),
+            startdate: moment(selectedRow[0].startdate).format("YYYY-MM-DD"),
+            enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD")
+        }
+
+        if (window.confirm("Are You Sure You Want To Delete") === true) {
+            dispatch(deleteCropsPlan(selectedRow[0].id, obj)).then(res => {
+                if(res.payload.data.success){
+                    dispatch(getPlannedCrops())
+                }
+            })
+        }
+    }
 
     const renderSeasonColumn = (e) => {
         return (
@@ -49,11 +89,13 @@ const CropsPlanning = () => {
     }
 
     const renderAcreColumn = (e) => {
-        return (
-            <span>
-                {e.data.acre}
-            </span>
-        )
+        if(acre !== 0){
+            return (
+                <span>
+                    {e.data.acre}
+                </span>
+            )
+        }
     }
 
     const renderStartDateColumn = (e) => {
@@ -74,19 +116,19 @@ const CropsPlanning = () => {
 
     const handleOnSeasonChange = (e) => {
         dispatch(getCropsBySeason(e))
-        setSeason(e);
+        setSeason(e)
     }
     const handleOnCropChange = (e) => {
-        setCrop(e);
+        setCrop(e)
     }
     const handleOnAcreChange = (e) => {
-        setAcre(e);
+        setAcre(e)
     }
     const handleOnStartDateChange = (e) => {
-        setStartDate(e);
+        setStartDate(e)
     }
     const handleOnEndDateChange = (e) => {
-        setEndDate(e);
+        setEndDate(e)
     }
 
     const handleOnSubmit = (e) => {
@@ -96,21 +138,48 @@ const CropsPlanning = () => {
         const plannedCrop = {
             season: season,
             crop: crop,
-            acre: acre,
+            acre: parseInt(acre),
             startdate: moment(startDate).format("YYYY-MM-DD"),
             enddate: moment(endDate).format("YYYY-MM-DD")
         }
 
-        dispatch(addCropsPlan(plannedCrop)).then(res => {
-            if(res.payload.data.success){
-                dispatch(getPlannedCrops()).then(res => {
+        if(!update){
+            dispatch(addCropsPlan(plannedCrop)).then(res => {
+                if(res.payload.data.success){
+                    setSeason("")
+                    setCrop("")
+                    setAcre("")
+                    setStartDate("")
+                    setEndDate("")
+                    dispatch(getPlannedCrops()).then(res => {
+                        if(res.payload.data.success){
+                            instance.refresh()
+                        }
+                    })
+                    notify("Crop Plan Added", "success", 2000)
+                }
+            })
+        }
+        else {
+            const selectedRow = instance.getSelectedRowsData()
+            if(selectedRow.length > 0 && update === true){
+                dispatch(updateCropsPlan(selectedRow[0].id, plannedCrop)).then(res => {
                     if(res.payload.data.success){
-                        instance.refresh()
+                        setSeason("")
+                        setCrop("")
+                        setAcre("")
+                        setStartDate("")
+                        setEndDate("")
+                        dispatch(getPlannedCrops()).then(res => {
+                            if(res.payload.data.success){
+                                instance.refresh()
+                            }
+                        })
+                        notify("Crop Plan Updated", "success", 2000)
                     }
                 })
-                notify("Crop Plan Added", "success", 2000)
             }
-        })
+        }
     }
 
     const renderForm = () => {
@@ -123,6 +192,7 @@ const CropsPlanning = () => {
                     dataSource={seasons.map(item => item.seasons)}
                     onValueChange={handleOnSeasonChange}
                     name="season"
+                    value={season}
                 />
                 <SelectBox
                     style={{ marginBottom: 20 }}
@@ -131,12 +201,14 @@ const CropsPlanning = () => {
                     dataSource={crops.map(item => item.name)}
                     name="crop"
                     onValueChange={handleOnCropChange}
+                    value={crop}
                 />
                 <TextBox
                     style={{ marginBottom: 20 }}
                     placeholder="Acre"
                     name="acre"
                     onValueChange={handleOnAcreChange}
+                    value={acre}
                 />
                 <DateBox
                     style={{ marginBottom: 20 }}
@@ -145,6 +217,7 @@ const CropsPlanning = () => {
                     type='date'
                     name="startDate"
                     onValueChange={handleOnStartDateChange}
+                    value={startDate}
                 />
                 <DateBox
                     style={{ marginBottom: 20 }}
@@ -153,15 +226,14 @@ const CropsPlanning = () => {
                     type='date'
                     name="endDate"
                     onValueChange={handleOnEndDateChange}
+                    value={endDate}
                 />
 
-                <FormButton outline>Save</FormButton>
+                <FormButton outline>{update ? "Update" : "Save"}</FormButton>
             </form>
             // </Container>
         )
     }
-
-    console.log(plannedCrops);
 
     const renderTreelist = () => {
         return (
@@ -178,10 +250,16 @@ const CropsPlanning = () => {
                     height={"calc(100vh - 105px)"}
                     columnResizingMode={"nextColumn"}>
 
+                    <Selection
+                        mode={"multiple"}
+                        showCheckBoxesMode={'none'} />
+
                     <Editing 
                         mode="row"
                         allowDeleting={true} 
                     />
+
+                    <Scrolling />
 
                     <Column
                         caption={"Season"}
@@ -234,13 +312,13 @@ const CropsPlanning = () => {
                             visible={true}
                             icon='fal fa-pencil'
                             cssClass={"treelist-edit-button"}
-                            onClick={() => alert("Edit Row")} />
+                            onClick={() => handleOnUpdate()} />
                         <Button
                             hint="Delete"
                             visible={true}
                             icon='fal fa-trash'
                             cssClass={"treelist-delete-button"}
-                            onClick={() => alert("Delete Row")} />
+                            onClick={() => handleOnDelete()} />
                     </Column>
                 </TreeList>
             </div>

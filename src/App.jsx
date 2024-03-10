@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes } from 'react-router'
 import { useNavigate } from 'react-router-dom'
 
-import AppRoutes from './routes/AppRoutes'
 import AuthRoutes from './routes/AuthRoutes'
+import AppContainer from './components/Main/AppContainer'
 import RequireAuth from '@auth-kit/react-router/RequireAuth'
 import Loading from './components/SupportComponents/Loading'
-import PopupContainer from './components/Popups/PopupContainer'
 
 import { getSeasons } from './actions/SeasonsAction'
 import { getCookie } from './utilities/CommonUtilities'
@@ -71,7 +70,7 @@ const App = () => {
 					<Route              
 						index
 						path="/app/*"
-						element={<RequireAuth fallbackPath='/auth/login'><AppRoutes /></RequireAuth>}>
+						element={<RequireAuth fallbackPath='/auth/login'><AppContainer /></RequireAuth>}>
 					</Route>
 				</>
 			)
@@ -84,7 +83,6 @@ const App = () => {
 				{render()}
 			</Routes>
 			<Loading />
-			<PopupContainer />
 		</>
 	)
 }

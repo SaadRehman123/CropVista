@@ -1,6 +1,9 @@
 const INITIAL_STATE = {
     login: false,
-    loading: false
+    navbar: false,
+    loading: false,
+	cropPlanRef: null,
+    deletePopup: { active: false, type: "" },
 }
 
 const ViewReducer = (state = INITIAL_STATE, action) => {
@@ -15,6 +18,24 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
 			return {
 				...state,
 				login: action.payload
+			}
+		}
+		case "TOGGLE_DELETE_POPUP": {
+            return {
+                ...state,
+                deletePopup: action.payload
+            }
+        }
+		case "SET_CROP_PLAN_REF": {
+            return {
+                ...state,
+                cropPlanRef: action.payload
+            }
+        }
+		case "TOGGLE_NAVBAR": {
+			return {
+				...state,
+				navbar: action.payload
 			}
 		}
 		default: return state

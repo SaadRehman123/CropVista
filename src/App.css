@@ -1,1 +1,23 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+body{
+    overflow: hidden !important;
+}
+
+.modal-title {
+    font-size: 16px;
+    color: #0A1A1E;
+}
+
+.modal-header {
+    background-color: #fff;
+    border-bottom: 1px solid #eee !important;
+    padding-bottom: 10px !important;
+    padding-top: 10px !important;
+}
+
+@media (min-width: 576px) {
+    .modal-sm {
+        max-width: 370px !important;
+    }  
+}

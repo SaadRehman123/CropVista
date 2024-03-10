@@ -1,0 +1,16 @@
+.nav-toggle-button{
+    color: #C0C6CC;
+    font-size: 16px;
+    margin-left: 10px;
+    margin-right: 8px;
+}
+
+.nav-title{
+    font-size: 25px;
+    font-family: 'Roboto';
+    font-weight: 500;
+}
+
+.navbar-drawer-container{
+    background-color: #F9FAFA;
+}

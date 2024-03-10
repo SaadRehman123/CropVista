@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 
@@ -15,6 +15,7 @@ import { DateBox, Form, SelectBox, TextBox } from 'devextreme-react'
 
 import './styles.css'
 import { ButtonItem, Label, RequiredRule, SimpleItem } from 'devextreme-react/form'
+import { setCropPlanRef, toggleDeletePopup } from '../../actions/ViewActions'
 
 const CropsPlanning = () => {
 
@@ -33,6 +34,10 @@ const CropsPlanning = () => {
 
     const dispatch = useDispatch()
 
+    useEffect(() => {
+        dispatch(setCropPlanRef(treeListRef))
+    }, [])
+
     const handleOnUpdate = () => {
         const instance = treeListRef.current.instance
         const selectedRow = instance.getSelectedRowsData()
@@ -48,27 +53,6 @@ const CropsPlanning = () => {
             setAcre(selectedRow[0].acre)
             setStartDate(selectedRow[0].startdate)
             setEndDate(selectedRow[0].enddate)
-        }
-    }
-
-    const handleOnDelete = () => {
-        const instance = treeListRef.current.instance
-        const selectedRow = instance.getSelectedRowsData()
-        
-        let obj = {
-            season: selectedRow[0].season,
-            crop: selectedRow[0].crop,
-            acre: parseInt(selectedRow[0].acre),
-            startdate: moment(selectedRow[0].startdate).format("YYYY-MM-DD"),
-            enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD")
-        }
-
-        if (window.confirm("Are You Sure You Want To Delete") === true) {
-            dispatch(deleteCropsPlan(selectedRow[0].id, obj)).then(res => {
-                if(res.payload.data.success){
-                    dispatch(getPlannedCrops())
-                }
-            })
         }
     }
 
@@ -89,13 +73,11 @@ const CropsPlanning = () => {
     }
 
     const renderAcreColumn = (e) => {
-        if(acre !== 0){
-            return (
-                <span>
-                    {e.data.acre}
-                </span>
-            )
-        }
+        return (
+            <span>
+                {e.data.acre}
+            </span>
+        )
     }
 
     const renderStartDateColumn = (e) => {
@@ -318,7 +300,7 @@ const CropsPlanning = () => {
                             visible={true}
                             icon='fal fa-trash'
                             cssClass={"treelist-delete-button"}
-                            onClick={() => handleOnDelete()} />
+                            onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
                     </Column>
                 </TreeList>
             </div>
@@ -331,7 +313,6 @@ const CropsPlanning = () => {
 
     return (
         <div>
-            <h1>Crops Planning</h1>
             {renderForm()}
             {renderTreelist()}
         </div>

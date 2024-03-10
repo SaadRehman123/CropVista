@@ -6,10 +6,9 @@ const DashboardContainer = () => {
     const navigate = useNavigate()
 
     return (
-        <>
-            <h1>Dashboard</h1>
+        <div style={{padding: 10}}>
             <Button outline onClick={() => navigate('/app/crops-planning')}>Crops Planning</Button>
-        </>
+        </div>
     )
 }
 

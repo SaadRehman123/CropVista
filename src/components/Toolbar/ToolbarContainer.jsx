@@ -1,10 +1,16 @@
 import React from 'react'
-import styled from 'styled-components'
+
+import Logo from './Logo'
+import AppHeading from './AppHeading'
 import SettingButton from './SettingButton'
+
+import styled from 'styled-components'
 
 const ToolbarContainer = () => {
     return (
        <Container>
+            <Logo />
+            <AppHeading />
             <SettingButton />
        </Container>
     )
@@ -13,7 +19,7 @@ const ToolbarContainer = () => {
 export default ToolbarContainer
 
 const Container = styled.div`
-    height: 50px;
+    height: 60px;
     display: flex;
     align-items: center;
     background-color: white;

@@ -1,15 +1,17 @@
 .setting-btn {
-    font-size: 13px;
-    line-height: 24px;
+    width: 35px;
+    height: 35px;
+    
     padding: 1px;
-    border-radius: 18px;
-    text-align: center;
-    width: 30px;
+    font-size: 14px;
     font-weight: 500;
-    height: 30px;
+    border-radius: 18px;
+
     display: flex;
-    justify-content: center;
+    text-align: center;
     align-items: center;
+    justify-content: center;
+    
     cursor: pointer;
     color: #0A1A1E;
     border: 1px solid #eeeeee;

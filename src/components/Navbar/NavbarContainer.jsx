@@ -53,6 +53,7 @@ export default NavbarContainer
 const Container = styled.div`
     display: flex;
     margin-top: 2px;
+    padding-top: 5px;
     margin-bottom: 5px;
     align-items: center;
 `

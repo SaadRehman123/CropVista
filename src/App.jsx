@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes } from 'react-router'
 import { useNavigate } from 'react-router-dom'
 
-import AppRoutes from './routes/AppRoutes'
 import AuthRoutes from './routes/AuthRoutes'
+import AppContainer from './components/Main/AppContainer'
 import RequireAuth from '@auth-kit/react-router/RequireAuth'
 import Loading from './components/SupportComponents/Loading'
-import PopupContainer from './components/Popups/PopupContainer'
 
+import { getSeasons } from './actions/SeasonsAction'
 import { getCookie } from './utilities/CommonUtilities'
+import { getPlannedCrops } from './actions/CropsActions'
 import { renderLoadingView } from './actions/ViewActions'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 
@@ -17,8 +18,8 @@ import './App.css'
 
 const App = () => {
 
-    const loading = useSelector(state => state.view.loading)
     const login = useSelector(state => state.view.login)
+    const loading = useSelector(state => state.view.loading)
 
     const [appReady, setAppReady] = useState(false)
 
@@ -26,7 +27,9 @@ const App = () => {
     const navigate = useNavigate()
 
 	useEffect(() => {
+		dispatch(getSeasons()).catch((error) => console.error(error))
 		dispatch(getAllUsers()).catch((error) => console.error(error))
+		dispatch(getPlannedCrops()).catch((error) => console.error(error))
         setUpApplication()
     }, [login])
 
@@ -67,7 +70,7 @@ const App = () => {
 					<Route              
 						index
 						path="/app/*"
-						element={<RequireAuth fallbackPath='/auth/login'><AppRoutes /></RequireAuth>}>
+						element={<RequireAuth fallbackPath='/auth/login'><AppContainer /></RequireAuth>}>
 					</Route>
 				</>
 			)
@@ -80,7 +83,6 @@ const App = () => {
 				{render()}
 			</Routes>
 			<Loading />
-			<PopupContainer />
 		</>
 	)
 }

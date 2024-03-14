@@ -1,18 +1,21 @@
-import React from 'react'
+import React from 'react';
 import { Route, Routes } from 'react-router-dom'
 
-import ToolbarContainer from '../components/Toolbar/ToolbarContainer'
+import CropsPlanning from '../components/Crops/CropsPlanning'
 import DashboardContainer from '../components/Dashboard/DashboardContainer'
 
 const AppRoutes = () => {
     return (
-        <div>
-            <ToolbarContainer />
+        <div style={{ backgroundColor: '#F9FAFA', height: '100vh' }}>
             <Routes>
                 <Route
                     index
                     path="dashboard"
                     element={<DashboardContainer />}>
+                </Route>
+                <Route
+                    path="crops-planning"
+                    element={<CropsPlanning />}>
                 </Route>
             </Routes>
         </div>

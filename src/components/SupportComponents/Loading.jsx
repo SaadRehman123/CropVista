@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-import loader from '../../assets/loader.png'
+import loader from '../../assets/logo.png'
 
 import "./styles.css"
 import styled from 'styled-components'

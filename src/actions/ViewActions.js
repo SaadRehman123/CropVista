@@ -33,3 +33,10 @@ export const toggleNavbar = (value) => {
 		payload: value
 	}
 }
+
+export const setNavToolbarTitle = (value) => {
+	return {
+		type: "SET_NAV_TOOLBAR_TITLE",
+		payload: value
+	}
+}

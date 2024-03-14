@@ -1,16 +1,24 @@
 .nav-toggle-button{
-    color: #C0C6CC;
     font-size: 16px;
+    font-weight: 700;
+    color: #C0C6CC;
     margin-left: 10px;
     margin-right: 8px;
 }
 
-.nav-title{
+.nav-toolbar-title{
+    margin: 0;
     font-size: 25px;
-    font-family: 'Roboto';
     font-weight: 500;
+    color: #1F272E;
+    font-family: 'Roboto';
+    text-transform: uppercase;
 }
 
 .navbar-drawer-container{
     background-color: #F9FAFA;
+}
+
+.navbar-drawer-container .dx-drawer-panel-content{
+    margin-right: 10px !important;
 }

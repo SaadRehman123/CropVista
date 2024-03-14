@@ -1,16 +1,20 @@
 import React, { useCallback, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 import Drawer from 'devextreme-react/drawer'
 import AppRoutes from '../../routes/AppRoutes'
 
-import NavigationContainer from '../Navigation/NavigationContainer'
+import NavigationContainer from './Navigation/NavigationContainer'
 
 import './styles.css'
 import styled from 'styled-components'
 
 const NavbarContainer = () => {
 
+    const title = useSelector(state => state.view.setNavToolbarTitle)
+
     const [open, setOpen] = useState(false)
+    const [over, setOver] = useState(false)
     
     const handleOnOutSideClick = useCallback(() => {
         setOpen(false)
@@ -20,8 +24,10 @@ const NavbarContainer = () => {
     return (
         <div className="flex-container" style={{backgroundColor: '#F9FAFA'}}>
             <Container>
-                <span onClick={() => setOpen(!open)} className={`${!open ? 'fas fa-chevron-double-right' : 'fas fa-chevron-double-left'} nav-toggle-button`} />
-                <span className='nav-title'>Dashboard</span>
+                <div id='side-nav' style={{ width: 32, cursor: "pointer" }} onMouseEnter={() => setOver(true)} onMouseLeave={() => setOver(false)} onClick={() => setOpen(!open)}>
+                    <i className={`${setIcon(over, open)} nav-toggle-button`} />
+                </div>
+                <h3 className='nav-toolbar-title'>{title}</h3>
             </Container>
             <div>
                 <Drawer
@@ -45,8 +51,20 @@ const NavbarContainer = () => {
 export default NavbarContainer
 
 const Container = styled.div`
+    display: flex;
     margin-top: 2px;
     margin-bottom: 5px;
-    display: flex;
     align-items: center;
 `
+
+const setIcon = (over, open) => {
+    if(over && open) {
+        return "fal fa-chevron-left"
+    }
+    else if(over && !open) {
+        return "fal fa-chevron-right"
+    }
+    else {
+        return "fal fa-bars"
+    }
+}

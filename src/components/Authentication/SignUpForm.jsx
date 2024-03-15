@@ -74,7 +74,7 @@ const SignUpForm = () => {
         <div className="form-container sign-up-container">
             <Form onSubmit={handleOnSubmit}>
                 <h1 className='auth-heading'>Create Account</h1>
-                <Mark top={176} condition={indicator.name} title={"Invalid Name"} />
+                <Mark top={174} condition={indicator.name} title={"Invalid Name"} />
                 <input value={formData.name} name='name' className='auth-input' type="text" placeholder="Name" autoComplete='new-Name' onChange={handleOnChange} />
                 <Mark top={231} condition={indicator.email || indicator.isEmail} title={indicator.isEmail ? "Email Already Exists" : "Invalid Email"} />
                 <input value={formData.email} name='email' className='auth-input' type="text" placeholder="Email" autoComplete='new-email' onChange={handleOnChange} />

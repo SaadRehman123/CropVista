@@ -21,3 +21,17 @@ body{
         max-width: 370px !important;
     }  
 }
+
+.dx-row.dx-data-row.dx-row-lines.dx-column-lines.dx-selection{
+    background-color: #FFEFBB !important;
+}
+
+.dx-treelist-columns-separator.dx-treelist-columns-separator-transparent{
+    display: none !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}

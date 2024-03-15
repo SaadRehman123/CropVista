@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import Drawer from 'devextreme-react/drawer'
@@ -16,11 +16,6 @@ const NavbarContainer = () => {
     const [open, setOpen] = useState(false)
     const [over, setOver] = useState(false)
     
-    const handleOnOutSideClick = useCallback(() => {
-        setOpen(false)
-        return false
-    }, [setOpen])
-    
     return (
         <div className="flex-container" style={{backgroundColor: '#F9FAFA'}}>
             <Container>
@@ -36,10 +31,10 @@ const NavbarContainer = () => {
                     position={"left"}
                     revealMode={"slide"}
                     openedStateMode={"shrink"}
+                    closeOnOutsideClick={false}
                     className={'navbar-drawer-container'}
-                    closeOnOutsideClick={handleOnOutSideClick}
                     component={() => { return <NavigationContainer /> }}>
-                    <div id="content" className="dx-theme-background-color">
+                    <div id="content">
                         <AppRoutes />
                     </div>
                 </Drawer>

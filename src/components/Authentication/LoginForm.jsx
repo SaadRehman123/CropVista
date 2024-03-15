@@ -74,11 +74,11 @@ const LoginForm = () => {
         <div className="form-container sign-in-container">
             <Form onSubmit={handleOnSubmit}>
                 <h1 className='auth-heading'>Login</h1>
-                <Mark top={205} condition={indicator.email} title={"Invalid Email"} />
+                <Mark top={201} condition={indicator.email} title={"Invalid Email"} />
                 <input name='email' className='auth-input' type="text" placeholder="Email" autoComplete='new-email' onChange={handleOnChange} />
                 <Mark top={259} condition={formData.password.trim() === "" && indicator.password} title={'Invalid Password'} />
                 <TogglePassword
-                    top={259}
+                    top={257}
                     display={formData.password.trim() === "" ? "none" : "block"}
                     className={showPassword ? 'fal fa-eye' : 'fal fa-eye-slash'}
                     onClick={() => setShowPassword(!showPassword)} 

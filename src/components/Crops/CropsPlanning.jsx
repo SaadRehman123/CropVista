@@ -45,7 +45,7 @@ const CropsPlanning = () => {
             setValidDate(true)
             setMessage("Both Start Date and End Date Should be Selected")
         }
-        else if (formData.startDate > formData.endDate) {
+        else if (formData.startDate >= formData.endDate) {
             setValidDate(true)
             setMessage("End Date Should Be Greater Than Start Date")
         }

@@ -1,21 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-
-import {Button as FormButton} from 'reactstrap'  
-import TreeList, { Button, Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { Input as SelectBox, Input as DatePicker, Input } from 'reactstrap'
+import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { Form, FormButton, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Option } from '../SupportComponents/StyledComponents'
 
 import notify from 'devextreme/ui/notify'
+import FormBackground from '../SupportComponents/FormBackground'
 
-import { addCropsPlan, deleteCropsPlan, getCropsBySeason, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
+import moment from 'moment/moment'
+
+import { setCropPlanRef, toggleDeletePopup } from '../../actions/ViewActions'
+import { addCropsPlan, getCropsBySeason, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
 
 import styled from 'styled-components'
-import moment from 'moment/moment'
-import { DateBox, Form, SelectBox, TextBox } from 'devextreme-react'
-
 import './styles.css'
-import { ButtonItem, Label, RequiredRule, SimpleItem } from 'devextreme-react/form'
-import { setCropPlanRef, toggleDeletePopup } from '../../actions/ViewActions'
 
 const CropsPlanning = () => {
 
@@ -23,12 +22,9 @@ const CropsPlanning = () => {
     const seasons = useSelector(state => state.seasons.getSeasons)
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
     
-    const [season, setSeason] = useState('')
-    const [crop, setCrop] = useState('')
-    const [acre, setAcre] = useState("")
-    const [startDate, setStartDate] = useState('')
     const [update, setUpdate] = useState(false)
-    const [endDate, setEndDate] = useState('')
+    const [formData, setFormData] = useState({ season: "", crop: "", acre: "", startDate: "", endDate: "" })
+    const [indicator, setIndicator] = useState({ season: false, crop: false, acre: false, startDate: false, endDate: false })
 
     const treeListRef = useRef(null)
 
@@ -43,16 +39,88 @@ const CropsPlanning = () => {
         const selectedRow = instance.getSelectedRowsData()
         
         if(selectedRow.length > 0){
-
             setUpdate(true)
-            
             dispatch(getCropsBySeason(selectedRow[0].season))
+            setFormData({
+                season: selectedRow[0].season,
+                crop: selectedRow[0].crop,
+                acre: (selectedRow[0].acre).toString(),
+                startDate: moment(selectedRow[0].startdate).format("YYYY-MM-DD"),
+                endDate: moment(selectedRow[0].enddate).format("YYYY-MM-DD")
+            })
+        }
+    }
 
-            setSeason(selectedRow[0].season)
-            setCrop(selectedRow[0].crop)
-            setAcre(selectedRow[0].acre)
-            setStartDate(selectedRow[0].startdate)
-            setEndDate(selectedRow[0].enddate)
+    const handleOnChange = (e) => {
+        const { name, value } = e.target
+        if(name === "season") dispatch(getCropsBySeason(e.target.value))
+        setFormData(prevState => ({ ...prevState, [name]: value }))
+    }
+
+    const handleOnSubmit = (e) => {
+        e.preventDefault()
+        const instance = treeListRef.current.instance
+        const selectedRow = instance.getSelectedRowsData()
+
+        const plannedCrop = {
+            season: formData.season,
+            crop: formData.crop,
+            acre: parseInt(formData.acre),
+            startdate: moment(formData.startDate).format("YYYY-MM-DD"),
+            enddate: moment(formData.endDate).format("YYYY-MM-DD")
+        }
+        
+        const acreLimit = formData.acre.trim() < 1 || formData.acre.trim() > 2000
+        if (formData.season.trim() === "" || formData.crop.trim() === "" || formData.acre.trim() === "" || formData.startDate.trim() === "" || formData.endDate.trim() === "" || acreLimit === true) {
+            setIndicator({ 
+                season: formData.season.trim() === "" ? true : false,
+                crop: formData.crop.trim() === "" ? true : false,
+                acre: formData.acre.trim() === "" || acreLimit === true ? true : false,
+                startDate: formData.startDate.trim() === "" ? true : false,
+                endDate: formData.endDate.trim() === "" ? true : false,
+            })
+            return
+        }
+
+        if(update){
+            const changes = validateChanges(selectedRow, plannedCrop)
+            if(!changes){
+                notify("No Changes Detected", "info", 2000)
+                return
+            }
+        }
+
+        if(!update){
+            dispatch(addCropsPlan(plannedCrop)).then(res => {
+                if(res.payload.data.success){
+                    setFormData({ season: "", crop: "", acre: "", startDate: "", endDate: "" })
+                    setIndicator({ season: false, crop: false, acre: false, startDate: false, endDate: false })
+                    dispatch(getPlannedCrops()).then(res => {
+                        if(res.payload.data.success){
+                            instance.refresh()
+                        }
+                    })
+                    notify("Crop Plan Added", "success", 2000)
+                }
+            })
+        }
+        else {
+            const selectedRow = instance.getSelectedRowsData()
+            if(selectedRow.length > 0 && update === true){
+                dispatch(updateCropsPlan(selectedRow[0].id, plannedCrop)).then(res => {
+                    if(res.payload.data.success){
+                        setFormData({ season: "", crop: "", acre: "", startDate: "", endDate: "" })
+                        setIndicator({ season: false, crop: false, acre: false, startDate: false, endDate: false })
+                        setUpdate(false)
+                        dispatch(getPlannedCrops()).then(res => {
+                            if(res.payload.data.success){
+                                instance.refresh()
+                            }
+                        })
+                        notify("Crop Plan Updated", "success", 2000)
+                    }
+                })
+            }
         }
     }
 
@@ -95,125 +163,67 @@ const CropsPlanning = () => {
             </span>
         )
     }
+    
+    const renderActionColumn = (e) => {
+        return (
+            <ActionCellContainer>
+                <button
+                    title='Edit Plan'
+                    className='fal fa-pencil treelist-edit-button'
+                    onClick={() => handleOnUpdate()} />
 
-    const handleOnSeasonChange = (e) => {
-        dispatch(getCropsBySeason(e))
-        setSeason(e)
-    }
-    const handleOnCropChange = (e) => {
-        setCrop(e)
-    }
-    const handleOnAcreChange = (e) => {
-        setAcre(e)
-    }
-    const handleOnStartDateChange = (e) => {
-        setStartDate(e)
-    }
-    const handleOnEndDateChange = (e) => {
-        setEndDate(e)
-    }
-
-    const handleOnSubmit = (e) => {
-        e.preventDefault()
-        const instance = treeListRef.current.instance
-
-        const plannedCrop = {
-            season: season,
-            crop: crop,
-            acre: parseInt(acre),
-            startdate: moment(startDate).format("YYYY-MM-DD"),
-            enddate: moment(endDate).format("YYYY-MM-DD")
-        }
-
-        if(!update){
-            dispatch(addCropsPlan(plannedCrop)).then(res => {
-                if(res.payload.data.success){
-                    setSeason("")
-                    setCrop("")
-                    setAcre("")
-                    setStartDate("")
-                    setEndDate("")
-                    dispatch(getPlannedCrops()).then(res => {
-                        if(res.payload.data.success){
-                            instance.refresh()
-                        }
-                    })
-                    notify("Crop Plan Added", "success", 2000)
-                }
-            })
-        }
-        else {
-            const selectedRow = instance.getSelectedRowsData()
-            if(selectedRow.length > 0 && update === true){
-                dispatch(updateCropsPlan(selectedRow[0].id, plannedCrop)).then(res => {
-                    if(res.payload.data.success){
-                        setSeason("")
-                        setCrop("")
-                        setAcre("")
-                        setStartDate("")
-                        setEndDate("")
-                        dispatch(getPlannedCrops()).then(res => {
-                            if(res.payload.data.success){
-                                instance.refresh()
-                            }
-                        })
-                        notify("Crop Plan Updated", "success", 2000)
-                    }
-                })
-            }
-        }
+                <button
+                    title='Delete Plan'
+                    className='fal fa-trash treelist-delete-button'
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
+            </ActionCellContainer>
+        )
     }
 
     const renderForm = () => {
         return (
-            // <Container>
-            <form onSubmit={handleOnSubmit} style={{ display: 'flex', padding: 20, width: "50%", flexDirection: "column" }}>
-                <SelectBox
-                    style={{ marginBottom: 20 }}
-                    placeholder='Season'
-                    dataSource={seasons.map(item => item.seasons)}
-                    onValueChange={handleOnSeasonChange}
-                    name="season"
-                    value={season}
-                />
-                <SelectBox
-                    style={{ marginBottom: 20 }}
-                    placeholder='Crop'
-                    disabled={season === "" ? true : false}
-                    dataSource={crops.map(item => item.name)}
-                    name="crop"
-                    onValueChange={handleOnCropChange}
-                    value={crop}
-                />
-                <TextBox
-                    style={{ marginBottom: 20 }}
-                    placeholder="Acre"
-                    name="acre"
-                    onValueChange={handleOnAcreChange}
-                    value={acre}
-                />
-                <DateBox
-                    style={{ marginBottom: 20 }}
-                    placeholder='Start Date'
-                    pickerType='calendar'
-                    type='date'
-                    name="startDate"
-                    onValueChange={handleOnStartDateChange}
-                    value={startDate}
-                />
-                <DateBox
-                    style={{ marginBottom: 20 }}
-                    placeholder='End Date'
-                    pickerType='calendar'
-                    type='date'
-                    name="endDate"
-                    onValueChange={handleOnEndDateChange}
-                    value={endDate}
-                />
+            <Form onSubmit={handleOnSubmit}>
+                <FormGroupContainer>
+                    <FormGroupItem style={{ marginRight : 15 }}>
+                        <FormLabel>Season</FormLabel>
+                        <SelectBox invalid={indicator.season} name={"season"} value={formData.season} type="select" className={"form-selectbox"} onChange={handleOnChange}>
+                            <Option hidden={true} selected={true}>Select Season</Option>
+                            {seasons.map((item) => {
+                                return <Option>{item.seasons}</Option>
+                            })}
+                        </SelectBox>
+                    </FormGroupItem>
+                
+                    <FormGroupItem style={{ marginLeft : 15 }}>
+                        <FormLabel>Crop</FormLabel>
+                        <SelectBox invalid={indicator.crop} disabled={formData.season === "" ? true : false} name={"crop"} value={formData.crop} type="select" className={"form-selectbox"} onChange={handleOnChange}>
+                            <Option hidden={true} selected={true}>Select Crop</Option>
+                            {crops.map((item) => {
+                                return <Option>{item.name}</Option>
+                            })}
+                        </SelectBox>
+                    </FormGroupItem>
 
-                <FormButton outline>{update ? "Update" : "Save"}</FormButton>
-            </form>
-            // </Container>
+                    <FormGroupItem style={{ marginRight : 15 }}>
+                        <FormLabel>Acre</FormLabel>
+                        <Input invalid={indicator.acre} placeholder={"Number Of Acre"} name={"acre"} value={formData.acre} type='number' className={'form-textbox'} onChange={handleOnChange} />
+                    </FormGroupItem>
+                
+                    <FormGroupItem style={{ marginLeft : 15 }}>
+                        <FormLabel>Start Date</FormLabel>
+                        <DatePicker invalid={indicator.startDate} name={"startDate"} value={formData.startDate} type='date' className={"form-datebox"} onChange={handleOnChange} />
+                    </FormGroupItem>
+                
+                    <FormGroupItem style={{ marginRight : 15 }}>
+                        <FormLabel>End Date</FormLabel>
+                        <DatePicker invalid={indicator.endDate} name={"endDate"} value={formData.endDate} type='date' className={"form-datebox"} onChange={handleOnChange} />
+                    </FormGroupItem>
+                </FormGroupContainer>
+
+                <FormButtonContainer>
+                    <FormButton>{update ? "Update" : "Save"} Plan</FormButton>
+                </FormButtonContainer>
+            </Form>
         )
     }
 
@@ -229,34 +239,29 @@ const CropsPlanning = () => {
                     dataSource={plannedCrops}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    height={"calc(100vh - 105px)"}
+                    noDataText={'No Plan'}
+                    height={"calc(100vh - 430px)"}
+                    className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
 
-                    <Selection
-                        mode={"multiple"}
-                        showCheckBoxesMode={'none'} />
+                    <Selection mode={"single"} />
 
-                    <Editing 
-                        mode="row"
-                        allowDeleting={true} 
-                    />
-
-                    <Scrolling />
+                    <Scrolling mode={"standard"} />
 
                     <Column
                         caption={"Season"}
                         dataField={"season"}
                         allowSorting={false}
-                        headerCellRender={renderHeaderCell}
                         cellRender={renderSeasonColumn} 
+                        headerCellRender={renderHeaderCell}
                     />
                         
                     <Column
                         caption={"Crop"}
                         dataField={"crop"}
                         allowSorting={false}
-                        headerCellRender={renderHeaderCell}
                         cellRender={renderCropColumn} 
+                        headerCellRender={renderHeaderCell}
                     />
 
                     <Column
@@ -264,44 +269,36 @@ const CropsPlanning = () => {
                         dataField={"acre"}
                         alignment={"left"}
                         allowSorting={false}
-                        headerCellRender={renderHeaderCell}
                         cellRender={renderAcreColumn} 
+                        headerCellRender={renderHeaderCell}
                     />
 
                     <Column
                         caption={"Start Date"}
                         dataField={"startDate"}
                         allowSorting={false}
-                        headerCellRender={renderHeaderCell}
                         cellRender={renderStartDateColumn} 
+                        headerCellRender={renderHeaderCell}
                     />
 
                     <Column
                         caption={"End Date"}
                         dataField={"endDate"}
                         allowSorting={false}
-                        headerCellRender={renderHeaderCell}
                         cellRender={renderEndDateColumn} 
+                        headerCellRender={renderHeaderCell}
                     />
 
                     <Column
-                        type="buttons"
-                        caption='Action'
+                        width={98}
+                        minWidth={98}
+                        caption={"Actions"}
+                        dataField={"actions"}
+                        alignment={"center"}
                         allowSorting={false}
-                        headerCellRender={renderHeaderCell}>
-                        <Button
-                            hint='Edit'
-                            visible={true}
-                            icon='fal fa-pencil'
-                            cssClass={"treelist-edit-button"}
-                            onClick={() => handleOnUpdate()} />
-                        <Button
-                            hint="Delete"
-                            visible={true}
-                            icon='fal fa-trash'
-                            cssClass={"treelist-delete-button"}
-                            onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
-                    </Column>
+                        cellRender={renderActionColumn}
+                        headerCellRender={renderHeaderCell} 
+                    />
                 </TreeList>
             </div>
         )
@@ -313,40 +310,42 @@ const CropsPlanning = () => {
 
     return (
         <div>
-            {renderForm()}
-            {renderTreelist()}
+            <FormBackground Form={renderForm()} />
+            <FormBackground Form={renderTreelist()} />
         </div>
     )
 }
 
 export default CropsPlanning
 
-export const ActionCellContainer = styled.span`
-    font-size: 16px;
+const validateChanges = (selectedRow, formData) => {
+    const reconstructedStructure = {
+        season: selectedRow[0].season,
+        crop: selectedRow[0].crop,
+        acre: selectedRow[0].acre,
+        startdate: moment(selectedRow[0].startdate).format("YYYY-MM-DD"),
+        enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD")
+    }
+
+    const keys1 = Object.keys(reconstructedStructure)
+    const keys2 = Object.keys(formData)
+    
+    if (keys1.length !== keys2.length) {
+        return true
+    }
+
+    for (const key of keys1) {
+        if (reconstructedStructure[key] !== formData[key]) {
+            return true
+        }
+    }
+
+    return false
+}
+
+const ActionCellContainer = styled.div`
     display: flex;
-    justify-content: space-evenly;
+    font-size: 16px;
     align-items: center;
+    justify-content: space-evenly;
 `
-
-// const Container = styled.div`
-//     width: 300px;
-//     display: flex;
-//     align-items: center;
-//     border: 2px solid #ddd;
-//     border-radius: 6px;
-//     padding: 4px;
-//     margin-left: 6px;
-//     background-color: white;
-//     &:hover {
-//         border: 2px solid #ccc;
-//     }
-//     &:focus-within {
-//         border: 2px solid #ccc;
-//     }
-// `
-
-// const Input = styled.input`
-//     // border: none;
-//     // width: 180px;
-//     margin-bottom: 20px;
-// `

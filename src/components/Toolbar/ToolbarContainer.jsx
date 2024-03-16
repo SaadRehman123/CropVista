@@ -9,8 +9,8 @@ import styled from 'styled-components'
 const ToolbarContainer = () => {
     return (
        <Container>
-            <Logo />
-            <AppHeading />
+            {/* <Logo />
+            <AppHeading /> */}
             <SettingButton />
        </Container>
     )
@@ -19,7 +19,7 @@ const ToolbarContainer = () => {
 export default ToolbarContainer
 
 const Container = styled.div`
-    height: 60px;
+    height: 45px;
     display: flex;
     align-items: center;
     background-color: white;

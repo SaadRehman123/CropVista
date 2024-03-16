@@ -23,9 +23,12 @@ const CropsPlanning = () => {
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
     
     const [update, setUpdate] = useState(false)
+    const [message, setMessage] = useState("")
+    const [validAcre, setValidAcre] = useState(false)
+    const [validDate, setValidDate] = useState(false)
     const [formData, setFormData] = useState({ season: "", crop: "", acre: "", startDate: "", endDate: "" })
     const [indicator, setIndicator] = useState({ season: false, crop: false, acre: false, startDate: false, endDate: false })
-
+    
     const treeListRef = useRef(null)
 
     const dispatch = useDispatch()
@@ -33,6 +36,23 @@ const CropsPlanning = () => {
     useEffect(() => {
         dispatch(setCropPlanRef(treeListRef))
     }, [])
+    
+    useEffect(() => {
+        if(parseInt(formData.acre) < 1 || parseInt(formData.acre) > 5000) setValidAcre(true)
+        else setValidAcre(false)
+
+        if(formData.startDate === "" || formData.endDate === ""){
+            setValidDate(true)
+            setMessage("Both Start Date and End Date Should be Selected")
+        }
+        else if (formData.startDate > formData.endDate) {
+            setValidDate(true)
+            setMessage("End Date Should Be Greater Than Start Date")
+        }
+        else {
+            setValidDate(false)
+        }
+    }, [formData])
 
     const handleOnUpdate = () => {
         const instance = treeListRef.current.instance
@@ -53,7 +73,7 @@ const CropsPlanning = () => {
 
     const handleOnChange = (e) => {
         const { name, value } = e.target
-        if(name === "season") dispatch(getCropsBySeason(e.target.value))
+        if(name === "season") dispatch(getCropsBySeason(value))
         setFormData(prevState => ({ ...prevState, [name]: value }))
     }
 
@@ -79,6 +99,10 @@ const CropsPlanning = () => {
                 startDate: formData.startDate.trim() === "" ? true : false,
                 endDate: formData.endDate.trim() === "" ? true : false,
             })
+            return
+        }
+
+        if(validAcre || validDate){
             return
         }
 
@@ -196,7 +220,7 @@ const CropsPlanning = () => {
                 
                     <FormGroupItem style={{ marginLeft : 15 }}>
                         <FormLabel>Crop</FormLabel>
-                        <SelectBox invalid={indicator.crop} disabled={formData.season === "" ? true : false} name={"crop"} value={formData.crop} type="select" className={"form-selectbox"} onChange={handleOnChange}>
+                        <SelectBox style={{ opacity: formData.season === "" ? 0.5 : "" }} invalid={indicator.crop} disabled={formData.season === "" ? true : false} name={"crop"} value={formData.crop} type="select" className={"form-selectbox"} onChange={handleOnChange}>
                             <Option hidden={true} selected={true}>Select Crop</Option>
                             {crops.map((item) => {
                                 return <Option>{item.name}</Option>
@@ -207,19 +231,22 @@ const CropsPlanning = () => {
                     <FormGroupItem style={{ marginRight : 15 }}>
                         <FormLabel>Acre</FormLabel>
                         <Input invalid={indicator.acre} placeholder={"Number Of Acre"} name={"acre"} value={formData.acre} type='number' className={'form-textbox'} onChange={handleOnChange} />
+                        <Validation show={validAcre}>Acre should be greater then 0 and less then 5000</Validation>
                     </FormGroupItem>
                 
                     <FormGroupItem style={{ marginLeft : 15 }}>
                         <FormLabel>Start Date</FormLabel>
                         <DatePicker invalid={indicator.startDate} name={"startDate"} value={formData.startDate} type='date' className={"form-datebox"} onChange={handleOnChange} />
+                        <Validation show={validDate}>{message}</Validation>
                     </FormGroupItem>
                 
                     <FormGroupItem style={{ marginRight : 15 }}>
                         <FormLabel>End Date</FormLabel>
                         <DatePicker invalid={indicator.endDate} name={"endDate"} value={formData.endDate} type='date' className={"form-datebox"} onChange={handleOnChange} />
+                        <Validation show={validDate}>{message}</Validation>
                     </FormGroupItem>
                 </FormGroupContainer>
-
+                            
                 <FormButtonContainer>
                     <FormButton>{update ? "Update" : "Save"} Plan</FormButton>
                 </FormButtonContainer>
@@ -348,4 +375,22 @@ const ActionCellContainer = styled.div`
     font-size: 16px;
     align-items: center;
     justify-content: space-evenly;
+`
+
+const Validation = styled.div`
+    top: 70px;
+    position: absolute;
+    left: calc(100% - 305px);
+    
+    width: 305px;
+    padding: 5px;
+
+    cursor: default;
+    font-weight: 600;
+    border-radius: 5px;
+    border: 1px solid red;
+    
+    color: white;
+    background-color: #FF1717D9;
+    display: ${(props) => props.show ? "block" : "none"}
 `

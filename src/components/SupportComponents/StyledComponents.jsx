@@ -11,6 +11,7 @@ export const FormGroupContainer = styled.div`
 
 export const FormGroupItem = styled.div`
     display: grid;
+    position: relative;
 `
 
 export const FormLabel = styled.label`

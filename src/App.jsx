@@ -78,12 +78,12 @@ const App = () => {
 	}
 
 	return (
-		<>
+		<div style={{ userSelect : "none" }}>
 			<Routes>
 				{render()}
 			</Routes>
 			<Loading />
-		</>
+		</div>
 	)
 }
 

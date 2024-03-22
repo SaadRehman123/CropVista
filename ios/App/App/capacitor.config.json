@@ -1,8 +1,0 @@
-{
-	"appId": "com.cropvista.app",
-	"appName": "cropvista-app",
-	"webDir": "build",
-	"server": {
-		"androidScheme": "https"
-	}
-}

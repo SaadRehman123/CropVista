@@ -4,7 +4,7 @@
     box-sizing: border-box !important;
     color: rgba(0, 0, 0, 0.87) !important;
     display: block !important;
-    font-family: Roboto, RobotoFallback, "Noto Kufi Arabic", Helvetica, Arial, sans-serif !important;
+    font-family: 'RobotoFallback', RobotoFallback, "Noto Kufi Arabic", Helvetica, Arial, sans-serif !important;
     font-weight: 500 !important; 
     pointer-events: auto !important;
     text-align: left !important; 
@@ -15,6 +15,110 @@
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
 }
 
-.popup-header .close{
+.popup-header .close {
     padding: 14px 15px !important;
+}
+
+.form-selectbox .dx-texteditor-input  {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border: 1px solid #ced4da;
+    border-right: 0px ;
+    height: 40px;
+    background-color: #FFFFFF;
+}
+
+.form-selectbox .dx-texteditor-buttons-container {
+    border: 1px solid #ced4da;
+    background-color: #FFFFFF;
+    border-left: 0px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.form-selectbox::before {
+    border: 0 !important;
+}
+
+.form-selectbox::after {
+    border: 0 !important;
+}
+
+.form-numberbox .dx-texteditor-input  {
+    border-radius: 3px;
+    border: 1px solid #ced4da;
+    border-right: 0px ;
+    height: 40px;
+    background-color: #FFFFFF;
+}
+
+.form-numberbox .dx-texteditor-buttons-container {
+    border: 1px solid #ced4da;
+    background-color: #FFFFFF;
+    border-left: 0px;
+    border-radius: 3px;
+}
+
+.form-numberbox::before {
+    border: 0 !important;
+}
+
+.form-numberbox::after {
+    border: 0 !important;
+}
+
+.form-datebox .dx-texteditor-input  {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border: 1px solid #ced4da;
+    border-right: 0px ;
+    height: 40px;
+    background-color: #FFFFFF;
+}
+
+.form-datebox .dx-texteditor-buttons-container {
+    border: 1px solid #ced4da;
+    background-color: #FFFFFF;
+    border-left: 0px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.form-datebox::before {
+    border: 0 !important;
+}
+
+.form-datebox::after {
+    border: 0 !important;
+}
+
+.form-action-button{
+    border-color: #0AB39C !important;
+    background-color: #0AB39C !important;
+}
+
+.form-action-button:focus{
+    box-shadow: none !important;
+}
+
+.form-action-button:hover{
+    border-color: #099280 !important;
+    background-color: #099280 !important;
+}
+
+.form-close-button{
+    width: 70px !important;
+    margin-right: 10px !important;
+    color: rgb(14, 14, 14) !important;
+    border-color: #E9EBEC !important;
+    background-color: #E9EBEC !important;
+}
+
+.form-close-button:focus{
+    box-shadow: none !important;
+}
+
+.form-close-button:hover{
+    border-color: #D8DADB !important;
+    background-color: #D8DADB !important;
 }

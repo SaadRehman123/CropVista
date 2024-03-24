@@ -1,8 +1,10 @@
-import React from 'react';
+import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import CropsPlanning from '../components/Crops/CropsPlanning'
-import DashboardContainer from '../components/Dashboard/DashboardContainer'
+
+import Production from '../components/Cards/Production'
+import CropsPlanning from '../components/Production/Crops/CropsPlanning'
+import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
 
 const AppRoutes = () => {
     return (
@@ -14,7 +16,11 @@ const AppRoutes = () => {
                     element={<DashboardContainer />}>
                 </Route>
                 <Route
-                    path="crops-planning"
+                    path="production"
+                    element={<Production />}>
+                </Route>
+                <Route
+                    path="crop-plan"
                     element={<CropsPlanning />}>
                 </Route>
             </Routes>

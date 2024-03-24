@@ -1,0 +1,22 @@
+#content{
+    overflow-y: scroll !important;
+}
+
+#content::-webkit-scrollbar{
+    width: 0px !important;
+}
+
+.treelist-edit-button{
+    border: none;
+    cursor: pointer;
+    font-weight: 700 !important;
+    background-color: transparent;
+    color: #405189 !important;
+}
+
+.treelist-delete-button{
+    border: none;
+    cursor: pointer;
+    color: red !important;
+    background-color: transparent;
+}

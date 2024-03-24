@@ -46,8 +46,10 @@ const DeletePopup = () => {
             }
 
             dispatch(deleteCropsPlan(selectedRow[0].id, obj)).then(res => {
-                if(res.payload.data.success){
-                    dispatch(getPlannedCrops())
+                const data = res.payload.data
+                if(data.success){
+                    instance.getDataSource().store().remove(data.result.id)
+                    instance.refresh()
                 }
             })
             handleOnToggle(deletePopup.type)

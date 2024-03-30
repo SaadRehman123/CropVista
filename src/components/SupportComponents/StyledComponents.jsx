@@ -23,3 +23,16 @@ export const FormButtonContainer = styled.div`
     align-items: center;
     flex-direction: row-reverse;
 `
+
+export const CellContainer = styled.div`
+    display: flex;
+    height: 100%;
+`
+
+export const CellContent = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 8px;
+    padding-right: 8px;
+`

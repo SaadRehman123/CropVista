@@ -2,8 +2,13 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { getPlannedCrops } from '../../../actions/CropsActions'
 import { setNavToolbarTitle } from '../../../actions/ViewActions'
+
+import DashboardNavigation from './DashboardNavigation'
+import ProductionNavigation from './ProductionNavigation'
+import InventoryNavigation from './InventoryNavigation'
+import PurchaseNavigation from './PurchaseNavigation'
+import SalesNavigation from './SalesNavigation'
 
 import styled from 'styled-components'
 
@@ -48,81 +53,11 @@ const NavigationContainer = () => {
 
     return (
         <Container>
-            <SectionContainer>
-                <DropIcon className={sectionsState.overview ? 'fal fa-chevron-down' : 'fal fa-chevron-right'} marginTop={13} onClick={() => handleOnExpand('overview')} /><Title marginTop={15} marginRight={95}>Overview</Title>
-            </SectionContainer>
-            <NavNavigationContainer height={sectionsState.overview ? 45 : 0}>
-                {navigations.map(item => {
-                    return (
-                        item.type === 'overview' && (
-                            <ItemContainer pad={item.pad} active={activeTab === item.id} onClick={() => handleOnClick(item)} key={item.id}>
-                                <Icon className={item.icon} />
-                                <NavigationButton>{item.name}</NavigationButton>
-                            </ItemContainer>
-                        )
-                    )
-                })}
-            </NavNavigationContainer>
-            <SectionContainer>
-                <DropIcon className={sectionsState.production ? 'fal fa-chevron-down' : 'fal fa-chevron-right'} marginTop={10} onClick={() => handleOnExpand('production')} /><Title marginTop={10} marginRight={78} onClick={() => handleOnSectionClick('production')}>Production</Title>
-            </SectionContainer>
-            <NavNavigationContainer height={sectionsState.production ? 100 : 0}>
-                {navigations.map(item => {
-                    return (
-                        item.type === 'production' && (
-                            <ItemContainer pad={item.pad} active={activeTab === item.id} onClick={() => handleOnClick(item)} key={item.id}>
-                                <Icon className={item.icon} />
-                                <NavigationButton style={{ paddingTop: 2 }}>{item.name}</NavigationButton>
-                            </ItemContainer>
-                        )
-                    )
-                })}
-            </NavNavigationContainer>
-            <SectionContainer>
-                <DropIcon className={sectionsState.inventory ? 'fal fa-chevron-down' : 'fal fa-chevron-right'} marginTop={10} onClick={() => handleOnExpand('inventory')} /><Title marginTop={10} marginRight={87} onClick={() => handleOnSectionClick('inventory')}>Inventory</Title>
-            </SectionContainer>
-            <NavNavigationContainer height={sectionsState.inventory ? 100 : 0}>
-                {navigations.map(item => {
-                    return (
-                        item.type === 'inventory' && (
-                            <ItemContainer pad={item.pad} active={activeTab === item.id} onClick={() => handleOnClick(item)} key={item.id}>
-                                <Icon className={item.icon} />
-                                <NavigationButton style={{ paddingTop: 2 }}>{item.name}</NavigationButton>
-                            </ItemContainer>
-                        )
-                    )
-                })}
-            </NavNavigationContainer>
-            <SectionContainer>
-                <DropIcon className={sectionsState.purchase ? 'fal fa-chevron-down' : 'fal fa-chevron-right'} marginTop={10} onClick={() => handleOnExpand('purchase')} /><Title marginTop={10} marginRight={90} onClick={() => handleOnSectionClick('purchase')}>Purchase</Title>
-            </SectionContainer>
-            <NavNavigationContainer height={sectionsState.purchase ? 100 : 0}>
-                {navigations.map(item => {
-                    return (
-                        item.type === 'purchase' && (
-                            <ItemContainer pad={item.pad} active={activeTab === item.id} onClick={() => handleOnClick(item)} key={item.id}>
-                                <Icon className={item.icon} />
-                                <NavigationButton style={{ paddingTop: 2 }}>{item.name}</NavigationButton>
-                            </ItemContainer>
-                        )
-                    )
-                })}
-            </NavNavigationContainer>
-            <SectionContainer>
-                <DropIcon className={sectionsState.sales ? 'fal fa-chevron-down' : 'fal fa-chevron-right'} marginTop={10} onClick={() => handleOnExpand('sales')} /><Title marginTop={10} marginRight={116} onClick={() => handleOnSectionClick('sales')}>Sales</Title>
-            </SectionContainer>
-            <NavNavigationContainer height={sectionsState.sales ? 100 : 0}>
-                {navigations.map(item => {
-                    return (
-                        item.type === 'sales' && (
-                            <ItemContainer pad={item.pad} active={activeTab === item.id} onClick={() => handleOnClick(item)} key={item.id}>
-                                <Icon className={item.icon} />
-                                <NavigationButton style={{ paddingTop: 2 }}>{item.name}</NavigationButton>
-                            </ItemContainer>
-                        )
-                    )
-                })}
-            </NavNavigationContainer>
+            <DashboardNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} />
+            <ProductionNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick}/>
+            {/* <InventoryNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} />
+            <PurchaseNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} />
+            <SalesNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} /> */}
         </Container>
     )
 }
@@ -135,68 +70,6 @@ const Container = styled.div`
     align-items: center;
     flex-direction: column;
     justify-content: center;
-`
-
-const SectionContainer = styled.div`
-    display: flex;
-    cursor: pointer;
-    align-items: center;
-`
-
-const NavNavigationContainer = styled.div`
-    overflow: hidden;
-    height: ${(prop) => prop.height}px;
-    transition: height 0.4s ease-in-out;
-`
-
-const DropIcon = styled.i`
-    color: #333C44;
-    font-weight: 700;
-
-    margin-right: 4px;
-    margin-top: ${(prop) => prop.marginTop}px;
-`
-
-const Title = styled.span`
-    font-size: 13px;
-    font-family: 'RobotoFallback';
-    
-    color: #333C44;
-    font-weight: 600;
-    text-transform: uppercase;
-
-    margin-top: ${(prop) => prop.marginTop}px;
-    margin-right: ${(prop) => prop.marginRight}px;
-`
-
-const ItemContainer = styled.div`
-    width: 165px;
-    font-size: 14px;
-    border-radius: 5px;
-    
-    margin-top: 5px;
-    margin-bottom: 2px;
-
-    cursor: pointer;
-    overflow: hidden;
-
-    color: #1F272E;
-    padding: ${(prop) => `8px 12px 8px ${prop.pad}px`};
-    background-color: ${prop => prop.active ? "#EBEEF0" : "transparent"};
-
-    &:hover{
-        background-color: #EBEEF0;
-    }
-`
-
-const Icon = styled.i`
-    font-size: 18px;
-    position: relative;
-`
-
-const NavigationButton = styled.button`
-    border: none;
-    background-color: transparent;
 `
 
 const navigations = [

@@ -19,14 +19,14 @@ const CreatePlan = () => {
     const createPlanPopup = useSelector(state => state.popup.toggleCreatePlanPopup)
     
     const [validationErrors, setValidationErrors] = useState([])
-    const [formData, setFormData] = useState({ season: "", crop: "", acre: "", startDate: "", endDate: "" })
+    const [formData, setFormData] = useState({ season: "", crop: "", acre: "", startDate: "", endDate: "", status: "" })
     const [invalid, setInvalid] = useState({ season: false, crop: false, acre: false, startDate: false, endDate: false })
     
     const dispatch = useDispatch()
 
     const toggle = () => {
         dispatch(toggleCreatePlanPopup({ open: false, type: "" }))
-        setFormData({ season: "", crop: "", acre: "", startDate: "", endDate: "" })
+        setFormData({ season: "", crop: "", acre: "", startDate: "", endDate: "", status: "" })
         setInvalid({ season: false, crop: false, acre: false, startDate: false, endDate: false })
     }
 
@@ -44,7 +44,8 @@ const CreatePlan = () => {
                 crop: selectedRow[0].crop,
                 acre: (selectedRow[0].acre).toString(),
                 startDate: selectedRow[0].startdate,
-                endDate: selectedRow[0].enddate
+                endDate: selectedRow[0].enddate,
+                status: selectedRow[0].status
             })        
         }
     }, [createPlanPopup.type])
@@ -119,11 +120,13 @@ const CreatePlan = () => {
         const selectedRow = instance.getSelectedRowsData()
 
         const task = {
+            id: "",
             season: formData.season,
             crop: formData.crop,
             acre: parseInt(formData.acre),
             startdate: moment(formData.startDate).format("YYYY-MM-DD"),
-            enddate: moment(formData.endDate).format("YYYY-MM-DD")
+            enddate: moment(formData.endDate).format("YYYY-MM-DD"),
+            status: "Pending"
         }
 
         if (formData.season.trim() === "" || formData.crop.trim() === "" || setFormDataAcre(formData).trim() === "" || moment(formData.startDate).format("DD/MM/yyyy") === "Invalid date" || moment(formData.endDate).format("DD/MM/yyyy") === "Invalid date") {
@@ -150,6 +153,9 @@ const CreatePlan = () => {
                     instance.refresh()
                     notify("Crop Plan Create Successfully", "info", 2000)
                 }
+                else {
+                    notify(data.message, "info", 2000)
+                }
                 toggle()
             })
         }
@@ -161,6 +167,9 @@ const CreatePlan = () => {
                         instance.getDataSource().store().update(data.result.id, data.result)
                         instance.refresh()
                         notify("Crop Plan Updated Successfully", "info", 2000)
+                    }
+                    else {
+                        notify(data.message, "info", 2000)
                     }
                     toggle()
                 })
@@ -300,23 +309,27 @@ const setFormDataAcre = (formData) => {
 }
 
 const validateChanges = (selectedRow, formData) => {
+
+    const { id, ...task } = formData
+
     const reconstructedStructure = {
         season: selectedRow[0].season,
         crop: selectedRow[0].crop,
         acre: selectedRow[0].acre,
         startdate: moment(selectedRow[0].startdate).format("YYYY-MM-DD"),
-        enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD")
+        enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD"),
+        status: selectedRow[0].status
     }
 
     const keys1 = Object.keys(reconstructedStructure)
-    const keys2 = Object.keys(formData)
+    const keys2 = Object.keys(task)
     
     if (keys1.length !== keys2.length) {
         return true
     }
 
     for (const key of keys1) {
-        if (reconstructedStructure[key] !== formData[key]) {
+        if (reconstructedStructure[key] !== task[key]) {
             return true
         }
     }

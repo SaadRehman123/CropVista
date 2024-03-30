@@ -1,9 +1,8 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-
 import Production from '../components/Cards/Production'
-import CropsPlanning from '../components/Production/Crops/CropsPlanning'
+import CropPlan from '../components/Production/Crops/CropPlan'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
 
 const AppRoutes = () => {
@@ -21,7 +20,7 @@ const AppRoutes = () => {
                 </Route>
                 <Route
                     path="crop-plan"
-                    element={<CropsPlanning />}>
+                    element={<CropPlan />}>
                 </Route>
             </Routes>
         </div>

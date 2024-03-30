@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalHeader } from 'reactstrap'
 
 import moment from 'moment'
+import notify from 'devextreme/ui/notify'
 
 import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteCropsPlan, getPlannedCrops } from '../../actions/CropsActions'
@@ -38,7 +39,7 @@ const DeletePopup = () => {
             const selectedRow = instance.getSelectedRowsData()
             
             const obj = {
-                id: "",
+                id: selectedRow[0].id,
                 season: selectedRow[0].season,
                 crop: selectedRow[0].crop,
                 acre: parseInt(selectedRow[0].acre),
@@ -52,6 +53,10 @@ const DeletePopup = () => {
                 if(data.success){
                     instance.getDataSource().store().remove(data.result.id)
                     instance.refresh()
+                }
+                else {
+                    notify(data.message + " ...Refreshing", "info", 2000)
+                    setTimeout(() => dispatch(getPlannedCrops()), 1000)
                 }
             })
             handleOnToggle(deletePopup.type)

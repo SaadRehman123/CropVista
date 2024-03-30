@@ -9,7 +9,7 @@ import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap'
 import { FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../SupportComponents/StyledComponents'
 
 import { toggleCreatePlanPopup } from '../../actions/PopupActions'
-import { addCropsPlan, getCropsBySeason, updateCropsPlan } from '../../actions/CropsActions'
+import { addCropsPlan, getCropsBySeason, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
 
 const CreatePlan = () => {
 
@@ -105,6 +105,10 @@ const CreatePlan = () => {
                 flag = true
                 setValidationErrors([{ message: "Planning period must exceed 3 months" }])
             }
+            if (diffMonths > 8) {
+                flag = true
+                setValidationErrors([{ message: "Planning period must not exceed 8 months" }])
+            }
         }
         
         setInvalid(prevInvalid => ({
@@ -169,7 +173,8 @@ const CreatePlan = () => {
                         notify("Crop Plan Updated Successfully", "info", 2000)
                     }
                     else {
-                        notify(data.message, "info", 2000)
+                        notify(data.message + " ...Refreshing", "info", 2000)
+                        setTimeout(() => dispatch(getPlannedCrops()), 1000)
                     }
                     toggle()
                 })
@@ -227,10 +232,12 @@ const CreatePlan = () => {
                             elementAttr={{
                                 class: "form-numberbox"
                             }}
+                            step={1}
                             accessKey={'acre'}
-                            value={formData.acre}
+                            value={Math.round(formData.acre)}
                             onFocusIn={handleOnFocusIn}
                             onFocusOut={handleOnFocusOut}
+                            format={(value) => value.toString()}
                             placeholder={"Enter Acre i.e (1 - 5000)"}
                             onValueChanged={(e) => onValueChanged(e, 'acre')}
                             validationStatus={invalid.acre === false ? "valid" : "invalid"}

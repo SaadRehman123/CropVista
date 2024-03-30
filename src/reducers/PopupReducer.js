@@ -1,5 +1,6 @@
 const INITIAL_STATE = {
-	toggleSettingPopup : false
+	toggleSettingPopup : false,
+	toggleCreatePlanPopup : { open: false, type: ""},
 }
 
 const PopupReducer = (state = INITIAL_STATE, action) => {
@@ -8,6 +9,12 @@ const PopupReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 toggleSettingPopup: action.payload
+            }
+        }
+        case "TOGGLE_CREATE_PLAN_POPUP": {
+            return {
+                ...state,
+                toggleCreatePlanPopup: action.payload
             }
         }
 		default: return state

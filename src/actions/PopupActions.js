@@ -4,3 +4,10 @@ export const toggleSettingPopup = (obj) => {
 		payload : obj
 	}
 }
+
+export const toggleCreatePlanPopup = (obj) => {
+    return {
+		type : "TOGGLE_CREATE_PLAN_POPUP",
+		payload : obj
+	}
+}

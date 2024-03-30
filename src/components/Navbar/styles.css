@@ -1,16 +1,17 @@
 .nav-toggle-button{
     font-size: 16px;
-    font-weight: 700;
-    color: #C0C6CC;
+    font-weight: 600;
+    color: #A4ADB7;
     margin-left: 10px;
     margin-right: 8px;
 }
 
 .nav-toolbar-title{
-    margin: 0;
-    font-size: 25px;
-    font-weight: 500;
-    color: #1F272E;
+    font-size: 20px;
+    font-family: 'RobotoFallback';
+    color: #333C44;
+    font-weight: 600;
+    text-transform: capitalize;
 }
 
 .navbar-drawer-container{

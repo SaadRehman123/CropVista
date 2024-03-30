@@ -1,0 +1,25 @@
+#card{
+    cursor: pointer;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+#card:hover{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.card-header{
+    font-size: 17px !important;
+    font-weight: 500 !important;
+    padding: 10px !important;
+    font-family: 'RobotoFallback' !important;
+}
+
+.card-body{
+    padding: 15px !important;
+}
+
+.card-text{
+    font-size: 14px;
+    font-weight: 400;
+    font-family: sans-serif;
+}

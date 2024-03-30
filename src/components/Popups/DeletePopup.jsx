@@ -38,16 +38,20 @@ const DeletePopup = () => {
             const selectedRow = instance.getSelectedRowsData()
             
             const obj = {
+                id: "",
                 season: selectedRow[0].season,
                 crop: selectedRow[0].crop,
                 acre: parseInt(selectedRow[0].acre),
                 startdate: moment(selectedRow[0].startdate).format("YYYY-MM-DD"),
-                enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD")
+                enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD"),
+                status: selectedRow[0].status,
             }
 
             dispatch(deleteCropsPlan(selectedRow[0].id, obj)).then(res => {
-                if(res.payload.data.success){
-                    dispatch(getPlannedCrops())
+                const data = res.payload.data
+                if(data.success){
+                    instance.getDataSource().store().remove(data.result.id)
+                    instance.refresh()
                 }
             })
             handleOnToggle(deletePopup.type)

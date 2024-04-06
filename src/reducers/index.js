@@ -5,6 +5,7 @@ import ViewReducer from "./ViewReducer"
 import PopupReducer from "./PopupReducer"
 import CropsReducer from "./CropsReducer"
 import SeasonsReducer from "./SeasonsReducer"
+import WarehouseReducer from "./WarehouseReducer"
 
 const rootReducers = combineReducers({
     user: UserReducer,
@@ -12,6 +13,7 @@ const rootReducers = combineReducers({
     popup: PopupReducer,
     crops: CropsReducer,
     seasons: SeasonsReducer,
+    warehouse: WarehouseReducer
 })
 
 export default rootReducers

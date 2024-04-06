@@ -7,7 +7,7 @@ const SalesNavigation = (props) => {
             <SectionContainer>
                 <DropIcon className={props.sectionsState.sales ? 'fal fa-chevron-down' : 'fal fa-chevron-right'} marginTop={10} onClick={() => props.handleOnExpand('sales')} /><Title marginTop={10} marginRight={116} onClick={() => props.handleOnSectionClick('sales')}>Sales</Title>
             </SectionContainer>
-            <NavNavigationContainer height={props.sectionsState.sales ? 100 : 0}>
+            <NavNavigationContainer height={props.sectionsState.sales ? 200 : 0}>
                 {props.navigations.map(item => {
                     return (
                         item.type === 'sales' && (

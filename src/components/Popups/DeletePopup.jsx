@@ -24,11 +24,17 @@ const DeletePopup = () => {
         if (deletePopup.type === 'CROP_PLAN') {
             return 'Delete Crop Plan'
         }
+        else if (deletePopup.type === 'WAREHOUSE') {
+            return 'Delete Warehouse'
+        }
     }, [deletePopup])
 
     const renderText = () => {
         if (deletePopup.type === 'CROP_PLAN') {
             return 'Are you sure you want to delete selected Crop Plan?'
+        }
+        else if (deletePopup.type === 'WAREHOUSE') {
+            return 'Are you sure you want to delete selected Warehouse?'
         }
     }
 

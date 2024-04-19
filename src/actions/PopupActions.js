@@ -11,3 +11,17 @@ export const toggleCreatePlanPopup = (obj) => {
 		payload : obj
 	}
 }
+
+export const toggleCreateWarehousePopup = (obj) => {
+    return {
+		type : "TOGGLE_CREATE_WAREHOUSE_POPUP",
+		payload : obj
+	}
+}
+
+export const toggleCreateResourcePopup = (obj) => {
+    return {
+		type : "TOGGLE_CREATE_RESOURCE_POPUP",
+		payload : obj
+	}
+}

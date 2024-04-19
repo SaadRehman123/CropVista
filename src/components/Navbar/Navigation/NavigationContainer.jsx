@@ -29,7 +29,7 @@ const NavigationContainer = () => {
 
     const handleOnExpand = (section) => {
         setSectionsState(prevState => ({
-            ...prevState, 
+            ...prevState,
             [section]: !prevState[section]
         }))
     }
@@ -37,6 +37,9 @@ const NavigationContainer = () => {
     const handleOnSectionClick = (section) => {
         if (section === "production"){
             navigate('/app/production')
+        }
+        else if (section === "inventory"){
+            navigate('/app/inventory')
         }
     }
 
@@ -49,15 +52,23 @@ const NavigationContainer = () => {
             navigate('/app/crop-plan')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        else if(obj.id === "warehouse"){
+            navigate('/app/warehouse')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
+        else if(obj.id === "resource"){
+            navigate('/app/resource')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
     }
 
     return (
         <Container>
             <DashboardNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} />
-            <ProductionNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick}/>
-            {/* <InventoryNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} />
-            <PurchaseNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} />
-            <SalesNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} /> */}
+            <ProductionNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
+            <InventoryNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
+            {/* <PurchaseNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} /> */}
+            {/* <SalesNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} /> */}
         </Container>
     )
 }
@@ -74,5 +85,7 @@ const Container = styled.div`
 
 const navigations = [
     {id: "dashboard", name: "Dashboard", icon: "fal fa-analytics", pad: 20, type: "overview"},
+    {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 20, type: "inventory"},
+    {id: "resource", name: "Resources", icon: "fal fa-user-plus", pad: 20, type: "inventory"},
     {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 25, type: "production"},
 ]

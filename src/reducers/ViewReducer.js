@@ -3,6 +3,8 @@ const INITIAL_STATE = {
     navbar: false,
     loading: false,
 	cropPlanRef: null,
+	resourceRef: null,
+	warehouseRef: null,
 	setNavToolbarTitle: 'Dashboard',
     deletePopup: { active: false, type: "" },
 }
@@ -31,6 +33,18 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 cropPlanRef: action.payload
+            }
+        }
+		case "SET_WAREHOUSE_REF": {
+            return {
+                ...state,
+                warehouseRef: action.payload
+            }
+        }
+		case "SET_RESOURCE_REF": {
+            return {
+                ...state,
+                resourceRef: action.payload
             }
         }
 		case "TOGGLE_NAVBAR": {

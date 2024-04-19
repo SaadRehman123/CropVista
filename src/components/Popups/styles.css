@@ -67,6 +67,60 @@
     border: 0 !important;
 }
 
+.form-textbox .dx-texteditor-input  {
+    border-radius: 3px;
+    border: 1px solid #ced4da;
+    border-right: 0px ;
+    height: 40px;
+    background-color: #FFFFFF;
+}
+
+.form-textbox .dx-texteditor-buttons-container {
+    border: 1px solid #ced4da;
+    background-color: #FFFFFF;
+    border-left: 0px;
+    border-radius: 3px;
+}
+
+.form-textbox::before {
+    border: 0 !important;
+}
+
+.form-textbox::after {
+    border: 0 !important;
+}
+
+/* ///asdadad */
+
+.dx-textarea .dx-texteditor-input-container{
+    margin: 0px !important;
+}
+
+.form-areabox .dx-texteditor-input  {
+    border-radius: 3px;
+    border: 1px solid #ced4da;
+    border-right: 0px ;
+    height: 40px;
+    background-color: #FFFFFF;
+}
+
+.form-areabox .dx-texteditor-buttons-container {
+    border: 1px solid #ced4da;
+    background-color: #FFFFFF;
+    border-left: 0px;
+    border-radius: 3px;
+}
+
+.form-areabox::before {
+    border: 0 !important;
+}
+
+.form-areabox::after {
+    border: 0 !important;
+}
+
+/* sadada */
+
 .form-datebox .dx-texteditor-input  {
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;

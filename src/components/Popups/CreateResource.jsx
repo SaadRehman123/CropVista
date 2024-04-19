@@ -3,41 +3,39 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import notify from 'devextreme/ui/notify'
 
-import { CheckBox, TextBox, SelectBox } from 'devextreme-react'
+import { TextBox, SelectBox } from 'devextreme-react'
 import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap'
 
-import { toggleCreateWarehousePopup } from '../../actions/PopupActions'
-import { addWarehouse, getWarehouse, updateWarehouse } from '../../actions/WarehouseAction'
+import { toggleCreateResourcePopup } from '../../actions/PopupActions'
+import { addResource, getResource, updateResource } from '../../actions/ResourceAction'
 import { FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../SupportComponents/StyledComponents'
 
-const CreateWarehouse = () => {
+const CreateResource = () => {
 
-    const warehouseRef = useSelector(state => state.view.warehouseRef)
-    const createWarehouse = useSelector(state => state.popup.toggleCreateWarehousePopup)
+    const resourceRef = useSelector(state => state.view.resourceRef)
+    const createResource = useSelector(state => state.popup.toggleCreateResourcePopup)
 
-    const [invalid, setInvalid] = useState({ name: false, wrType: false, location: false })
-    const [formData, setFormData] = useState({ name: "", wrType: "", location: "", active: false })
+    const [invalid, setInvalid] = useState({ name: false, rType: false })
+    const [formData, setFormData] = useState({ name: "", rType: "" })
 
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if (createWarehouse.type === "UPDATE") {            
-            const instance = warehouseRef.current.instance
+        if (createResource.type === "UPDATE") {            
+            const instance = resourceRef.current.instance
             const selectedRow = instance.getSelectedRowsData()
             
             setFormData({
                 name: selectedRow[0].name,
-                wrType: selectedRow[0].wrType,
-                location: selectedRow[0].location,
-                active: selectedRow[0].active
+                rType: selectedRow[0].rType
             })        
         }
-    }, [createWarehouse.type])
+    }, [createResource.type])
 
     const toggle = () => {
-        setInvalid({ name: false, wrType: false, location: false })
-        dispatch(toggleCreateWarehousePopup({ open: false, type: "" }))
-        setFormData({ name: "", wrType: "", location: "", active: true })
+        setInvalid({ name: false, rType: false })
+        dispatch(toggleCreateResourcePopup({ open: false, type: "" }))
+        setFormData({ name: "", rType: "" })
     }
 
     const onValueChanged = (e, name) => {
@@ -64,26 +62,24 @@ const CreateWarehouse = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
 
-        const instance = warehouseRef.current.instance
+        const instance = resourceRef.current.instance
         const selectedRow = instance.getSelectedRowsData()
 
         const task = {
-            wrId: "",
+            rId: "",
             name: formData.name,
-            wrType: formData.wrType,
-            active: formData.active,
-            location: formData.location
+            rType: formData.rType
         }
 
-        if (formData.name.trim() === "" || formData.wrType.trim() === "" || formData.location.trim() === "") {
+        if (formData.name.trim() === "" || formData.rType.trim() === "") {
             return
         }
 
-        if (invalid.name === true || invalid.wrType === true || invalid.location === true) {
+        if (invalid.name === true || invalid.rType === true) {
             return
         }
 
-        if(createWarehouse.type === "UPDATE"){
+        if(createResource.type === "UPDATE"){
             const isUpdated = validateChanges(selectedRow, task)
             if(!isUpdated){
                 notify("No Changes Detected", "info", 2000)
@@ -91,13 +87,13 @@ const CreateWarehouse = () => {
             }
         }
 
-        if(createWarehouse.type === "CREATE"){
-            dispatch(addWarehouse(task)).then(res => {
+        if(createResource.type === "CREATE"){
+            dispatch(addResource(task)).then(res => {
                 const data = res.payload.data
                 if(data.success) {
                     instance.getDataSource().store().insert(data.result)
                     instance.refresh()
-                    notify("Warehouse Create Successfully", "info", 2000)
+                    notify("Resource Create Successfully", "info", 2000)
                 }
                 else {
                     notify(data.message, "info", 2000)
@@ -105,18 +101,18 @@ const CreateWarehouse = () => {
                 toggle()
             })
         }
-        else if (createWarehouse.type === "UPDATE") {
+        else if (createResource.type === "UPDATE") {
             if(selectedRow.length > 0){
-                dispatch(updateWarehouse(selectedRow[0].wrId, task)).then(res => {
+                dispatch(updateResource(selectedRow[0].rId, task)).then(res => {
                     const data = res.payload.data
                     if(data.success){
-                        instance.getDataSource().store().update(data.result.wrId, data.result)
+                        instance.getDataSource().store().update(data.result.rId, data.result)
                         instance.refresh()
-                        notify("Warehouse Updated Successfully", "info", 2000)
+                        notify("Resource Updated Successfully", "info", 2000)
                     }
                     else {
                         notify(data.message + " ...Refreshing", "info", 2000)
-                        setTimeout(() => dispatch(getWarehouse()), 1000)
+                        setTimeout(() => dispatch(getResource()), 1000)
                     }
                     toggle()
                 })
@@ -125,8 +121,8 @@ const CreateWarehouse = () => {
     }
 
     const renderHeader = () => {
-        if (createWarehouse.type === "CREATE") return "Create Warehouse"
-        else if (createWarehouse.type === "UPDATE") return "Update Warehouse"
+        if (createResource.type === "CREATE") return "Create Resource"
+        else if (createResource.type === "UPDATE") return "Update Resource"
     }
 
     const renderBody = () => {
@@ -155,51 +151,21 @@ const CreateWarehouse = () => {
                             elementAttr={{
                                 class: "form-selectbox"
                             }}
-                            accessKey={'wrType'}
-                            value={formData.wrType}
+                            accessKey={'rType'}
+                            value={formData.rType}
                             onFocusIn={handleOnFocusIn}
-                            placeholder={"Select Warehouse Type"}
+                            placeholder={"Select Resource Type"}
                             onFocusOut={handleOnFocusOut}
-                            onValueChanged={(e) => onValueChanged(e, 'wrType')}
-                            dataSource={["Quarantine", "Finish Good", "Raw Material"]}
-                            validationStatus={invalid.wrType === false ? "valid" : "invalid"}
+                            onValueChanged={(e) => onValueChanged(e, 'rType')}
+                            dataSource={["Machine", "Labour"]}
+                            validationStatus={invalid.rType === false ? "valid" : "invalid"}
                         />
                     </FormGroupItem>
-                    
-                    <div style={{ display: 'flex', justifyContent: "space-between", marginTop: 5, marginBottom: 5 }}>                 
-                        <FormGroupItem>
-                            <FormLabel>Location</FormLabel>
-                            <TextBox
-                                elementAttr={{
-                                    class: "form-areabox"
-                                }}
-                                width={225}
-                                accessKey={'location'}
-                                value={formData.location}
-                                onFocusIn={handleOnFocusIn}
-                                placeholder={"Enter Location"}
-                                onFocusOut={handleOnFocusOut}
-                                onValueChanged={(e) => onValueChanged(e, 'location')}
-                                validationStatus={invalid.location === false ? "valid" : "invalid"}
-                            />
-                        </FormGroupItem>
-                        
-                        <FormGroupItem style={{ marginRight: 160 }}>
-                            <FormLabel>Active</FormLabel>
-                            <CheckBox
-                                style={{
-                                    marginBottom: 8
-                                }}
-                                value={formData.active}
-                                onValueChanged={(e) => onValueChanged(e, 'active')}
-                            />
-                        </FormGroupItem>
-                    </div>
-
                 </FormGroupContainer>
+
                 <FormButtonContainer style={{ marginTop: 20 }}>
                     <Button size="sm" className={"form-action-button"}>
-                        {createWarehouse.type === "UPDATE" ? "Update" : "Create"} Warehouse
+                        {createResource.type === "UPDATE" ? "Update" : "Create"} Resource
                     </Button>
                     <Button size="sm" className={"form-close-button"} onClick={() => toggle()}>
                         Close
@@ -210,24 +176,22 @@ const CreateWarehouse = () => {
     }
 
     return (
-        <Modal size={"l"} centered={true} backdrop={"static"} isOpen={createWarehouse.open} toggle={toggle}>
+        <Modal size={"l"} centered={true} backdrop={"static"} isOpen={createResource.open} toggle={toggle}>
             <ModalHeader className={"popup-header"} toggle={toggle}>{renderHeader()}</ModalHeader>
             <ModalBody>{renderBody()}</ModalBody>
         </Modal>
     )
 }
 
-export default CreateWarehouse
+export default CreateResource
 
 const validateChanges = (selectedRow, formData) => {
 
-    const { wrId, ...task } = formData
+    const { rId, ...task } = formData
 
     const reconstructedStructure = {
         name: selectedRow[0].name,
-        wrType: selectedRow[0].wrType,
-        location: selectedRow[0].location,
-        active: selectedRow[0].active
+        rType: selectedRow[0].rType
     }
 
     const keys1 = Object.keys(reconstructedStructure)

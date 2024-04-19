@@ -4,6 +4,7 @@ import { Route, Routes } from 'react-router-dom'
 import Inventory from '../components/Cards/Inventory'
 import Production from '../components/Cards/Production'
 import CropPlan from '../components/Production/Crops/CropPlan'
+import Resource from '../components/Inventory/Resource/Resource'
 import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
 
@@ -31,6 +32,10 @@ const AppRoutes = () => {
                 <Route
                     path="warehouse"
                     element={<Warehouse />}>
+                </Route>
+                <Route
+                    path="resource"
+                    element={<Resource />}>
                 </Route>
             </Routes>
         </div>

@@ -9,6 +9,7 @@ import RequireAuth from '@auth-kit/react-router/RequireAuth'
 import Loading from './components/SupportComponents/Loading'
 
 import { getSeasons } from './actions/SeasonsAction'
+import { getResource } from './actions/ResourceAction'
 import { getCookie } from './utilities/CommonUtilities'
 import { getWarehouse } from './actions/WarehouseAction'
 import { getPlannedCrops } from './actions/CropsActions'
@@ -32,6 +33,7 @@ const App = () => {
 		dispatch(getAllUsers()).catch((error) => console.error(error))
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
 		dispatch(getWarehouse()).catch((error) => console.error(error))
+		dispatch(getResource()).catch((error) => console.error(error))
         setUpApplication()
     }, [login])
 

@@ -34,6 +34,13 @@ export const setWarehouseRef = (obj) => {
     }
 }
 
+export const setResourceRef = (obj) => {
+    return {
+        type: "SET_RESOURCE_REF",
+        payload: obj
+    }
+}
+
 export const toggleNavbar = (value) => {
 	return {
 		type: "TOGGLE_NAVBAR",

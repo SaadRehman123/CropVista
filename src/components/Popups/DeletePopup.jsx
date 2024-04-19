@@ -7,14 +7,18 @@ import moment from 'moment'
 import notify from 'devextreme/ui/notify'
 
 import { toggleDeletePopup } from '../../actions/ViewActions'
+import { deleteResource, getResource } from '../../actions/ResourceAction'
 import { deleteCropsPlan, getPlannedCrops } from '../../actions/CropsActions'
+import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
 
 import styled from 'styled-components'
 
 const DeletePopup = () => {
     
+    const resourceRef = useSelector(state => state.view.resourceRef)
     const cropPlanRef = useSelector((state) => state.view.cropPlanRef)
     const deletePopup = useSelector((state) => state.view.deletePopup)
+    const warehouseRef = useSelector((state) => state.view.warehouseRef)
 
     const dispatch = useDispatch()
 
@@ -27,6 +31,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'WAREHOUSE') {
             return 'Delete Warehouse'
         }
+        else if (deletePopup.type === 'RESOURCE') {
+            return 'Delete Resource'
+        }
     }, [deletePopup])
 
     const renderText = () => {
@@ -36,11 +43,14 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'WAREHOUSE') {
             return 'Are you sure you want to delete selected Warehouse?'
         }
+        else if (deletePopup.type === 'RESOURCE') {
+            return 'Are you sure you want to delete selected Resource?'
+        }
     }
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
-        if(deletePopup.type === "CROP_PLAN"){
+        if(deletePopup.type === "CROP_PLAN") {
             const instance = cropPlanRef.current.instance
             const selectedRow = instance.getSelectedRowsData()
             
@@ -63,6 +73,54 @@ const DeletePopup = () => {
                 else {
                     notify(data.message + " ...Refreshing", "info", 2000)
                     setTimeout(() => dispatch(getPlannedCrops()), 1000)
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "WAREHOUSE") {
+            const instance = warehouseRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                wrId: selectedRow[0].wrId,
+                name: selectedRow[0].name,
+                wrType: selectedRow[0].wrType,
+                location: selectedRow[0].location,
+                active: selectedRow[0].active
+            }
+
+            dispatch(deleteWarehouse(selectedRow[0].wrId, obj)).then(res => {
+                const data = res.payload.data
+                if(data.success){
+                    instance.getDataSource().store().remove(data.result.wrId)
+                    instance.refresh()
+                }
+                else {
+                    notify(data.message + " ...Refreshing", "info", 2000)
+                    setTimeout(() => dispatch(getWarehouse()), 1000)
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "RESOURCE") {
+            const instance = resourceRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                rId: selectedRow[0].rId,
+                name: selectedRow[0].name,
+                rType: selectedRow[0].rType
+            }
+
+            dispatch(deleteResource(selectedRow[0].rId, obj)).then(res => {
+                const data = res.payload.data
+                if(data.success){
+                    instance.getDataSource().store().remove(data.result.rId)
+                    instance.refresh()
+                }
+                else {
+                    notify(data.message + " ...Refreshing", "info", 2000)
+                    setTimeout(() => dispatch(getResource()), 1000)
                 }
             })
             handleOnToggle(deletePopup.type)

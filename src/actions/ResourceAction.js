@@ -1,53 +1,53 @@
 import axios from "axios"
 import { Properties } from "../utilities/Properties"
 
-export const getWarehouse = () => {
+export const getResource = () => {
     const result = axios({
         method: 'GET',
-        url: `/rest/warehouse/getWarehouses`,
+        url: `/rest/resource/getResources`,
         ...Properties,
     })
     return {
-        type: 'GET_WAREHOUSES',
+        type: 'GET_RESOURCES',
         payload: result
     }
 }
 
-export const addWarehouse = (obj) => {
+export const addResource = (obj) => {
     const result = axios({
         method: 'POST',
-        url: `rest/warehouse/create`,
+        url: `rest/resource/create`,
         data: obj,
         ...Properties,
     })
     return {
-        type: 'ADD_WAREHOUSE',
+        type: 'ADD_RESOURCE',
         payload: result
     }
 }
 
-export const updateWarehouse = (id, obj) => {
+export const updateResource = (id, obj) => {
     const result = axios({
         method: 'POST',
-        url: `rest/warehouse/update/${id}`,
+        url: `rest/resource/update/${id}`,
         data: obj,
         ...Properties,
     })
     return {
-        type: 'UPDATE_WAREHOUSE',
+        type: 'UPDATE_RESOURCE',
         payload: result
     }
 }
 
-export const deleteWarehouse = (id, obj) => {
+export const deleteResource = (id, obj) => {
     const result = axios({
         method: 'POST',
-        url: `rest/warehouse/delete/${id}`,
+        url: `rest/resource/delete/${id}`,
         data: obj,
         ...Properties,
     })
     return {
-        type: 'UPDATE_WAREHOUSE',
+        type: 'UPDATE_RESOURCE',
         payload: result
     }
 }

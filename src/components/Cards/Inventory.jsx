@@ -15,6 +15,9 @@ const Inventory = () => {
         if (id === 1) {
             navigate('/app/warehouse')
         }
+        else if (id === 2) {
+            navigate('/app/resource')
+        }
     }
 
     const renderCards = () => {
@@ -50,4 +53,5 @@ const CardContainer = styled.div`
 
 const card = [
     { id: 1, name: "Warehouse", text: "Manage your warehouse inventory efficiently by categorizing items into Raw Materials, Finished Goods, and Quarantine. Track stock levels, organize storage to ensure smooth supply chain management"},
+    { id: 2, name: "Resource", text: "Efficiently manage your resources with real-time data. Add, update, and delete resources seamlessly to ensure smooth operations and optimal utilization"},
 ]

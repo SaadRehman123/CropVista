@@ -29,7 +29,7 @@ const NavigationContainer = () => {
 
     const handleOnExpand = (section) => {
         setSectionsState(prevState => ({
-            ...prevState, 
+            ...prevState,
             [section]: !prevState[section]
         }))
     }
@@ -54,6 +54,10 @@ const NavigationContainer = () => {
         }
         else if(obj.id === "warehouse"){
             navigate('/app/warehouse')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
+        else if(obj.id === "resource"){
+            navigate('/app/resource')
             dispatch(setNavToolbarTitle(obj.name))
         }
     }
@@ -82,5 +86,6 @@ const Container = styled.div`
 const navigations = [
     {id: "dashboard", name: "Dashboard", icon: "fal fa-analytics", pad: 20, type: "overview"},
     {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 20, type: "inventory"},
+    {id: "resource", name: "Resources", icon: "fal fa-user-plus", pad: 20, type: "inventory"},
     {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 25, type: "production"},
 ]

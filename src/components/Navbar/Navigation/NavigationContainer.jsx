@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { setNavToolbarTitle } from '../../../actions/ViewActions'
 
-import DashboardNavigation from './DashboardNavigation'
-import ProductionNavigation from './ProductionNavigation'
-import InventoryNavigation from './InventoryNavigation'
-import PurchaseNavigation from './PurchaseNavigation'
 import SalesNavigation from './SalesNavigation'
+import PurchaseNavigation from './PurchaseNavigation'
+import DashboardNavigation from './DashboardNavigation'
+import InventoryNavigation from './InventoryNavigation'
+import ProductionNavigation from './ProductionNavigation'
 
 import styled from 'styled-components'
 

@@ -41,6 +41,20 @@ export const setResourceRef = (obj) => {
     }
 }
 
+export const setBomRef = (obj) => {
+    return {
+        type: "SET_BOM_REF",
+        payload: obj
+    }
+}
+
+export const setItemResourceTreeRef = (obj) => {
+    return {
+        type: "SET_ITEM_RESOURCE_REF",
+        payload: obj
+    }
+}
+
 export const toggleNavbar = (value) => {
 	return {
 		type: "TOGGLE_NAVBAR",

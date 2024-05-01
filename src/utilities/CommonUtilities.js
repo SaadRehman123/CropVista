@@ -17,3 +17,23 @@ export const getCookie = (name) => {
     
     return null
 }
+
+export const treeToArray = (tree) => {
+    return tree.reduce((array, item) => {
+        if (item.children && item.children.length > 0) {
+            array.push(...treeToArray(item.children))
+        }
+        array.push(item)
+        return array
+    }, [])
+}
+
+export const assignClientId = (array) => {
+    if(Array.isArray(array)){
+        return array.map((item, index) => {
+            item.clientId = (index + 1)
+    
+            return item
+        })
+    }
+}

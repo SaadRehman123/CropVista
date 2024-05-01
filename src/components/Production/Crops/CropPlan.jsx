@@ -267,7 +267,7 @@ const CropPlan = () => {
     }
 
     return (
-        <FormBackground Form={renderTreelist()} />
+        <FormBackground Form={[renderTreelist()]} />
     )
 }
 

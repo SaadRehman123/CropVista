@@ -7,6 +7,8 @@ import CropPlan from '../components/Production/Crops/CropPlan'
 import Resource from '../components/Inventory/Resource/Resource'
 import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
+import BillOfMaterial from '../components/Production/BillOfMaterial/BillOfMaterial'
+import CreateBOM from '../components/Production/BillOfMaterial/CreateBOM'
 
 const AppRoutes = () => {
     return (
@@ -36,6 +38,14 @@ const AppRoutes = () => {
                 <Route
                     path="resource"
                     element={<Resource />}>
+                </Route>
+                <Route
+                    path="Bill_Of_Material"
+                    element={<BillOfMaterial />}>
+                </Route>
+                <Route
+                    path="create_bom"
+                    element={<CreateBOM />}>
                 </Route>
             </Routes>
         </div>

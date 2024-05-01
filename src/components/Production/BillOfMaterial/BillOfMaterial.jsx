@@ -1,130 +1,121 @@
 import React, { Fragment, useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-
 import FormBackground from '../../SupportComponents/FormBackground'
-
-import { toggleCreateWarehousePopup } from '../../../actions/PopupActions'
-import { setWarehouseRef, toggleDeletePopup } from '../../../actions/ViewActions'
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
-
 import styled from 'styled-components'
-import '../styles.css'
+import { Button } from 'reactstrap'
+import { TreeList } from 'devextreme-react'
+import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import { useDispatch, useSelector } from 'react-redux'
+import { setBomRef, toggleDeletePopup } from '../../../actions/ViewActions'
+import moment from 'moment'
+import { useNavigate } from 'react-router-dom'
+import { bomActionType, getBom } from '../../../actions/BomActions'
 
-const Warehouse = () => {
+const BillOfMaterial = () => {
 
-    const warehouses = useSelector(state => state.warehouse.warehouses)
-
+    const bomDatasource = useSelector(state => state.bom.Bom)
+    
+    const navigate = useNavigate()
     const treeListRef = useRef(null)
 
     const dispatch = useDispatch()
-    
+
     useEffect(() => {
-        dispatch(setWarehouseRef(treeListRef))
+        dispatch(getBom(0))
+        dispatch(bomActionType({ node: null, type: "CREATE" }))
     }, [])
 
-    const handleOnEditClick = () => {
-        setTimeout(() => {
-            dispatch(toggleCreateWarehousePopup({ open: true, type: "UPDATE" }))
-        }, 0)
+    useEffect(() => {
+        dispatch(setBomRef(treeListRef))
+    }, [])
+
+    const handleOnEditClick = (e) => {
+        dispatch(bomActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/create_bom')
     }
 
-    const renderWarehouseIdColumn = (e) => {
+    const renderBomIdColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.wrId}
+                    {e.data.bid}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderNameColumn = (e) => {
+    const renderProductDescriptionColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.name}
+                    {e.data.productDescription}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderWarehouseTypeColumn = (e) => {
+    const renderQuantityColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.wrType}
+                    {e.data.quantity}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderInactiveColumn = (e) => {
-        return (
-            <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"active-badge"} color={!e.data.active ? "secondary" : "success"}>
-                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>Active</span>
-                </Badge>
-            </CellContainer>
-        )
-    }
-
-    const renderLocationColumn = (e) => {
+    const renderCreationDateColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.location}
+                    {moment(e.data.creationDate).format("DD/MM/YYYY")}
                 </CellContent>
             </CellContainer>
         )
     }
-    
+
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Warehouse'
+                    title='Edit Bom'
                     className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick()} />
+                    onClick={() => handleOnEditClick(e)} />
 
                 <button
-                    title='Delete Warehouse'
+                    title='Delete Bom'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"WAREHOUSE" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"BOM" }))} />
             </ActionCellContainer>
         )
     }
 
     const renderTreelist = () => {
-
         return (
             <Fragment>
 
                 <Header>
-                    <HeaderSpan>Warehouse History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => dispatch(toggleCreateWarehousePopup({ open: true, type: "CREATE" }))}>
+                    <HeaderSpan>Bill of Material History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/create_bom')}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Warehouse
+                        Create Bill of Material
                     </Button>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "warehouse-treelist",
+                        id: "bom-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"wrId"}
+                    keyExpr={"bid"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={warehouses}
+                    dataSource={bomDatasource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Warehouse'}
+                    noDataText={'No Bill of Material'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -134,57 +125,45 @@ const Warehouse = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Warehouse-Id"}
-                        dataField={"wrId"}
+                        caption={"BOM-Id"}
+                        dataField={"BID"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderWarehouseIdColumn} 
+                        cellRender={renderBomIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Name"}
-                        dataField={"name"}
+                        caption={"Product Description"}
+                        dataField={"productDescription"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderNameColumn} 
+                        cellRender={renderProductDescriptionColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Type"}
-                        dataField={"wrType"}
+                        caption={"Quantity"}
+                        dataField={"quantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderWarehouseTypeColumn} 
+                        cellRender={renderQuantityColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        caption={"Location"}
-                        dataField={"location"}
+                        caption={"Creation Date"}
+                        dataField={"creationDate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderLocationColumn} 
+                        cellRender={renderCreationDateColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
-                    <Column
-                        width={102}
-                        minWidth={102}
-                        caption={"Active"}
-                        dataField={"inactive"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        cellRender={renderInactiveColumn} 
-                        headerCellRender={renderActiveHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-                    
                     <Column
                         width={98}
                         minWidth={98}
@@ -205,16 +184,6 @@ const Warehouse = () => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
     }
 
-    const renderActiveHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
-    }
-
     const renderHeaderCell = (e) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
@@ -224,13 +193,13 @@ const Warehouse = () => {
             </div>
         )
     }
-    
+
     return (
         <FormBackground Form={[renderTreelist()]} />
     )
 }
 
-export default Warehouse
+export default BillOfMaterial
 
 const ActionCellContainer = styled.div`
     display: flex;

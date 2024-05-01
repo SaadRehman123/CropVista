@@ -1,9 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
-body{
-    overflow: hidden !important;
-}
-
 .modal-title {
     font-size: 16px;
     color: #0A1A1E;
@@ -34,4 +30,8 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     margin: 0;
     -webkit-appearance: none;
+}
+
+.dx-texteditor-input[aria-readonly="true"]{
+    color: black !important;
 }

@@ -21,3 +21,7 @@
 .navbar-drawer-container .dx-drawer-panel-content{
     margin-right: 10px !important;
 }
+
+.navbar-drawer-container .dx-drawer-content{
+    overflow: auto !important;
+}

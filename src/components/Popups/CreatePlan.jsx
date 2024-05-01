@@ -234,10 +234,9 @@ const CreatePlan = () => {
                             }}
                             step={1}
                             accessKey={'acre'}
-                            value={Math.round(formData.acre)}
+                            value={formData.acre && formData.acre.toLocaleString("en", { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
                             onFocusIn={handleOnFocusIn}
                             onFocusOut={handleOnFocusOut}
-                            format={(value) => value.toString()}
                             placeholder={"Enter Acre i.e (1 - 5000)"}
                             onValueChanged={(e) => onValueChanged(e, 'acre')}
                             validationStatus={invalid.acre === false ? "valid" : "invalid"}

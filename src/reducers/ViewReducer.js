@@ -2,9 +2,11 @@ const INITIAL_STATE = {
     login: false,
     navbar: false,
     loading: false,
+	bomRef: null,
 	cropPlanRef: null,
 	resourceRef: null,
 	warehouseRef: null,
+	itemResourceRef: null,
 	setNavToolbarTitle: 'Dashboard',
     deletePopup: { active: false, type: "" },
 }
@@ -45,6 +47,18 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 resourceRef: action.payload
+            }
+        }
+		case "SET_BOM_REF": {
+            return {
+                ...state,
+                bomRef: action.payload
+            }
+        }
+		case "SET_ITEM_RESOURCE_REF": {
+            return {
+                ...state,
+                itemResourceRef: action.payload
             }
         }
 		case "TOGGLE_NAVBAR": {

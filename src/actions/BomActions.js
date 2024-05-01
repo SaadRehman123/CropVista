@@ -26,6 +26,19 @@ export const addBom = (obj) => {
     }
 }
 
+export const updateBom = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/bom/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_BOM',
+        payload: result
+    }
+}
+
 export const addBomItemResource = (obj) => {
     const result = axios({
         method: 'POST',

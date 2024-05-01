@@ -129,7 +129,7 @@ const BillOfMaterial = () => {
                         dataField={"BID"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderBomIdColumn} 
+                        cellRender={renderBomIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />

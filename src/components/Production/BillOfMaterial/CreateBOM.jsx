@@ -11,7 +11,7 @@ import { Button } from 'reactstrap'
 import notify from 'devextreme/ui/notify'
 import { setItemResourceTreeRef } from '../../../actions/ViewActions'
 import moment from 'moment'
-import { addBom, addBomItemResource, bomActionType, getBom } from '../../../actions/BomActions'
+import { addBom, addBomItemResource, bomActionType, getBom, updateBom } from '../../../actions/BomActions'
 import { assignClientId } from '../../../utilities/CommonUtilities'
 
 const CreateBOM = () => {
@@ -171,10 +171,16 @@ const CreateBOM = () => {
                 [name]: !updatedFormData[name] || setFormDataNumber(updatedFormData).trim() === "" || flag === true ? true : false,
             }))
         }
-        else if(name === "itemId"){
+        else if(name === "itemId" && bomAction.type === "CREATE"){
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 [name]: !updatedFormData[name] || updatedFormData[name].trim() === "" ? true : false,
+            }))
+        }
+        else if(name === "itemId" && bomAction.type === "UPDATE"){
+            setInvalid((prevInvalid) => ({
+                ...prevInvalid,
+                [name]: false,
             }))
         }
         else if(name === "warehouseId"){
@@ -196,11 +202,11 @@ const CreateBOM = () => {
 
         const task = {
             BID : "",  
-            productId : formData.itemId.itemId,
+            productId : formData.itemId.itemId ? formData.itemId.itemId : formData.itemId,
             productDescription : formData.productDescription,
             productionStdCost : formData.productionStdCost,
             quantity : formData.quantity,
-            wrId : formData.warehouseId.wrId,
+            wrId : formData.warehouseId.wrId ? formData.warehouseId.wrId : formData.warehouseId ,
             priceList : formData.priceList,
             total : 0,
             productPrice : 0,
@@ -219,8 +225,6 @@ const CreateBOM = () => {
         if (treeListData.length === 0) {
             return notify("Please add atleast one item or resource to be used in BOM")
         }
-
-        console.log(bomAction);
 
         if(bomAction.type === "CREATE"){
             dispatch(addBom(task)).then(res => {
@@ -244,7 +248,11 @@ const CreateBOM = () => {
             })
         }
         else if (bomAction.type === "UPDATE") {
-            console.log(formData);
+            dispatch(updateBom(task, bomAction.node.data.bid)).then((resX) => {
+                const data = resX.payload.data
+                console.log(treeListData);
+                console.log(data);
+            })
         }
     }
 
@@ -268,6 +276,7 @@ const CreateBOM = () => {
                                         }}
                                         searchTimeout={200}
                                         accessKey={'itemId'}
+                                        readOnly={bomAction.type !== "CREATE" ? true : false}
                                         searchEnabled={true}
                                         displayExpr={'itemId'}
                                         searchMode={'contains'}
@@ -743,6 +752,7 @@ const CreateBOM = () => {
                         caption={"UoM"}
                         dataField={"uom"}
                         alignment={"left"}
+                        allowEditing={bomAction.type === "UPDATE" ? false : true}
                         allowSorting={false}
                         cellRender={renderUomCell} 
                         headerCellRender={renderHeaderCell}

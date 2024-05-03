@@ -9,6 +9,8 @@ import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
 import BillOfMaterial from '../components/Production/BillOfMaterial/BillOfMaterial'
 import CreateBOM from '../components/Production/BillOfMaterial/CreateBOM'
+import ItemMaster from '../components/Inventory/ItemMaster/ItemMaster'
+import CreateItem from '../components/Inventory/ItemMaster/CreateItem'
 
 const AppRoutes = () => {
     return (
@@ -46,6 +48,14 @@ const AppRoutes = () => {
                 <Route
                     path="create_bom"
                     element={<CreateBOM />}>
+                </Route>
+                <Route
+                    path="Item_Master"
+                    element={<ItemMaster />}>
+                </Route>
+                <Route
+                    path="Create_Item"
+                    element={<CreateItem />}>
                 </Route>
             </Routes>
         </div>

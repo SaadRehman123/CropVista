@@ -6,6 +6,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap'
 import moment from 'moment'
 import notify from 'devextreme/ui/notify'
 
+import { getItemMaster } from '../../actions/ItemActions'
 import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteResource, getResource } from '../../actions/ResourceAction'
 import { deleteCropsPlan, getPlannedCrops } from '../../actions/CropsActions'
@@ -19,6 +20,7 @@ const DeletePopup = () => {
     const cropPlanRef = useSelector((state) => state.view.cropPlanRef)
     const deletePopup = useSelector((state) => state.view.deletePopup)
     const warehouseRef = useSelector((state) => state.view.warehouseRef)
+    const itemMasterRef = useSelector((state) => state.view.itemMasterRef)
 
     const dispatch = useDispatch()
 
@@ -34,6 +36,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'RESOURCE') {
             return 'Delete Resource'
         }
+        else if (deletePopup.type === 'ITEM_MASTER') {
+            return 'Delete Item'
+        }
     }, [deletePopup])
 
     const renderText = () => {
@@ -45,6 +50,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'RESOURCE') {
             return 'Are you sure you want to delete selected Resource?'
+        }
+        else if (deletePopup.type === 'ITEM_MASTER') {
+            return 'Are you sure you want to delete selected Item?'
         }
     }
 
@@ -121,6 +129,33 @@ const DeletePopup = () => {
                 else {
                     notify(data.message + " ...Refreshing", "info", 2000)
                     setTimeout(() => dispatch(getResource()), 1000)
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "ITEM_MASTER") {
+            const instance = itemMasterRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                itemId: selectedRow[0].itemId,
+                disable: selectedRow[0].disable,
+                itemName: selectedRow[0].itemName,
+                itemType: selectedRow[0].itemType,
+                sellingRate: selectedRow[0].sellingRate,
+                valuationRate: selectedRow[0].valuationRate,
+                UOM: selectedRow[0].UOM
+            }
+
+            dispatch(deleteResource(selectedRow[0].itemId, obj)).then(res => {
+                const data = res.payload.data
+                if(data.success){
+                    instance.getDataSource().store().remove(data.result.itemId)
+                    instance.refresh()
+                }
+                else {
+                    notify(data.message + " ...Refreshing", "info", 2000)
+                    setTimeout(() => dispatch(getItemMaster()), 1000)
                 }
             })
             handleOnToggle(deletePopup.type)

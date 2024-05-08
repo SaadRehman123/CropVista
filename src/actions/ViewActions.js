@@ -55,6 +55,13 @@ export const setItemResourceTreeRef = (obj) => {
     }
 }
 
+export const setItemMasterTreeRef = (obj) => {
+    return {
+        type: "SET_ITEM_MASTER_REF",
+        payload: obj
+    }
+}
+
 export const toggleNavbar = (value) => {
 	return {
 		type: "TOGGLE_NAVBAR",

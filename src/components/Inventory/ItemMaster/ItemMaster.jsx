@@ -1,18 +1,19 @@
 import React, { Fragment, useEffect, useRef } from 'react'
-import FormBackground from '../../SupportComponents/FormBackground'
-import styled from 'styled-components'
-import { Button } from 'reactstrap'
-import { TreeList } from 'devextreme-react'
-import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
-import { useDispatch, useSelector } from 'react-redux'
-import { setBomRef, toggleDeletePopup } from '../../../actions/ViewActions'
-import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+
+import FormBackground from '../../SupportComponents/FormBackground'
+
+import { Badge, Button } from 'reactstrap'
+import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import { setItemMasterTreeRef, toggleDeletePopup } from '../../../actions/ViewActions'
+
+import styled from 'styled-components'
 
 const ItemMaster = () => {
 
-    const ItemDataSource = useSelector(state => state.bom.Bom)
+    const itemDataSource = useSelector(state => state.item.itemMaster)
     
     const navigate = useNavigate()
     const treeListRef = useRef(null)
@@ -20,21 +21,19 @@ const ItemMaster = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-       // dispatch(getBom(0))
-      //  dispatch(bomActionType({ node: null, type: "CREATE" }))
+        // dispatch(ItemMasterActionType({ node: null, type: "CREATE" }))
     }, [])
 
     useEffect(() => {
-      //  dispatch(setBomRef(treeListRef))
+       dispatch(setItemMasterTreeRef(treeListRef))
     }, [])
 
     const handleOnEditClick = (e) => {
      //   dispatch(bomActionType({ node: e, type: "UPDATE" }))
        // navigate('/app/create_ItemMastewe')
-     }
-
+    }
     
-    const renderItemIDColumn = (e)=> {
+    const renderItemIdColumn = (e)=> {
         return(
             <CellContainer>
                 <CellContent>
@@ -45,19 +44,20 @@ const ItemMaster = () => {
     }
 
    const renderItemName = (e)=>{
-    return(
-        <CellContainer>
-            <CellContent>
-                {e.data.itemName}
-            </CellContent>
-        </CellContainer>
-    )
-   }
+        return(
+            <CellContainer>
+                <CellContent>
+                    {e.data.itemName}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
     const renderItemTypeColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.itemtype}
+                    {e.data.itemType}
                 </CellContent>
             </CellContainer>
         )
@@ -67,20 +67,22 @@ const ItemMaster = () => {
         return (
             <CellContainer>
                 <CellContent>
-                    {(e.data.sellingRate)}
+                    {e.data.sellingRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                 </CellContent>
             </CellContainer>
         )
     }
+
     const renderValuationRateColumn =(e)=>{
         return(
             <CellContainer>
                 <CellContent>
-                    {e.data.valuationRate}
+                    {e.data.valuationRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                 </CellContent>
             </CellContainer>
         )
     }
+
     const renderUOMColumn = (e) =>{
         return(
             <CellContainer>
@@ -91,19 +93,28 @@ const ItemMaster = () => {
         )
     }
 
+    const renderDisableColumn = (e) => {
+        return (
+            <CellContainer style={{ alignItems: 'center' }}>
+                <Badge className={"active-badge"} color={!e.data.disable ? "secondary" : "success"}>
+                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
+                    <span>Disabled</span>
+                </Badge>
+            </CellContainer>
+        )
+    }
+
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
                 <button
                     title='Edit Item Master'
                     className='fal fa-pen treelist-edit-button'
-                     onClick={() => handleOnEditClick(e)}/>
-                    
-
+                    onClick={() => handleOnEditClick(e)}/>
                 <button
                     title='Delete Item Master'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"ItemMaster" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"ITEM_MASTER" }))} />
             </ActionCellContainer>
         )
     }
@@ -111,18 +122,17 @@ const ItemMaster = () => {
     const renderTreelist = () => {
         return (
             <Fragment>
-
-                { <Header>
+                <Header>
                     <HeaderSpan>Item Master</HeaderSpan>
                     <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Item')}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
                         Create Item Master
                     </Button>
-                </Header> }
+                </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "ItemMaster-treelist",
+                        id: "item-master-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"itemId"}
@@ -130,8 +140,8 @@ const ItemMaster = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={ItemDataSource}
                     allowColumnResizing={true}
+                    dataSource={itemDataSource}
                     rowAlternationEnabled={true}
                     noDataText={'Item Not Available'}
                     height={"calc(100vh - 195px)"}
@@ -147,7 +157,7 @@ const ItemMaster = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderItemIDColumn} 
+                        cellRender={renderItemIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -181,16 +191,17 @@ const ItemMaster = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
-                     <Column 
+
+                    <Column 
                         caption={"Valuation Rate"}
                         dataField={"valuationRate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderValuationRateColumn} 
                         headerCellRender={renderHeaderCell}
+                        cellRender={renderValuationRateColumn} 
                         cssClass={"project-treelist-column"}
-
                     />
+
                     <Column 
                         caption={"UOM"}
                         dataField={"UOM"}
@@ -199,7 +210,18 @@ const ItemMaster = () => {
                         cellRender={renderUOMColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
+                    />
 
+                    <Column
+                        width={110}
+                        minWidth={110}
+                        caption={"Disable"}
+                        dataField={"disable"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderDisableColumn} 
+                        headerCellRender={renderDisableHeaderCell}
+                        cssClass={"project-treelist-column"}
                     />
 
                     <Column
@@ -213,7 +235,6 @@ const ItemMaster = () => {
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}
                     />
-                   
                 </TreeList>
             </Fragment>
         )
@@ -221,6 +242,16 @@ const ItemMaster = () => {
 
     const renderActionHeaderCell = (e) => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
+    }
+
+    const renderDisableHeaderCell = (e) => {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
+                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
+                    {e.column.caption}
+                </span>
+            </div>
+        )
     }
 
     const renderHeaderCell = (e) => {
@@ -235,16 +266,11 @@ const ItemMaster = () => {
 
     return (
         <FormBackground Form={[renderTreelist()]} />
-    )
-
-
-    
-
-   
-
-   
+    )   
 }
-export default ItemMaster;
+
+export default ItemMaster
+
 const ActionCellContainer = styled.div`
     display: flex;
     font-size: 16px;

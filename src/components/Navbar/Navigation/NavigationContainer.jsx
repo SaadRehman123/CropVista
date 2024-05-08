@@ -64,7 +64,7 @@ const NavigationContainer = () => {
             navigate('/app/Bill_Of_Material')
             dispatch(setNavToolbarTitle(obj.name))
         }
-        else if(obj.id === "ItemMaster"){
+        else if(obj.id === "itemMaster"){
             navigate('/app/Item_Master')
             dispatch(setNavToolbarTitle(obj.name))
         }
@@ -94,9 +94,9 @@ const Container = styled.div`
 
 const navigations = [
     {id: "dashboard", name: "Dashboard", icon: "fal fa-analytics", pad: 20, type: "overview"},
-    {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 20, type: "inventory"},
     {id: "resource", name: "Resources", icon: "fal fa-user-plus", pad: 20, type: "inventory"},
-    {id: "ItemMaster", name: "Item Master", icon: "fal fa-user-plus", pad: 20, type: "inventory"},
+    {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 20, type: "inventory"},
+    {id: "itemMaster", name: "Item Master", icon: "fal fa-cart-plus", pad: 22, type: "inventory"},
     {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 25, type: "production"},
     {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 27, type: "production"},
 ]

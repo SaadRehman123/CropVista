@@ -11,10 +11,11 @@ import { Button } from 'reactstrap'
 import notify from 'devextreme/ui/notify'
 import { setItemResourceTreeRef } from '../../../actions/ViewActions'
 import moment from 'moment'
-import { addBom, addBomItemResource, bomActionType, getBom, updateBom } from '../../../actions/BomActions'
+import { addBom, addBomItemResource, bomActionType, deleteBomItemResource, getBom, updateBom, updateBomItemResource } from '../../../actions/BomActions'
 import { assignClientId } from '../../../utilities/CommonUtilities'
 
 const CreateBOM = () => {
+
 
     const bomAction = useSelector(state => state.bom.bomAction)
     const itemMaster = useSelector(state => state.item.itemMaster)
@@ -22,6 +23,7 @@ const CreateBOM = () => {
     const warehouses = useSelector(state => state.warehouse.warehouses)
 
     const [treeListData, setTreeListData] = useState([])
+    const [deletedRows, setDeletedRows] = useState([])
     const [itemDataSource, setItemDataSource] = useState({ type: "", dataSource: null })
     const [invalid, setInvalid] = useState({ itemId: false, warehouseId: false, productDescription: false, priceList: false, quantity: false, productionStdCost: false })
     const [formData, setFormData] = useState({ itemId: "", warehouseId: "", productDescription: "", priceList: "", quantity: "", productionStdCost: "" })
@@ -48,7 +50,7 @@ const CreateBOM = () => {
                 if(res.payload.data.success){
                     const dataX = res.payload.data.result[0]
                     const Obj = itemMaster.find((item) => item.itemId === data.productId)
-
+                    console.log(dataX);
                     setFormData({ 
                         itemId: data.productId, 
                         warehouseId: data.wrId, 
@@ -101,12 +103,17 @@ const CreateBOM = () => {
     }
 
     const handleOnRowRemove = (e) => {
+        const deletedRow = treeListData.find(item => item.clientId === e.row.key)
+        setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
+
         const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
         setTreeListData(updatedData)
         
         itemResourceDatasource.store().remove(e.row.key).then(() => {
             itemResourceDatasource.reload()
         })
+
+        console.log(deletedRows);
     }
 
     const onValueChanged = (e, name) => {
@@ -250,8 +257,14 @@ const CreateBOM = () => {
         else if (bomAction.type === "UPDATE") {
             dispatch(updateBom(task, bomAction.node.data.bid)).then((resX) => {
                 const data = resX.payload.data
-                console.log(treeListData);
-                console.log(data);
+                if (data.success) {
+                    treeListData.forEach((item) => {
+                        // dispatch(updateBomItemResource(item, item.itemResourceId))
+                        deletedRows.forEach((item) => {
+                            dispatch(deleteBomItemResource(item, item.itemResourceId))
+                        })
+                    })
+                }
             })
         }
     }
@@ -853,6 +866,7 @@ const getItemResourceObj = (clientId) => {
         priceList: "",
         unitPrice: 0,
         total: "",
+        itemResourceId: "",
         clientId: clientId
     }
 }

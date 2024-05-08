@@ -11,11 +11,13 @@ import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteResource, getResource } from '../../actions/ResourceAction'
 import { deleteCropsPlan, getPlannedCrops } from '../../actions/CropsActions'
 import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
+import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
 
 import styled from 'styled-components'
 
 const DeletePopup = () => {
     
+    const bomRef = useSelector((state) => state.view.bomRef)
     const resourceRef = useSelector(state => state.view.resourceRef)
     const cropPlanRef = useSelector((state) => state.view.cropPlanRef)
     const deletePopup = useSelector((state) => state.view.deletePopup)
@@ -36,6 +38,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'RESOURCE') {
             return 'Delete Resource'
         }
+        else if (deletePopup.type === 'BOM') {
+            return 'Delete BOM'
+        }
         else if (deletePopup.type === 'ITEM_MASTER') {
             return 'Delete Item'
         }
@@ -50,6 +55,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'RESOURCE') {
             return 'Are you sure you want to delete selected Resource?'
+        }
+        else if (deletePopup.type === 'BOM') {
+            return 'Are you sure you want to delete selected BOM?'
         }
         else if (deletePopup.type === 'ITEM_MASTER') {
             return 'Are you sure you want to delete selected Item?'
@@ -131,6 +139,43 @@ const DeletePopup = () => {
                     setTimeout(() => dispatch(getResource()), 1000)
                 }
             })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "BOM") {
+            const instance = bomRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                BID : selectedRow[0].bid,
+                productId : selectedRow[0].productId,
+                productDescription : selectedRow[0].productDescription,
+                productionStdCost : selectedRow[0].productionStdCost,
+                quantity : selectedRow[0].quantity,
+                wrId : selectedRow[0].wrId,
+                priceList : selectedRow[0].priceList,
+                total : selectedRow[0].total,
+                productPrice : selectedRow[0].productPrice,
+                creationDate : selectedRow[0].creationDate,
+                itemBID : ""
+            }
+
+            selectedRow[0].children.map((item) => {
+                dispatch(deleteBomItemResource(item, item.itemResourceId)).then((res) => {
+                    if(res.payload.data.success){
+                        dispatch(deleteBom(obj, selectedRow[0].bid)).then((resX) => {
+                            if(resX.payload.data.success){
+                                instance.getDataSource().store().remove(selectedRow[0].bid)
+                                instance.refresh()
+                            }
+                            else {
+                                notify(res.payload.data.message + " ...Refreshing", "info", 2000)
+                                setTimeout(() => dispatch(getBom(0)), 1000)
+                            }
+                        })
+                    }
+                })
+            })
+
             handleOnToggle(deletePopup.type)
         }
         else if(deletePopup.type === "ITEM_MASTER") {

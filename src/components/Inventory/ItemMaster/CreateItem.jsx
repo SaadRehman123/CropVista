@@ -14,7 +14,7 @@ import moment from 'moment'
 import { assignClientId } from '../../../utilities/CommonUtilities'
 import { Margin } from 'devextreme-react/bullet'
 
-const CreateItem = () =>{
+const CreateItem = () => {
 
 
     const [treeListData, setTreeListData] = useState([])
@@ -459,26 +459,11 @@ const CreateItem = () =>{
         )
     }
         
-    
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
     return (
-        <FormBackground Form={[renderContent(),renderTreelist()]} />
+        <FormBackground Form={[renderContent(), renderTreelist()]} />
     )
 }
+
 export default CreateItem
 
 

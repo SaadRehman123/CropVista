@@ -37,7 +37,7 @@ const Production = () => {
     }
 
     return (
-        <FormBackground Form={renderCards()} />
+        <FormBackground Form={[renderCards()]} />
     )
 }
 

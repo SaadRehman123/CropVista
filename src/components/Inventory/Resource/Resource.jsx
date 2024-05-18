@@ -172,7 +172,7 @@ const Resource = () => {
     }
 
     return (
-        <FormBackground Form={renderTreelist()} />
+        <FormBackground Form={[renderTreelist()]} />
     )
 }
 

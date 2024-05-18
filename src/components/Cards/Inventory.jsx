@@ -39,7 +39,7 @@ const Inventory = () => {
     }
 
     return (
-        <FormBackground Form={renderCards()} />
+        <FormBackground Form={[renderCards()]} />
     )
 }
 

@@ -1,73 +1,94 @@
 import React, { Fragment, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-
+import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import moment from 'moment/moment'
-
-import { toggleCreatePlanPopup } from '../../../actions/PopupActions'
-import { setCropPlanRef, toggleDeletePopup } from '../../../actions/ViewActions'
+import { Button } from 'reactstrap'
+import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
+import { getBom } from '../../../actions/BomActions'
+import { getPlannedCrops } from '../../../actions/CropsActions'
+import { getProductionOrder, productionOrderActionType } from '../../../actions/ProductionOrderAction'
+
 import styled from 'styled-components'
-import './styles.css'
+import { setProductionOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
-const CropPlan = () => {
+const ProductionOrder = () => {
 
-    const plannedCrops = useSelector(state => state.crops.plannedCrops)
+    const productionOrder = useSelector(state => state.production.productionOrder)
     
-    const treeListRef = useRef(null)
-
+    const navigate = useNavigate()
     const dispatch = useDispatch()
 
+    const treeListRef = useRef(null)
+
     useEffect(() => {
-        dispatch(setCropPlanRef(treeListRef))
+        dispatch(setProductionOrderRef(treeListRef))
     }, [])
 
-    const handleOnEditClick = () => {
-        setTimeout(() => {
-            dispatch(toggleCreatePlanPopup({ open: true, type: "UPDATE" }))
-        }, 0)
+    useEffect(() => {
+        dispatch(getBom(0))
+        dispatch(getPlannedCrops())
+        dispatch(getProductionOrder(0))
+    }, [])
+
+    const handleOnEditClick = (e) => {
+        dispatch(productionOrderActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Production_Order')
     }
 
-    const renderPlanIdColumn = (e) => {
+    const renderActionHeaderCell = (e) => {
+        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
+    }
+
+    const renderHeaderCell = (e) => {
         return (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
+                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
+                    {e.column.caption}
+                </span>
+            </div>
+        )
+    }
+
+    const renderProductionOrderIdColumn = (e) => {
+        return(
             <CellContainer>
                 <CellContent>
-                    {e.data.id}
+                    {e.data.productionOrderId}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderSeasonColumn = (e) => {
+    const renderProductionNoColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.season}
+                    {e.data.productionNo}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderCropColumn = (e) => {
+    const renderProductDescriptionColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.crop}
+                    {e.data.productDescription}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderAcreColumn = (e) => {
+    const renderQuantityColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.acre}
+                    {e.data.quantity}
                 </CellContent>
             </CellContainer>
         )
@@ -77,7 +98,7 @@ const CropPlan = () => {
         return (
             <CellContainer>
                 <CellContent>
-                    {moment(e.data.startdate).format("DD/MM/YYYY")}
+                    {moment(e.data.startDate).format("DD/MM/YYYY")}
                 </CellContent>
             </CellContainer>
         )
@@ -87,65 +108,58 @@ const CropPlan = () => {
         return (
             <CellContainer>
                 <CellContent>
-                    {moment(e.data.enddate).format("DD/MM/YYYY")}
+                    {moment(e.data.endDate).format("DD/MM/YYYY")}
                 </CellContent>
             </CellContainer>
         )
     }
-    
-    const renderStatusColumn = (e) => {
-        return (
-            <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"status-badge"} color='warning'>
-                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>{e.data.status}</span>
-                </Badge>
-            </CellContainer>
-        )
-    }
-    
+
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Plan'
+                    title='Edit Production Order'
                     className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick()} />
+                    onClick={() => handleOnEditClick(e)} />
 
                 <button
-                    title='Delete Plan'
+                    title='Delete Production Order'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PRODUCTION_ORDER" }))} />
             </ActionCellContainer>
         )
+    }
+
+    const handleOnCreateProductionOrder = () => {
+        dispatch(productionOrderActionType({ node: null, type: "Create" }))
+        navigate('/app/Create_Production_Order')
     }
 
     const renderTreelist = () => {
         return (
             <Fragment>
-
                 <Header>
-                    <HeaderSpan>Plan History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => dispatch(toggleCreatePlanPopup({ open: true, type: "CREATE" }))}>
+                    <HeaderSpan>Production Order History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreateProductionOrder()}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Plan
+                        Create Production Order
                     </Button>
                 </Header>
-
+                
                 <TreeList
                     elementAttr={{
-                        id: "crop-plan-treelist",
+                        id: "production-order-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"id"}
+                    keyExpr={"productionOrderId"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={plannedCrops}
+                    dataSource={productionOrder}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Plan'}
+                    noDataText={'No Production Order'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -155,41 +169,41 @@ const CropPlan = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Plan-Id"}
-                        dataField={"id"}
+                        caption={"Production Order-Id"}
+                        dataField={"productionOrderId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderPlanIdColumn} 
+                        cellRender={renderProductionOrderIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Season"}
-                        dataField={"season"}
+                        caption={"Product Id"}
+                        dataField={"productionNo"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderSeasonColumn} 
+                        cellRender={renderProductionNoColumn}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+
+                    <Column
+                        caption={"Product Description"}
+                        dataField={"productDescription"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderProductDescriptionColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Crop"}
-                        dataField={"crop"}
+                        caption={"Quantity"}
+                        dataField={"quantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderCropColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"Acre"}
-                        dataField={"acre"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderAcreColumn} 
+                        cellRender={renderQuantityColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -213,18 +227,6 @@ const CropPlan = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
-                    
-                    <Column
-                        width={100}
-                        minWidth={100}
-                        caption={"Status"}
-                        dataField={"status"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        cellRender={renderStatusColumn} 
-                        headerCellRender={renderStatusHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
 
                     <Column
                         width={98}
@@ -241,37 +243,13 @@ const CropPlan = () => {
             </Fragment>
         )
     }
-
-    const renderActionHeaderCell = (e) => {
-        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
-    }
-
-    const renderStatusHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
-    }
-
-    const renderHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
-    }
-
+    
     return (
         <FormBackground Form={[renderTreelist()]} />
     )
 }
 
-export default CropPlan
+export default ProductionOrder
 
 const ActionCellContainer = styled.div`
     display: flex;

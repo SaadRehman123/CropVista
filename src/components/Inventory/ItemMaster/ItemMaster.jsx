@@ -1,121 +1,119 @@
 import React, { Fragment, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-
-import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import moment from 'moment/moment'
-
-import { toggleCreatePlanPopup } from '../../../actions/PopupActions'
-import { setCropPlanRef, toggleDeletePopup } from '../../../actions/ViewActions'
+import { Badge, Button } from 'reactstrap'
+import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import { setItemMasterTreeRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
 import styled from 'styled-components'
-import './styles.css'
 
-const CropPlan = () => {
+const ItemMaster = () => {
 
-    const plannedCrops = useSelector(state => state.crops.plannedCrops)
+    const itemDataSource = useSelector(state => state.item.itemMaster)
     
+    const navigate = useNavigate()
     const treeListRef = useRef(null)
 
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(setCropPlanRef(treeListRef))
+
     }, [])
 
-    const handleOnEditClick = () => {
-        setTimeout(() => {
-            dispatch(toggleCreatePlanPopup({ open: true, type: "UPDATE" }))
-        }, 0)
-    }
+    useEffect(() => {
+       dispatch(setItemMasterTreeRef(treeListRef))
+    }, [])
 
-    const renderPlanIdColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.id}
-                </CellContent>
-            </CellContainer>
-        )
-    }
+    const handleOnEditClick = (e) => {
 
-    const renderSeasonColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.season}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderCropColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.crop}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderAcreColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.acre}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderStartDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.startdate).format("DD/MM/YYYY")}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderEndDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.enddate).format("DD/MM/YYYY")}
-                </CellContent>
-            </CellContainer>
-        )
     }
     
-    const renderStatusColumn = (e) => {
+    const renderItemIdColumn = (e)=> {
+        return(
+            <CellContainer>
+                <CellContent>
+                    {e.data.itemId}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+   const renderItemName = (e)=>{
+        return(
+            <CellContainer>
+                <CellContent>
+                    {e.data.itemName}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderItemTypeColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.itemType}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderSellingRateColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.sellingRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderValuationRateColumn =(e)=>{
+        return(
+            <CellContainer>
+                <CellContent>
+                    {e.data.valuationRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderUOMColumn = (e) =>{
+        return(
+            <CellContainer>
+                <CellContent>
+                    {e.data.UOM}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderDisableColumn = (e) => {
         return (
             <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"status-badge"} color='warning'>
+                <Badge className={"active-badge"} color={!e.data.disable ? "secondary" : "success"}>
                     <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>{e.data.status}</span>
+                    <span>Disabled</span>
                 </Badge>
             </CellContainer>
         )
     }
-    
+
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Plan'
+                    title='Edit Item Master'
                     className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick()} />
-
+                    onClick={() => handleOnEditClick(e)}/>
                 <button
-                    title='Delete Plan'
+                    title='Delete Item Master'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"ITEM_MASTER" }))} />
             </ActionCellContainer>
         )
     }
@@ -123,29 +121,28 @@ const CropPlan = () => {
     const renderTreelist = () => {
         return (
             <Fragment>
-
                 <Header>
-                    <HeaderSpan>Plan History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => dispatch(toggleCreatePlanPopup({ open: true, type: "CREATE" }))}>
+                    <HeaderSpan>Item Master</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Item')}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Plan
+                        Create Item Master
                     </Button>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "crop-plan-treelist",
+                        id: "item-master-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"id"}
+                    keyExpr={"itemId"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={plannedCrops}
                     allowColumnResizing={true}
+                    dataSource={itemDataSource}
                     rowAlternationEnabled={true}
-                    noDataText={'No Plan'}
+                    noDataText={'Item Not Available'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -155,74 +152,74 @@ const CropPlan = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Plan-Id"}
-                        dataField={"id"}
+                        caption={"Item ID"}
+                        dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderPlanIdColumn} 
+                        cellRender={renderItemIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Season"}
-                        dataField={"season"}
+                        caption={"Item Name"}
+                        dataField={"itemName"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderSeasonColumn} 
+                        cellRender={renderItemName} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Crop"}
-                        dataField={"crop"}
+                        caption={"Item Type"}
+                        dataField={"itemType"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderCropColumn} 
+                        cellRender={renderItemTypeColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        caption={"Acre"}
-                        dataField={"acre"}
+                        caption={"Selling Rate"}
+                        dataField={"sellingRate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderAcreColumn} 
+                        cellRender={renderSellingRateColumn} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column 
+                        caption={"Valuation Rate"}
+                        dataField={"valuationRate"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        headerCellRender={renderHeaderCell}
+                        cellRender={renderValuationRateColumn} 
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column 
+                        caption={"UOM"}
+                        dataField={"UOM"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderUOMColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        caption={"Start Date"}
-                        dataField={"startDate"}
+                        width={110}
+                        minWidth={110}
+                        caption={"Disable"}
+                        dataField={"disable"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderStartDateColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"End Date"}
-                        dataField={"endDate"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderEndDateColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-                    
-                    <Column
-                        width={100}
-                        minWidth={100}
-                        caption={"Status"}
-                        dataField={"status"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        cellRender={renderStatusColumn} 
-                        headerCellRender={renderStatusHeaderCell}
+                        cellRender={renderDisableColumn} 
+                        headerCellRender={renderDisableHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
@@ -246,7 +243,7 @@ const CropPlan = () => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
     }
 
-    const renderStatusHeaderCell = (e) => {
+    const renderDisableHeaderCell = (e) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
                 <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
@@ -268,10 +265,10 @@ const CropPlan = () => {
 
     return (
         <FormBackground Form={[renderTreelist()]} />
-    )
+    )   
 }
 
-export default CropPlan
+export default ItemMaster
 
 const ActionCellContainer = styled.div`
     display: flex;

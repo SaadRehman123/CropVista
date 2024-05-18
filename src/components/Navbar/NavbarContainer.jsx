@@ -20,7 +20,8 @@ const NavbarContainer = () => {
     useEffect(() => {
         const url = window.location.href
         const index = url.indexOf('app/') + 4
-        const name = url.slice(index)
+        let name = url.slice(index)
+        name = name.replace(/_/g, ' ')
         dispatch(setNavToolbarTitle(name))
     }, [window.location.href])
 

@@ -41,6 +41,27 @@ export const setResourceRef = (obj) => {
     }
 }
 
+export const setBomRef = (obj) => {
+    return {
+        type: "SET_BOM_REF",
+        payload: obj
+    }
+}
+
+export const setItemResourceTreeRef = (obj) => {
+    return {
+        type: "SET_ITEM_RESOURCE_REF",
+        payload: obj
+    }
+}
+
+export const setItemMasterTreeRef = (obj) => {
+    return {
+        type: "SET_ITEM_MASTER_REF",
+        payload: obj
+    }
+}
+
 export const toggleNavbar = (value) => {
 	return {
 		type: "TOGGLE_NAVBAR",
@@ -51,6 +72,20 @@ export const toggleNavbar = (value) => {
 export const setNavToolbarTitle = (value) => {
 	return {
 		type: "SET_NAV_TOOLBAR_TITLE",
+		payload: value
+	}
+}
+
+export const setProductionOrderItemResource = (value) => {
+	return {
+		type: "SET_PRODUCTION_ORDER_ITEM_RESOURCE",
+		payload: value
+	}
+}
+
+export const setProductionOrderRef = (value) => {
+	return {
+		type: "SET_PRODUCTION_ORDER_REF",
 		payload: value
 	}
 }

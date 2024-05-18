@@ -2,9 +2,14 @@ const INITIAL_STATE = {
     login: false,
     navbar: false,
     loading: false,
+	bomRef: null,
 	cropPlanRef: null,
 	resourceRef: null,
 	warehouseRef: null,
+	itemMasterRef: null,
+	itemResourceRef: null,
+	productionOrderRef: null,
+	setProductionOrderItemResourceRef: null,
 	setNavToolbarTitle: 'Dashboard',
     deletePopup: { active: false, type: "" },
 }
@@ -47,6 +52,24 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
                 resourceRef: action.payload
             }
         }
+		case "SET_BOM_REF": {
+            return {
+                ...state,
+                bomRef: action.payload
+            }
+        }
+		case "SET_ITEM_RESOURCE_REF": {
+            return {
+                ...state,
+                itemResourceRef: action.payload
+            }
+        }
+		case "SET_ITEM_MASTER_REF": {
+            return {
+                ...state,
+                itemMasterRef: action.payload
+            }
+        }
 		case "TOGGLE_NAVBAR": {
 			return {
 				...state,
@@ -57,6 +80,18 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
 			return {
 				...state,
 				setNavToolbarTitle: action.payload
+			}
+		}
+		case "SET_PRODUCTION_ORDER_ITEM_RESOURCE": {
+			return {
+				...state,
+				setProductionOrderItemResourceRef: action.payload
+			}
+		}
+		case "SET_PRODUCTION_ORDER_REF": {
+			return {
+				...state,
+				productionOrderRef: action.payload
 			}
 		}
 		default: return state

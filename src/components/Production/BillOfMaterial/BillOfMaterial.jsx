@@ -1,121 +1,94 @@
 import React, { Fragment, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-
+import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import moment from 'moment/moment'
-
-import { toggleCreatePlanPopup } from '../../../actions/PopupActions'
-import { setCropPlanRef, toggleDeletePopup } from '../../../actions/ViewActions'
+import { Button } from 'reactstrap'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+
+import { bomActionType, getBom } from '../../../actions/BomActions'
+import { setBomRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
 import styled from 'styled-components'
-import './styles.css'
 
-const CropPlan = () => {
+const BillOfMaterial = () => {
 
-    const plannedCrops = useSelector(state => state.crops.plannedCrops)
+    const bomDatasource = useSelector(state => state.bom.Bom)
     
+    const navigate = useNavigate()
     const treeListRef = useRef(null)
 
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(setCropPlanRef(treeListRef))
+        dispatch(getBom(0))
+        dispatch(bomActionType({ node: null, type: "CREATE" }))
     }, [])
 
-    const handleOnEditClick = () => {
-        setTimeout(() => {
-            dispatch(toggleCreatePlanPopup({ open: true, type: "UPDATE" }))
-        }, 0)
+    useEffect(() => {
+        dispatch(setBomRef(treeListRef))
+    }, [])
+
+    const handleOnEditClick = (e) => {
+        dispatch(bomActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/create_bom')
     }
 
-    const renderPlanIdColumn = (e) => {
+    const renderBomIdColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.id}
+                    {e.data.bid}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderSeasonColumn = (e) => {
+    const renderProductDescriptionColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.season}
+                    {e.data.productDescription}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderCropColumn = (e) => {
+    const renderQuantityColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.crop}
+                    {e.data.quantity}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderAcreColumn = (e) => {
+    const renderCreationDateColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.acre}
+                    {moment(e.data.creationDate).format("DD/MM/YYYY")}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderStartDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.startdate).format("DD/MM/YYYY")}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderEndDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.enddate).format("DD/MM/YYYY")}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-    
-    const renderStatusColumn = (e) => {
-        return (
-            <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"status-badge"} color='warning'>
-                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>{e.data.status}</span>
-                </Badge>
-            </CellContainer>
-        )
-    }
-    
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Plan'
+                    title='Edit Bom'
                     className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick()} />
+                    onClick={() => handleOnEditClick(e)} />
 
                 <button
-                    title='Delete Plan'
+                    title='Delete Bom'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"BOM" }))} />
             </ActionCellContainer>
         )
     }
@@ -123,29 +96,28 @@ const CropPlan = () => {
     const renderTreelist = () => {
         return (
             <Fragment>
-
                 <Header>
-                    <HeaderSpan>Plan History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => dispatch(toggleCreatePlanPopup({ open: true, type: "CREATE" }))}>
+                    <HeaderSpan>Bill of Material History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/create_bom')}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Plan
+                        Create Bill of Material
                     </Button>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "crop-plan-treelist",
+                        id: "bom-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"id"}
+                    keyExpr={"bid"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={plannedCrops}
+                    dataSource={bomDatasource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Plan'}
+                    noDataText={'No Bill of Material'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -155,74 +127,42 @@ const CropPlan = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Plan-Id"}
-                        dataField={"id"}
+                        caption={"BOM-Id"}
+                        dataField={"BID"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderPlanIdColumn} 
+                        cellRender={renderBomIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Season"}
-                        dataField={"season"}
+                        caption={"Product Description"}
+                        dataField={"productDescription"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderSeasonColumn} 
+                        cellRender={renderProductDescriptionColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Crop"}
-                        dataField={"crop"}
+                        caption={"Quantity"}
+                        dataField={"quantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderCropColumn} 
+                        cellRender={renderQuantityColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        caption={"Acre"}
-                        dataField={"acre"}
+                        caption={"Creation Date"}
+                        dataField={"creationDate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderAcreColumn} 
+                        cellRender={renderCreationDateColumn} 
                         headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"Start Date"}
-                        dataField={"startDate"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderStartDateColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"End Date"}
-                        dataField={"endDate"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderEndDateColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-                    
-                    <Column
-                        width={100}
-                        minWidth={100}
-                        caption={"Status"}
-                        dataField={"status"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        cellRender={renderStatusColumn} 
-                        headerCellRender={renderStatusHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
@@ -246,16 +186,6 @@ const CropPlan = () => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
     }
 
-    const renderStatusHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
-    }
-
     const renderHeaderCell = (e) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
@@ -271,7 +201,7 @@ const CropPlan = () => {
     )
 }
 
-export default CropPlan
+export default BillOfMaterial
 
 const ActionCellContainer = styled.div`
     display: flex;

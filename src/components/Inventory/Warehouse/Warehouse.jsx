@@ -226,7 +226,7 @@ const Warehouse = () => {
     }
     
     return (
-        <FormBackground Form={renderTreelist()} />
+        <FormBackground Form={[renderTreelist()]} />
     )
 }
 

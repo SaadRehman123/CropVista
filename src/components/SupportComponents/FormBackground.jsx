@@ -3,7 +3,11 @@ import styled from 'styled-components'
 
 const FormBackground = ({ Form }) => {
     return (
-        <Background>{Form}</Background>
+        <>
+            {Form.map((form, index) => (
+                <Background key={index}>{form}</Background>
+            ))}
+        </>
     )
 }
 

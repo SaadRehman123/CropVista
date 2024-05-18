@@ -16,7 +16,7 @@ const CreateWarehouse = () => {
     const createWarehouse = useSelector(state => state.popup.toggleCreateWarehousePopup)
 
     const [invalid, setInvalid] = useState({ name: false, wrType: false, location: false })
-    const [formData, setFormData] = useState({ name: "", wrType: "", location: "", active: false })
+    const [formData, setFormData] = useState({ name: "", wrType: "", location: "", active: true })
 
     const dispatch = useDispatch()
 
@@ -102,7 +102,6 @@ const CreateWarehouse = () => {
                 else {
                     notify(data.message, "info", 2000)
                 }
-                toggle()
             })
         }
         else if (createWarehouse.type === "UPDATE") {
@@ -118,10 +117,11 @@ const CreateWarehouse = () => {
                         notify(data.message + " ...Refreshing", "info", 2000)
                         setTimeout(() => dispatch(getWarehouse()), 1000)
                     }
-                    toggle()
                 })
             }
         }
+
+        toggle()
     }
 
     const renderHeader = () => {

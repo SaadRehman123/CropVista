@@ -16,7 +16,7 @@ import { Button } from 'reactstrap'
 import { assignClientId } from '../../../utilities/CommonUtilities'
 import { toggleCreateJobCardPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
-import { addPoRouteStages, addProductionOrder, getProductionOrder } from '../../../actions/ProductionOrderAction'
+import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
 
@@ -71,6 +71,7 @@ const CreateProductionOrder = () => {
         
         if (array && array.length > 0) {
             const dataSource = array[0].children.map((child) => ({
+                PO_productionOrderId: child.pO_productionOrderId,
                 PO_RouteStageId : child.pO_RouteStageId,
                 PO_RouteStage: child.pO_RouteStage,
                 PO_Type : child.pO_Type,
@@ -171,7 +172,7 @@ const CreateProductionOrder = () => {
             productDescription: formData.productDescription,
             productionStdCost: formData.productionStdCost,
             quantity: formData.quantity,
-            status: "Saved",
+            status: "Planned",
             currentDate: moment(Date.now()).format('YYYY-MM-DD'),
             startDate: moment(formData.startDate).format('YYYY-MM-DD'),
             endDate: moment(formData.endDate).format('YYYY-MM-DD'),
@@ -192,7 +193,7 @@ const CreateProductionOrder = () => {
                     if(data.success) {
                         setFormData((prev) => ({
                             ...prev,
-                            status: "Saved"
+                            status: "Planned"
                         }))
 
                         const updatedTreeListData = treeListData.map((item, index) => {
@@ -216,6 +217,25 @@ const CreateProductionOrder = () => {
                 notify(data.message, "info", 2000)
             }
         })
+    }
+
+    const handleOnEditorPreparing = (e) => {
+        if (e.parentType !== "dataRow" || (e.dataField !== "PO_Quantity")) return
+
+        if (e.row.node.data.PO_Status === "Completed") {
+            e.editorOptions.disabled = true
+        }
+    }
+
+    const handleOnSaved = (e) => {
+        const data = e.changes[0].data
+        if (data.PO_Status !== "Completed"){
+            dispatch(updatePoRouteStages(data, data.PO_RouteStageId)).then((res) => {
+                if (res.payload.data.success){
+                    notify("Route Stage Updated Successfully", "info", 2000)
+                }
+            })
+        }
     }
 
     const ProgressBar = () => {
@@ -549,7 +569,9 @@ const CreateProductionOrder = () => {
                 rowAlternationEnabled={true}
                 noDataText={'No Data'}
                 className={'dev-form-treelist'}
-                columnResizingMode={"nextColumn"}>
+                columnResizingMode={"nextColumn"}
+                onSaved={handleOnSaved}
+                onEditorPreparing={handleOnEditorPreparing}>
                 
                 <Selection mode={"single"} />
 
@@ -614,7 +636,7 @@ const CreateProductionOrder = () => {
                     dataField={"PO_Quantity"}
                     alignment={"left"}
                     allowSorting={false}
-                    allowEditing={false}
+                    allowEditing={true}
                     editorOptions={"dxNumberBox"}
                     cellRender={renderQuantityColumn}
                     headerCellRender={renderHeaderCell}

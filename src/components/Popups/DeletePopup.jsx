@@ -12,9 +12,9 @@ import { deleteResource, getResource } from '../../actions/ResourceAction'
 import { deleteCropsPlan, getPlannedCrops } from '../../actions/CropsActions'
 import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
 import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
+import { deletePoRouteStages, deleteProductionOrder, getProductionOrder } from '../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
-import { deletePoRouteStages, deleteProductionOrder, getProductionOrder } from '../../actions/ProductionOrderAction'
 
 const DeletePopup = () => {
     

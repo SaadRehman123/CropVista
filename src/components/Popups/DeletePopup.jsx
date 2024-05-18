@@ -14,6 +14,7 @@ import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
 import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
 
 import styled from 'styled-components'
+import { deletePoRouteStages, deleteProductionOrder, getProductionOrder } from '../../actions/ProductionOrderAction'
 
 const DeletePopup = () => {
     
@@ -23,6 +24,7 @@ const DeletePopup = () => {
     const deletePopup = useSelector((state) => state.view.deletePopup)
     const warehouseRef = useSelector((state) => state.view.warehouseRef)
     const itemMasterRef = useSelector((state) => state.view.itemMasterRef)
+    const productionOrderRef = useSelector((state) => state.view.productionOrderRef)
 
     const dispatch = useDispatch()
 
@@ -44,6 +46,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'ITEM_MASTER') {
             return 'Delete Item'
         }
+        else if (deletePopup.type === 'PRODUCTION_ORDER') {
+            return 'Delete Production Order'
+        }
     }, [deletePopup])
 
     const renderText = () => {
@@ -61,6 +66,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'ITEM_MASTER') {
             return 'Are you sure you want to delete selected Item?'
+        }
+        else if (deletePopup.type === 'PRODUCTION_ORDER') {
+            return 'Are you sure you want to delete selected Production Order?'
         }
     }
 
@@ -201,6 +209,38 @@ const DeletePopup = () => {
                 else {
                     notify(data.message + " ...Refreshing", "info", 2000)
                     setTimeout(() => dispatch(getItemMaster()), 1000)
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "PRODUCTION_ORDER") {
+            const instance = productionOrderRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                "productionOrderId": selectedRow[0].productionOrderId,
+                "productionNo": selectedRow[0].productionNo,
+                "productDescription": selectedRow[0].productDescription,
+                "productionStdCost": selectedRow[0].productionStdCost,
+                "quantity": selectedRow[0].quantity,
+                "status": selectedRow[0].status,
+                "currentDate": selectedRow[0].currentDate,
+                "startDate": selectedRow[0].startDate,
+                "endDate": selectedRow[0].endDate,
+                "warehouse": selectedRow[0].warehouse,
+            }
+            
+            dispatch(deleteProductionOrder(obj, selectedRow[0].productionOrderId)).then((res) => {
+                if (res.payload.data.success) {
+                    instance.getDataSource().store().remove(res.payload.data.result.productionOrderId)
+                    instance.refresh()
+                    selectedRow[0].children.map((item) => {
+                        dispatch(deletePoRouteStages(item, item.pO_RouteStageId))
+                    })
+                }
+                else {
+                    notify(res.payload.data.message + " ...Refreshing", "info", 2000)
+                    setTimeout(() => dispatch(getProductionOrder(0)), 1000)
                 }
             })
             handleOnToggle(deletePopup.type)

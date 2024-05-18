@@ -1,15 +1,18 @@
 import React, { Fragment, useEffect, useRef } from 'react'
-import FormBackground from '../../SupportComponents/FormBackground'
-import styled from 'styled-components'
-import { Button } from 'reactstrap'
-import { TreeList } from 'devextreme-react'
-import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
-import { useDispatch, useSelector } from 'react-redux'
-import { setBomRef, toggleDeletePopup } from '../../../actions/ViewActions'
-import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+
+import moment from 'moment'
+import FormBackground from '../../SupportComponents/FormBackground'
+
+import { Button } from 'reactstrap'
+import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+
 import { bomActionType, getBom } from '../../../actions/BomActions'
+import { setBomRef, toggleDeletePopup } from '../../../actions/ViewActions'
+
+import styled from 'styled-components'
 
 const BillOfMaterial = () => {
 
@@ -93,7 +96,6 @@ const BillOfMaterial = () => {
     const renderTreelist = () => {
         return (
             <Fragment>
-
                 <Header>
                     <HeaderSpan>Bill of Material History</HeaderSpan>
                     <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/create_bom')}>

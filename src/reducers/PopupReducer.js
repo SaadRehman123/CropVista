@@ -1,5 +1,6 @@
 const INITIAL_STATE = {
 	toggleSettingPopup : false,
+	toggleCreateJobCardPopup  : false,
 	toggleCreatePlanPopup : { open: false, type: ""},
 	toggleCreateResourcePopup : { open: false, type: ""},
 	toggleCreateWarehousePopup : { open: false, type: ""},
@@ -29,6 +30,12 @@ const PopupReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 toggleCreateResourcePopup: action.payload
+            }
+        }
+        case "TOGGLE_CREATE_JOB_CARD_POPUP": {
+            return {
+                ...state,
+                toggleCreateJobCardPopup : action.payload
             }
         }
 		default: return state

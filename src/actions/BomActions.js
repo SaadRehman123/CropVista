@@ -52,11 +52,11 @@ export const deleteBom = (obj, id) => {
     }
 }
 
-export const addBomItemResource = (obj) => {
+export const addBomItemResource = (arr) => {
     const result = axios({
         method: 'POST',
         url: `rest/bomItemResource/create`,
-        data: obj,
+        data: arr,
         ...Properties,
     })
     return {

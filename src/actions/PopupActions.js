@@ -25,3 +25,10 @@ export const toggleCreateResourcePopup = (obj) => {
 		payload : obj
 	}
 }
+
+export const toggleCreateJobCardPopup = (obj) => {
+    return {
+		type : "TOGGLE_CREATE_JOB_CARD_POPUP",
+		payload : obj
+	}
+}

@@ -2,103 +2,114 @@ import React, { Fragment, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Badge, Button } from 'reactstrap'
+import { Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
-import { setItemMasterTreeRef, toggleDeletePopup } from '../../../actions/ViewActions'
+
+import { getBom } from '../../../actions/BomActions'
+import { getPlannedCrops } from '../../../actions/CropsActions'
+import { getProductionOrder, productionOrderActionType } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
+import { setProductionOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
-const ItemMaster = () => {
+const ProductionOrder = () => {
 
-    const itemDataSource = useSelector(state => state.item.itemMaster)
+    const productionOrder = useSelector(state => state.production.productionOrder)
     
     const navigate = useNavigate()
-    const treeListRef = useRef(null)
-
     const dispatch = useDispatch()
 
-    useEffect(() => {
+    const treeListRef = useRef(null)
 
+    useEffect(() => {
+        dispatch(setProductionOrderRef(treeListRef))
     }, [])
 
     useEffect(() => {
-       dispatch(setItemMasterTreeRef(treeListRef))
+        dispatch(getBom(0))
+        dispatch(getPlannedCrops())
+        dispatch(getProductionOrder(0))
     }, [])
 
     const handleOnEditClick = (e) => {
-
+        dispatch(productionOrderActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Production_Order')
     }
-    
-    const renderItemIdColumn = (e)=> {
+
+    const renderActionHeaderCell = (e) => {
+        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
+    }
+
+    const renderHeaderCell = (e) => {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
+                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
+                    {e.column.caption}
+                </span>
+            </div>
+        )
+    }
+
+    const renderProductionOrderIdColumn = (e) => {
         return(
             <CellContainer>
                 <CellContent>
-                    {e.data.itemId}
+                    {e.data.productionOrderId}
                 </CellContent>
             </CellContainer>
         )
     }
 
-   const renderItemName = (e)=>{
-        return(
-            <CellContainer>
-                <CellContent>
-                    {e.data.itemName}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderItemTypeColumn = (e) => {
+    const renderProductionNoColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.itemType}
+                    {e.data.productionNo}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderSellingRateColumn = (e) => {
+    const renderProductDescriptionColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.sellingRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                    {e.data.productDescription}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderValuationRateColumn =(e)=>{
-        return(
-            <CellContainer>
-                <CellContent>
-                    {e.data.valuationRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderUOMColumn = (e) =>{
-        return(
-            <CellContainer>
-                <CellContent>
-                    {e.data.UOM}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderDisableColumn = (e) => {
+    const renderQuantityColumn = (e) => {
         return (
-            <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"active-badge"} color={!e.data.disable ? "secondary" : "success"}>
-                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>Disabled</span>
-                </Badge>
+            <CellContainer>
+                <CellContent>
+                    {e.data.quantity}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderStartDateColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {moment(e.data.startDate).format("DD/MM/YYYY")}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderEndDateColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {moment(e.data.endDate).format("DD/MM/YYYY")}
+                </CellContent>
             </CellContainer>
         )
     }
@@ -107,42 +118,48 @@ const ItemMaster = () => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Item Master'
+                    title='Edit Production Order'
                     className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick(e)}/>
+                    onClick={() => handleOnEditClick(e)} />
+
                 <button
-                    title='Delete Item Master'
+                    title='Delete Production Order'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"ITEM_MASTER" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PRODUCTION_ORDER" }))} />
             </ActionCellContainer>
         )
+    }
+
+    const handleOnCreateProductionOrder = () => {
+        dispatch(productionOrderActionType({ node: null, type: "Create" }))
+        navigate('/app/Create_Production_Order')
     }
 
     const renderTreelist = () => {
         return (
             <Fragment>
                 <Header>
-                    <HeaderSpan>Item Master</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Item')}>
+                    <HeaderSpan>Production Order History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreateProductionOrder()}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Item Master
+                        Create Production Order
                     </Button>
                 </Header>
-
+                
                 <TreeList
                     elementAttr={{
-                        id: "item-master-treelist",
+                        id: "production-order-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"itemId"}
+                    keyExpr={"productionOrderId"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
+                    dataSource={productionOrder}
                     allowColumnResizing={true}
-                    dataSource={itemDataSource}
                     rowAlternationEnabled={true}
-                    noDataText={'Item Not Available'}
+                    noDataText={'No Production Order'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -152,74 +169,62 @@ const ItemMaster = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Item ID"}
-                        dataField={"itemId"}
+                        caption={"Production Order-Id"}
+                        dataField={"productionOrderId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderItemIdColumn} 
+                        cellRender={renderProductionOrderIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Item Name"}
-                        dataField={"itemName"}
+                        caption={"Product Id"}
+                        dataField={"productionNo"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderItemName} 
+                        cellRender={renderProductionNoColumn}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+
+                    <Column
+                        caption={"Product Description"}
+                        dataField={"productDescription"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderProductDescriptionColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Item Type"}
-                        dataField={"itemType"}
+                        caption={"Quantity"}
+                        dataField={"quantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderItemTypeColumn} 
+                        cellRender={renderQuantityColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        caption={"Selling Rate"}
-                        dataField={"sellingRate"}
+                        caption={"Start Date"}
+                        dataField={"startDate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderSellingRateColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column 
-                        caption={"Valuation Rate"}
-                        dataField={"valuationRate"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        headerCellRender={renderHeaderCell}
-                        cellRender={renderValuationRateColumn} 
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column 
-                        caption={"UOM"}
-                        dataField={"UOM"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderUOMColumn} 
+                        cellRender={renderStartDateColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        width={110}
-                        minWidth={110}
-                        caption={"Disable"}
-                        dataField={"disable"}
+                        caption={"End Date"}
+                        dataField={"endDate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderDisableColumn} 
-                        headerCellRender={renderDisableHeaderCell}
+                        cellRender={renderEndDateColumn} 
+                        headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
@@ -238,37 +243,13 @@ const ItemMaster = () => {
             </Fragment>
         )
     }
-
-    const renderActionHeaderCell = (e) => {
-        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
-    }
-
-    const renderDisableHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
-    }
-
-    const renderHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
-    }
-
+    
     return (
         <FormBackground Form={[renderTreelist()]} />
-    )   
+    )
 }
 
-export default ItemMaster
+export default ProductionOrder
 
 const ActionCellContainer = styled.div`
     display: flex;

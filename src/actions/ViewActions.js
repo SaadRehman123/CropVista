@@ -75,3 +75,17 @@ export const setNavToolbarTitle = (value) => {
 		payload: value
 	}
 }
+
+export const setProductionOrderItemResource = (value) => {
+	return {
+		type: "SET_PRODUCTION_ORDER_ITEM_RESOURCE",
+		payload: value
+	}
+}
+
+export const setProductionOrderRef = (value) => {
+	return {
+		type: "SET_PRODUCTION_ORDER_REF",
+		payload: value
+	}
+}

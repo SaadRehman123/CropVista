@@ -3,12 +3,13 @@ import { combineReducers } from "redux"
 import BomReducer from "./BomReducer"
 import UserReducer from "./UserReducer"
 import ViewReducer from "./ViewReducer"
+import ItemReducer from "./ItemReducer"
 import PopupReducer from "./PopupReducer"
 import CropsReducer from "./CropsReducer"
 import SeasonsReducer from "./SeasonsReducer"
 import ResourceReducer from "./ResourceReducer"
 import WarehouseReducer from "./WarehouseReducer"
-import ItemReducer from "./ItemReducer"
+import ProductionReducer from "./ProductionReducer"
 
 const rootReducers = combineReducers({
     bom: BomReducer,
@@ -19,7 +20,8 @@ const rootReducers = combineReducers({
     crops: CropsReducer,
     seasons: SeasonsReducer,
     resource: ResourceReducer,
-    warehouse: WarehouseReducer
+    warehouse: WarehouseReducer,
+    production: ProductionReducer
 })
 
 export default rootReducers

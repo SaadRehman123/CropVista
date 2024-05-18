@@ -8,6 +8,7 @@ import AppContainer from './components/Main/AppContainer'
 import RequireAuth from '@auth-kit/react-router/RequireAuth'
 import Loading from './components/SupportComponents/Loading'
 
+import { getBom } from './actions/BomActions'
 import { getSeasons } from './actions/SeasonsAction'
 import { getItemMaster } from './actions/ItemActions'
 import { getResource } from './actions/ResourceAction'
@@ -15,6 +16,7 @@ import { getCookie } from './utilities/CommonUtilities'
 import { getWarehouse } from './actions/WarehouseAction'
 import { getPlannedCrops } from './actions/CropsActions'
 import { renderLoadingView } from './actions/ViewActions'
+import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 
 import './App.css'
@@ -30,12 +32,14 @@ const App = () => {
     const navigate = useNavigate()
 
 	useEffect(() => {
+		dispatch(getBom(0)).catch((error) => console.error(error))
 		dispatch(getSeasons()).catch((error) => console.error(error))
 		dispatch(getAllUsers()).catch((error) => console.error(error))
-		dispatch(getPlannedCrops()).catch((error) => console.error(error))
-		dispatch(getWarehouse()).catch((error) => console.error(error))
 		dispatch(getResource()).catch((error) => console.error(error))
+		dispatch(getWarehouse()).catch((error) => console.error(error))
 		dispatch(getItemMaster()).catch((error) => console.error(error))
+		dispatch(getPlannedCrops()).catch((error) => console.error(error))
+		dispatch(getProductionOrder(0)).catch((error) => console.error(error))
         setUpApplication()
     }, [login])
 

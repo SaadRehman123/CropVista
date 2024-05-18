@@ -1,22 +1,26 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react'
-import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
-import FormBackground from '../../SupportComponents/FormBackground'
-import { NumberBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
-import DataSource from 'devextreme/data/data_source'
-import styled from 'styled-components'
-import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { useDispatch, useSelector } from 'react-redux'
-import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
-import { Button } from 'reactstrap'
-import notify from 'devextreme/ui/notify'
-import { setItemResourceTreeRef } from '../../../actions/ViewActions'
+
 import moment from 'moment'
-import { addBom, addBomItemResource, bomActionType, deleteBomItemResource, getBom, updateBom, updateBomItemResource } from '../../../actions/BomActions'
+import notify from 'devextreme/ui/notify'
+import DataSource from 'devextreme/data/data_source'
+import FormBackground from '../../SupportComponents/FormBackground'
+import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
+
+import { Button } from 'reactstrap'
+import { NumberBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
+import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
+
 import { assignClientId } from '../../../utilities/CommonUtilities'
+import { setItemResourceTreeRef } from '../../../actions/ViewActions'
+import { addBom, addBomItemResource, deleteBomItemResource, getBom, updateBom, updateBomItemResource } from '../../../actions/BomActions'
+
+import styled from 'styled-components'
 
 const CreateBOM = () => {
 
-
+    const bom = useSelector(state => state.bom.Bom)
     const bomAction = useSelector(state => state.bom.bomAction)
     const itemMaster = useSelector(state => state.item.itemMaster)
     const resources = useSelector(state => state.resource.resources)
@@ -25,8 +29,8 @@ const CreateBOM = () => {
     const [treeListData, setTreeListData] = useState([])
     const [deletedRows, setDeletedRows] = useState([])
     const [itemDataSource, setItemDataSource] = useState({ type: "", dataSource: null })
-    const [invalid, setInvalid] = useState({ itemId: false, warehouseId: false, productDescription: false, priceList: false, quantity: false, productionStdCost: false })
-    const [formData, setFormData] = useState({ itemId: "", warehouseId: "", productDescription: "", priceList: "", quantity: "", productionStdCost: "" })
+    const [invalid, setInvalid] = useState({ itemId: false, warehouseId: false, productDescription: false, quantity: false, productionStdCost: false })
+    const [formData, setFormData] = useState({ itemId: "", warehouseId: "", productDescription: "", quantity: "", productionStdCost: "" })
 
     const itemResourceDatasource = new DataSource({
         store: {
@@ -50,12 +54,11 @@ const CreateBOM = () => {
                 if(res.payload.data.success){
                     const dataX = res.payload.data.result[0]
                     const Obj = itemMaster.find((item) => item.itemId === data.productId)
-                    console.log(dataX);
+
                     setFormData({ 
                         itemId: data.productId, 
                         warehouseId: data.wrId, 
                         productDescription: Obj ? Obj : "", 
-                        priceList: data.priceList, 
                         quantity: dataX.quantity, 
                         productionStdCost: dataX.productionStdCost
                     })
@@ -67,7 +70,7 @@ const CreateBOM = () => {
                         return item
                     })
 
-                    setTreeListData(dataX.children)
+                    setTreeListData(dataX.children.sort((a, b) => a.routeSequence - b.routeSequence))
                 }
             })
         }
@@ -75,8 +78,9 @@ const CreateBOM = () => {
 
     const handleOnAddRow = () => {
         const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
-        const newRow = getItemResourceObj(newClientID)
-        setTreeListData([...treeListData, newRow])
+        const maxRouteSequence = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.routeSequence)) : 1
+        const newRow = getItemResourceObj(newClientID, maxRouteSequence)
+        setTreeListData([...treeListData, newRow].sort((a, b) => a.routeSequence - b.routeSequence))
     }
 
     const renderItems = (e, type) => {
@@ -112,8 +116,6 @@ const CreateBOM = () => {
         itemResourceDatasource.store().remove(e.row.key).then(() => {
             itemResourceDatasource.reload()
         })
-
-        console.log(deletedRows);
     }
 
     const onValueChanged = (e, name) => {
@@ -150,9 +152,8 @@ const CreateBOM = () => {
             "itemId": !formData.itemId ? '' : formData.itemId.itemId,
             "warehouseId": !formData.warehouseId ? '' : formData.warehouseId.wrId ,
             "productDescription": formData.productDescription,
-            "priceList": formData.priceList,
             "quantity": formData.quantity,
-            "productionStdCost": formData.productionStdCost
+            "productionStdCost": formData.productionStdCost,
         }
         
         const name = e.event.target.accessKey
@@ -214,18 +215,17 @@ const CreateBOM = () => {
             productionStdCost : formData.productionStdCost,
             quantity : formData.quantity,
             wrId : formData.warehouseId.wrId ? formData.warehouseId.wrId : formData.warehouseId ,
-            priceList : formData.priceList,
             total : 0,
             productPrice : 0,
             creationDate : moment(Date.now()).format('YYYY-MM-DD'),
             itemBID : ''
         }
 
-        if (formData.productDescription.trim() === "" || formData.priceList.trim() === "" || setFormDataNumber(formData).trim() === "") {
+        if (formData.productDescription.trim() === "" || setFormDataNumber(formData).trim() === "") {
             return
         }
 
-        if (invalid.itemId === true || invalid.warehouseId === true || invalid.productDescription === true || invalid.priceList === true || invalid.quantity === true || invalid.productionStdCost === true){
+        if (invalid.itemId === true || invalid.warehouseId === true || invalid.productDescription === true || invalid.quantity === true || invalid.productionStdCost === true){
             return 
         }
 
@@ -252,6 +252,16 @@ const CreateBOM = () => {
                 else {
                     notify(data.message, "info", 2000)
                 }
+
+                setFormData({
+                    itemId: "",
+                    quantity: "",
+                    warehouseId: "",
+                    productionStdCost: "", 
+                    productDescription: ""
+                })
+
+                setTreeListData([])
             })
         }
         else if (bomAction.type === "UPDATE") {
@@ -259,12 +269,34 @@ const CreateBOM = () => {
                 const data = resX.payload.data
                 if (data.success) {
                     treeListData.forEach((item) => {
-                        // dispatch(updateBomItemResource(item, item.itemResourceId))
+
+                        if(item.itemResourceId === ""){
+                            let task = []
+                            item.BID = data.result.bid
+                            task.push(item)
+
+                            dispatch(addBomItemResource(task))
+                        }
+                        else {
+                            dispatch(updateBomItemResource(item, item.itemResourceId))
+                        }
+
                         deletedRows.forEach((item) => {
                             dispatch(deleteBomItemResource(item, item.itemResourceId))
                         })
                     })
+                    notify("Bill Of Material Updated Successfully", "info", 2000)
                 }
+
+                setFormData({
+                    itemId: "",
+                    quantity: "",
+                    warehouseId: "",
+                    productionStdCost: "", 
+                    productDescription: ""
+                })
+
+                setTreeListData([])
             })
         }
     }
@@ -294,7 +326,7 @@ const CreateBOM = () => {
                                         displayExpr={'itemId'}
                                         searchMode={'contains'}
                                         searchExpr={'itemName'}
-                                        dataSource={itemMaster}
+                                        dataSource={itemMaster.filter(item => item.itemType === "Finish Good" && !bom.some(bomItem => bomItem.productId === item.itemId))}
                                         value={formData.itemId}
                                         openOnFieldClick={true}
                                         acceptCustomValue={true}
@@ -332,23 +364,6 @@ const CreateBOM = () => {
                                         value={"Production"}
                                     />
                                 </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Production Std Cost</FormLabel>
-                                    <NumberBox
-                                        elementAttr={{
-                                            class: "form-numberbox"
-                                        }}
-                                        type={"number"}
-                                        onFocusIn={handleOnFocusIn}
-                                        onFocusOut={handleOnFocusOut}
-                                        value={formData.productionStdCost}
-                                        accessKey={'productionStdCost'}
-                                        placeholder={"Enter Production Std Cost"}
-                                        onValueChanged={(e) => onValueChanged(e, 'productionStdCost')}
-                                        validationStatus={invalid.productionStdCost === false ? "valid" : "invalid"}
-                                    />
-                                </FormGroupItem>
                             </div>
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
@@ -378,22 +393,6 @@ const CreateBOM = () => {
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Price List</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        accessKey={'priceList'}
-                                        value={formData.priceList}
-                                        onFocusIn={handleOnFocusIn}
-                                        onFocusOut={handleOnFocusOut}
-                                        placeholder={"Enter Price List"}
-                                        onValueChanged={(e) => onValueChanged(e, 'priceList')}
-                                        validationStatus={invalid.priceList === false ? "valid" : "invalid"}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
                                     <FormLabel>Quantity</FormLabel>
                                     <NumberBox
                                         elementAttr={{
@@ -409,9 +408,27 @@ const CreateBOM = () => {
                                         validationStatus={invalid.quantity === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
-                                <FormButtonContainer style={{ marginTop: 45 }}>
+
+                                <FormGroupItem>
+                                    <FormLabel>Production Std Cost</FormLabel>
+                                    <NumberBox
+                                        elementAttr={{
+                                            class: "form-numberbox"
+                                        }}
+                                        type={"number"}
+                                        onFocusIn={handleOnFocusIn}
+                                        onFocusOut={handleOnFocusOut}
+                                        value={formData.productionStdCost}
+                                        accessKey={'productionStdCost'}
+                                        placeholder={"Enter Production Std Cost"}
+                                        onValueChanged={(e) => onValueChanged(e, 'productionStdCost')}
+                                        validationStatus={invalid.productionStdCost === false ? "valid" : "invalid"}
+                                    />
+                                </FormGroupItem>
+
+                                <FormButtonContainer style={{ marginTop: 30 }}>
                                     <Button size="sm" className={"form-action-button"}>
-                                        Save Bill Of Material
+                                        {bomAction.type === "UPDATE" ? "Update" : "Save"} Bill Of Material
                                     </Button>
                                 </FormButtonContainer>
                             </div>
@@ -423,12 +440,45 @@ const CreateBOM = () => {
     }
 
     //Treelist Rendering
-
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
         if (!data.quantity) data.quantity = 0 
         if (!data.unitPrice) data.unitPrice = 0
         data.total = data.quantity * data.unitPrice
+
+        const instance = itemResourceTreeRef.current.instance;
+        const selectedRowIndex = instance.getRowIndexByKey(data.clientId)
+        let maxRouteSequence = 0
+
+        if (selectedRowIndex !== undefined && selectedRowIndex >= 0) {
+            const rowsBeforeSelected = treeListData.slice(0, selectedRowIndex)
+            const rowsAfterSelected = treeListData.slice(selectedRowIndex + 1)
+
+            const allRouteSequences = [
+                ...rowsBeforeSelected.map(item => item.routeSequence),
+                ...rowsAfterSelected.map(item => item.routeSequence)
+            ]
+
+            if (allRouteSequences.length > 0) {
+                maxRouteSequence = Math.max(...allRouteSequences)
+            }
+
+            if (data.routeSequence > maxRouteSequence + 1 || data.routeSequence === 0) {
+                data.routeSequence = maxRouteSequence
+            }
+        }
+
+        setTreeListData(prevData => {
+            const newData = [...prevData]
+            const index = newData.findIndex(item => item.clientId === data.clientId)
+            if (index !== -1) {
+                newData[index] = { ...newData[index], ...data }
+            } else {
+                newData.push(data)
+            }
+    
+            return newData.sort((a, b) => a.routeSequence - b.routeSequence)
+        })
     }
 
     const handleOnTypeValueChanged = (e) => {
@@ -447,7 +497,7 @@ const CreateBOM = () => {
         if(value === "Item"){
             setItemDataSource({
                 type: "Item",
-                dataSource: itemMaster
+                dataSource: itemMaster.filter((item) => item.itemType !== "Finish Good")
             })
         }
         else if(value === "Resource"){
@@ -536,6 +586,16 @@ const CreateBOM = () => {
             <CellContainer>
                 <CellContent>
                     {e.data.warehouseId}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderRouteStageCell = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.routeSequence}
                 </CellContent>
             </CellContainer>
         )
@@ -636,16 +696,6 @@ const CreateBOM = () => {
         )
     }
 
-    const renderPriceListCell = ({ data }) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {data.priceList}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
     const renderUnitPriceCell = ({ data }) => {
         return (
             <CellContainer>
@@ -715,6 +765,17 @@ const CreateBOM = () => {
                     />
 
                     <Column
+                        caption={"Route Stage"}
+                        dataField={"routeSequence"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={true}
+                        cellRender={renderRouteStageCell}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+
+                    <Column
                         caption={"Type"}
                         dataField={"type"}
                         alignment={"left"}
@@ -765,7 +826,7 @@ const CreateBOM = () => {
                         caption={"UoM"}
                         dataField={"uom"}
                         alignment={"left"}
-                        allowEditing={bomAction.type === "UPDATE" ? false : true}
+                        allowEditing={true}
                         allowSorting={false}
                         cellRender={renderUomCell} 
                         headerCellRender={renderHeaderCell}
@@ -779,16 +840,6 @@ const CreateBOM = () => {
                         allowSorting={false}
                         cellRender={renderWarehouseCell} 
                         editCellRender={renderWarehouseCell}
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"Price List"}
-                        dataField={"priceList"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderPriceListCell} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -823,6 +874,7 @@ const CreateBOM = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowEditing={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}
@@ -855,7 +907,7 @@ const setFormDataNumber = (formData) => {
     return result
 }
 
-const getItemResourceObj = (clientId) => {
+const getItemResourceObj = (clientId, routStage) => {
     return {
         type: "",
         id: "",
@@ -863,10 +915,10 @@ const getItemResourceObj = (clientId) => {
         quantity: 0,
         uom: "",
         warehouseId: "",
-        priceList: "",
         unitPrice: 0,
         total: "",
         itemResourceId: "",
+        routeSequence: routStage,
         clientId: clientId
     }
 }

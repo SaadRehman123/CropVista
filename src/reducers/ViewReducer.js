@@ -8,6 +8,8 @@ const INITIAL_STATE = {
 	warehouseRef: null,
 	itemMasterRef: null,
 	itemResourceRef: null,
+	productionOrderRef: null,
+	setProductionOrderItemResourceRef: null,
 	setNavToolbarTitle: 'Dashboard',
     deletePopup: { active: false, type: "" },
 }
@@ -78,6 +80,18 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
 			return {
 				...state,
 				setNavToolbarTitle: action.payload
+			}
+		}
+		case "SET_PRODUCTION_ORDER_ITEM_RESOURCE": {
+			return {
+				...state,
+				setProductionOrderItemResourceRef: action.payload
+			}
+		}
+		case "SET_PRODUCTION_ORDER_REF": {
+			return {
+				...state,
+				productionOrderRef: action.payload
 			}
 		}
 		default: return state

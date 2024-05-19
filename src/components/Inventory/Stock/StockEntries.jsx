@@ -123,7 +123,7 @@ const StockEntries = () => {
                     />
 
                     <Column
-                        caption={"Name"}
+                        caption={"Item Name"}
                         dataField={"stockEntryName"}
                         alignment={"left"}
                         allowSorting={false}

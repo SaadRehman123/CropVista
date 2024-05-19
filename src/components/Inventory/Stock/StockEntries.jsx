@@ -1,11 +1,15 @@
 import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+
 import moment from 'moment'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-import styled from 'styled-components'
 import FormBackground from '../../SupportComponents/FormBackground'
+
+import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+
 import { getStockEntries } from '../../../actions/StockEntriesAction'
+
+import styled from 'styled-components'
 
 const StockEntries = () => {
 

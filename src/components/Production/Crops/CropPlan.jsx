@@ -13,7 +13,6 @@ import { setCropPlanRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import styled from 'styled-components'
-import './styles.css'
 
 const CropPlan = () => {
 
@@ -96,7 +95,7 @@ const CropPlan = () => {
     const renderStatusColumn = (e) => {
         return (
             <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"status-badge"} color='warning'>
+                <Badge className={"status-badge"} color={e.data.status === "Pending" ? 'warning' : 'success'}>
                     <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
                     <span>{e.data.status}</span>
                 </Badge>

@@ -20,6 +20,7 @@ import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 
 import './App.css'
+import { getStockEntries } from './actions/StockEntriesAction'
 
 const App = () => {
 
@@ -39,6 +40,7 @@ const App = () => {
 		dispatch(getWarehouse()).catch((error) => console.error(error))
 		dispatch(getItemMaster()).catch((error) => console.error(error))
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
+		dispatch(getStockEntries()).catch((error) => console.error(error))
 		dispatch(getProductionOrder(0)).catch((error) => console.error(error))
         setUpApplication()
     }, [login])

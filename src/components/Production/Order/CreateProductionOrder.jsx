@@ -16,6 +16,7 @@ import { Button } from 'reactstrap'
 import { assignClientId } from '../../../utilities/CommonUtilities'
 import { toggleCreateJobCardPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
+import { getPlannedCrops, updateCropsPlan } from '../../../actions/CropsActions'
 import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
@@ -97,7 +98,7 @@ const CreateProductionOrder = () => {
                     PO_Type : child.type,
                     PO_ItemNo : child.id,
                     PO_ItemDescription : child.name,
-                    PO_Quantity: child.quantity,
+                    PO_Quantity: child.itemquantity,
                     PO_Uom : child.uom,
                     PO_WarehouseId : child.warehouseId,
                     PO_UnitPrice : child.unitPrice,
@@ -207,7 +208,35 @@ const CreateProductionOrder = () => {
                         setTreeListData(updatedTreeListData)
                         setDisable(true)
 
-                        getProductionOrder(0)
+                        dispatch(getProductionOrder(0)).then((res) => {
+                            const data = res.payload.data.result;
+
+                            data.forEach((dataItem) => {
+                                if (dataItem.status === "Planned" && plannedCrops.some(plannedCrop => plannedCrop.crop === dataItem.productDescription)) {
+                                    const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === dataItem.productDescription)
+                                    if(crop && crop.length > 0){
+                                        crop.forEach((crop) => {
+                                            let dataX = {
+                                                "id": crop.id,
+                                                "season": crop.season,
+                                                "crop": crop.crop,
+                                                "acre": crop.acre,
+                                                "startdate": crop.startdate,
+                                                "enddate": crop.enddate,
+                                                "status": "Planned"
+                                            }
+
+                                            dispatch(updateCropsPlan(dataX.id, dataX)).then((resX) => {
+                                                if (resX.payload.data.success) {
+                                                    dispatch(getPlannedCrops())
+                                                }
+                                            })
+                                        })
+    
+                                    }
+                                }
+                            })
+                        })
 
                         notify("Production Order Created Successfully", "info", 2000)
                     }
@@ -229,12 +258,27 @@ const CreateProductionOrder = () => {
 
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (data.PO_Status !== "Completed"){
+        if (data.PO_RouteStageId && data.PO_Status !== "Completed"){
             dispatch(updatePoRouteStages(data, data.PO_RouteStageId)).then((res) => {
-                if (res.payload.data.success){
+                if (res.payload.data.success) {
+                    const updatedItem = res.payload.data.result
+                    
+                    setTreeListData(prevData => 
+                        prevData.map(item => 
+                            item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+                        )
+                    )
+                    
                     notify("Route Stage Updated Successfully", "info", 2000)
                 }
             })
+        }
+        else {
+            setTreeListData(prevData => 
+                prevData.map(item => 
+                    item.clientId === data.clientId ? { ...item, ...data } : item
+                )
+            )
         }
     }
 
@@ -392,7 +436,6 @@ const CreateProductionOrder = () => {
                                         value={formData.startDate}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
-                                        validationMessagePosition={"bottom"}
                                     />
                                 </FormGroupItem>
 
@@ -411,7 +454,6 @@ const CreateProductionOrder = () => {
                                         value={formData.endDate}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
-                                        validationMessagePosition={"bottom"}
                                     />
                                 </FormGroupItem>
 
@@ -552,154 +594,173 @@ const CreateProductionOrder = () => {
         )
     }
 
+    const calculateTotal = () => {
+        return treeListData.reduce((sum, item) => {
+            const total = item.PO_Quantity * item.PO_UnitPrice;
+            return sum + total;
+        }, 0);
+    }
+    
+    const renderTotal = () => {
+        const totalSum = calculateTotal()
+        return (
+            <div style={{ padding: 10, float: "right", fontSize: 15, fontWeight: 700, borderRadius: 5, marginTop: 10, marginBottom: 10, backgroundColor: "lightgray" }}>
+                Total: {totalSum.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+            </div>
+        )
+    }
+
     const renderTreelist = () => {
         return (
-            <TreeList
-                elementAttr={{
-                    id: "production-order-bom-treelist",
-                    class: "project-treelist"
-                }}
-                keyExpr={"clientId"}
-                ref={treelistRef}
-                showBorders={true}
-                showRowLines={true}
-                showColumnLines={true}
-                dataSource={itemResourceDatasource}
-                allowColumnResizing={true}
-                rowAlternationEnabled={true}
-                noDataText={'No Data'}
-                className={'dev-form-treelist'}
-                columnResizingMode={"nextColumn"}
-                onSaved={handleOnSaved}
-                onEditorPreparing={handleOnEditorPreparing}>
-                
-                <Selection mode={"single"} />
-
-                <Scrolling mode={"standard"} />
-
-                <Editing
-                    mode='cell'
-                    allowUpdating={true}
-                    startEditAction='dblClick'
-                    selectTextOnEditStart={true} 
-                    texts={{ confirmDeleteMessage: '' }}
-                />
-
-                <Column
-                    caption={"Route Stage"}
-                    dataField={"PO_RouteStage"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    allowEditing={false}
-                    cellRender={renderRouteStageCell}
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-item-column"}
-                />
-
-                <Column
-                    caption={"Type"}
-                    dataField={"PO_Type"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    allowEditing={false}
-                    cellRender={renderTypeCell}
-                    editCellRender={renderTypeCell}
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-item-column"}
-                />
-
-                <Column
-                    caption={"Item No"}
-                    dataField={"PO_ItemNo"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    cellRender={renderItemNumberCell}
-                    editCellRender={renderItemNumberCell}
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-item-column"}
-                />
-
-                <Column
-                    width={140}
-                    caption={"Item Description"}
-                    dataField={"PO_ItemDescription"}
-                    alignment={"left"}
-                    allowEditing={false}
-                    allowSorting={false}
-                    cellRender={renderNameCell} 
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-column"}
-                />
+            <>
+                <TreeList
+                    elementAttr={{
+                        id: "production-order-bom-treelist",
+                        class: "project-treelist"
+                    }}
+                    keyExpr={"clientId"}
+                    ref={treelistRef}
+                    showBorders={true}
+                    showRowLines={true}
+                    showColumnLines={true}
+                    dataSource={itemResourceDatasource}
+                    allowColumnResizing={true}
+                    rowAlternationEnabled={true}
+                    noDataText={'No Data'}
+                    className={'dev-form-treelist'}
+                    columnResizingMode={"nextColumn"}
+                    onSaved={handleOnSaved}
+                    onEditorPreparing={handleOnEditorPreparing}>
                     
-                <Column
-                    caption={"Quantity"}
-                    dataField={"PO_Quantity"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    allowEditing={true}
-                    editorOptions={"dxNumberBox"}
-                    cellRender={renderQuantityColumn}
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-column"}
-                />
+                    <Selection mode={"single"} />
 
-                <Column
-                    caption={"UoM"}
-                    dataField={"PO_Uom"}
-                    alignment={"left"}
-                    allowEditing={false}
-                    allowSorting={false}
-                    cellRender={renderUomCell} 
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-item-column"}
-                />
+                    <Scrolling mode={"standard"} />
 
-                <Column
-                    caption={"Warehouse"}
-                    dataField={"PO_WarehouseId"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    cellRender={renderWarehouseCell} 
-                    editCellRender={renderWarehouseCell}
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-column"}
-                />
+                    <Editing
+                        mode='cell'
+                        allowUpdating={true}
+                        startEditAction='dblClick'
+                        selectTextOnEditStart={true} 
+                        texts={{ confirmDeleteMessage: '' }}
+                    />
 
-                <Column
-                    caption={"Unit Price"}
-                    dataField={"PO_UnitPrice"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    editorOptions={"dxNumberBox"}
-                    allowEditing={false}
-                    cellRender={renderUnitPriceCell} 
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-column"}
-                />
+                    <Column
+                        caption={"Route Stage"}
+                        dataField={"PO_RouteStage"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={false}
+                        cellRender={renderRouteStageCell}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
 
-                <Column
-                    caption={"Total"}
-                    dataField={"PO_Total"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    allowEditing={false}
-                    cellRender={renderTotalCell} 
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-column"}
-                />
+                    <Column
+                        caption={"Type"}
+                        dataField={"PO_Type"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={false}
+                        cellRender={renderTypeCell}
+                        editCellRender={renderTypeCell}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
 
-                <Column
-                    caption={"Status"}
-                    dataField={"PO_Status"}
-                    alignment={"left"}
-                    allowSorting={false}
-                    allowEditing={false}
-                    cellRender={renderStatusCell} 
-                    headerCellRender={renderHeaderCell}
-                    cssClass={"project-treelist-column"}
-                />
+                    <Column
+                        caption={"Item No"}
+                        dataField={"PO_ItemNo"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderItemNumberCell}
+                        editCellRender={renderItemNumberCell}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+
+                    <Column
+                        width={140}
+                        caption={"Item Description"}
+                        dataField={"PO_ItemDescription"}
+                        alignment={"left"}
+                        allowEditing={false}
+                        allowSorting={false}
+                        cellRender={renderNameCell} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+                        
+                    <Column
+                        caption={"Quantity"}
+                        dataField={"PO_Quantity"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={true}
+                        editorOptions={"dxNumberBox"}
+                        cellRender={renderQuantityColumn}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"UoM"}
+                        dataField={"PO_Uom"}
+                        alignment={"left"}
+                        allowEditing={false}
+                        allowSorting={false}
+                        cellRender={renderUomCell} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+
+                    <Column
+                        caption={"Warehouse"}
+                        dataField={"PO_WarehouseId"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderWarehouseCell} 
+                        editCellRender={renderWarehouseCell}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"Unit Price"}
+                        dataField={"PO_UnitPrice"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        editorOptions={"dxNumberBox"}
+                        allowEditing={false}
+                        cellRender={renderUnitPriceCell} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"Total"}
+                        dataField={"PO_Total"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={false}
+                        cellRender={renderTotalCell} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"Status"}
+                        dataField={"PO_Status"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={false}
+                        cellRender={renderStatusCell} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+                </TreeList>
                 <CreateJobCard productionOrder={selectedItem} />
-            </TreeList>
+                {renderTotal()}
+            </>
         )
     }
 

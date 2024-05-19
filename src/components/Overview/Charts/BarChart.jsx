@@ -41,7 +41,7 @@ const BarChart = () => {
                 type="bar"
                 ignoreEmptyPoints={true}
             />
-            <Size width={1300}/>
+            <Size width={1000}/>
             <Export enabled={true} fileName={"Planned Crop Acreage Distribution"}/>
             <Title text="Planned Crop Acreage Distribution" />
             <SeriesTemplate nameField="crop" />

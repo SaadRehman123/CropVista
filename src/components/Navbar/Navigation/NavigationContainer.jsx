@@ -72,6 +72,10 @@ const NavigationContainer = () => {
             navigate('/app/Production_Order')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        else if(obj.id === "stock-entry"){
+            navigate('/app/Stock_Entries')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
     }
 
     return (
@@ -100,7 +104,8 @@ const navigations = [
     {id: "resource", name: "Resources", icon: "fal fa-user-plus", pad: 20, type: "inventory"},
     {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 20, type: "inventory"},
     {id: "itemMaster", name: "Item Master", icon: "fal fa-cart-plus", pad: 22, type: "inventory"},
+    {id: "stock-entry", name: "Stock Entries", icon: "fal fa-cubes", pad: 25, type: "inventory"},
     {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 21, type: "production"},
     {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 21, type: "production"},
-    {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 21, type: "production"},
+    {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 21, type: "production"}
 ]

@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import moment from 'moment'
 import notify from 'devextreme/ui/notify'
 
 import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap'
 import { CellContainer, CellContent } from '../SupportComponents/StyledComponents'
 import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 
+import { addStockEntries } from '../../actions/StockEntriesAction'
 import { toggleCreateJobCardPopup } from '../../actions/PopupActions'
 import { getProductionOrder, updatePoRouteStages } from '../../actions/ProductionOrderAction'
 
@@ -51,9 +53,20 @@ const CreateJobCard = (props) => {
                 delete item.clientId
                 item.pO_Status = "Completed"
     
+                const stockEntries = {
+                    StockEntryId : "",
+                    StockEntryName : item.pO_ItemDescription,
+                    StockEntryWarehouse : item.pO_WarehouseId,
+                    StockEntryQuantity : item.pO_Quantity,
+                    StockEntryTo: "Production",
+                    StockEntryDate: moment(Date.now()).format('YYYY-MM-DD')
+                }
+
                 dispatch(updatePoRouteStages(item, item.pO_RouteStageId)).then((res) => {
                     const data = res.payload.data
                     if (data.success) {
+
+                        dispatch(addStockEntries(stockEntries))
                         dispatch(getProductionOrder(0)).then((resX) => {
                             if (resX.payload.data.success) {
                                 notify("Route Stage Completed", "info", 2000)

@@ -442,9 +442,9 @@ const CreateBOM = () => {
     //Treelist Rendering
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (!data.quantity) data.quantity = 0 
+        if (!data.itemquantity) data.itemquantity = 0 
         if (!data.unitPrice) data.unitPrice = 0
-        data.total = data.quantity * data.unitPrice
+        data.total = data.itemquantity * data.unitPrice
 
         const instance = itemResourceTreeRef.current.instance;
         const selectedRowIndex = instance.getRowIndexByKey(data.clientId)
@@ -662,7 +662,7 @@ const CreateBOM = () => {
         return (
             <CellContainer>
                 <CellContent>
-                    {data.quantity}
+                    {data.itemquantity}
                 </CellContent>
             </CellContainer>
         )
@@ -707,7 +707,7 @@ const CreateBOM = () => {
     }
 
     const renderTotalCell = ({ data }) => {
-        const value = data.quantity * data.unitPrice 
+        const value = data.itemquantity * data.unitPrice 
         return (
             <CellContainer>
                 <CellContent>
@@ -727,7 +727,23 @@ const CreateBOM = () => {
             </ActionCellContainer>
         )
     }
+
+    const calculateTotal = () => {
+        return treeListData.reduce((sum, item) => {
+            const total = item.itemquantity * item.unitPrice;
+            return sum + total;
+        }, 0);
+    }
     
+    const renderTotal = () => {
+        const totalSum = calculateTotal()
+        return (
+            <div style={{ padding: 10, float: "right", fontSize: 15, fontWeight: 700, borderRadius: 5, marginTop: 10, marginBottom: 10, backgroundColor: "lightgray" }}>
+                Total: {totalSum.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+            </div>
+        )
+    }
+
     const renderTreelist = () => {
         return (
             <Fragment>
@@ -812,7 +828,7 @@ const CreateBOM = () => {
                         
                     <Column
                         caption={"Quantity"}
-                        dataField={"quantity"}
+                        dataField={"itemquantity"}
                         alignment={"left"}
                         allowSorting={false}
                         allowEditing={true}
@@ -880,6 +896,7 @@ const CreateBOM = () => {
                         cssClass={"project-treelist-column"}
                     />
                 </TreeList>
+                {renderTotal()}
             </Fragment>
         )
     }
@@ -912,7 +929,7 @@ const getItemResourceObj = (clientId, routStage) => {
         type: "",
         id: "",
         name: "",
-        quantity: 0,
+        itemquantity: 0,
         uom: "",
         warehouseId: "",
         unitPrice: 0,

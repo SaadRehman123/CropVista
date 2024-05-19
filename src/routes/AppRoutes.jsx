@@ -13,6 +13,7 @@ import ProductionOrder from '../components/Production/Order/ProductionOrder'
 import BillOfMaterial from '../components/Production/BillOfMaterial/BillOfMaterial'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
 import CreateProductionOrder from '../components/Production/Order/CreateProductionOrder'
+import StockEntries from '../components/Inventory/Stock/StockEntries'
 
 const AppRoutes = () => {
     return (
@@ -66,6 +67,10 @@ const AppRoutes = () => {
                 <Route
                     path="Create_Production_Order"
                     element={<CreateProductionOrder />}>
+                </Route>
+                <Route
+                    path="Stock_Entries"
+                    element={<StockEntries />}>
                 </Route>
             </Routes>
         </div>

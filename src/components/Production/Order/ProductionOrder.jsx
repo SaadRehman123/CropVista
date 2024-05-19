@@ -122,10 +122,10 @@ const ProductionOrder = () => {
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)} />
 
-                <button
+                {/* <button
                     title='Delete Production Order'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PRODUCTION_ORDER" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PRODUCTION_ORDER" }))} /> */}
             </ActionCellContainer>
         )
     }

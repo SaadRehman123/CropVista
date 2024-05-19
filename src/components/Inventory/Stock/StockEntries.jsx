@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import { getStockEntries } from '../../../actions/StockEntriesAction'
 

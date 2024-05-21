@@ -215,7 +215,7 @@ const CreateBOM = () => {
             productionStdCost : formData.productionStdCost,
             quantity : formData.quantity,
             wrId : formData.warehouseId.wrId ? formData.warehouseId.wrId : formData.warehouseId ,
-            total : 0,
+            total : calculateTotal(),
             productPrice : 0,
             creationDate : moment(Date.now()).format('YYYY-MM-DD'),
             itemBID : ''

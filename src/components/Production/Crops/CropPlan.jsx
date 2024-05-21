@@ -8,6 +8,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 
 import moment from 'moment/moment'
 
+import { getPlannedCrops } from '../../../actions/CropsActions'
 import { toggleCreatePlanPopup } from '../../../actions/PopupActions'
 import { setCropPlanRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
@@ -24,6 +25,10 @@ const CropPlan = () => {
 
     useEffect(() => {
         dispatch(setCropPlanRef(treeListRef))
+    }, [])
+
+    useEffect(() => {
+        dispatch(getPlannedCrops())
     }, [])
 
     const handleOnEditClick = () => {
@@ -95,7 +100,7 @@ const CropPlan = () => {
     const renderStatusColumn = (e) => {
         return (
             <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"status-badge"} color={e.data.status === "Pending" ? 'warning' : 'success'}>
+                <Badge className={"status-badge"} color={setColor(e)}>
                     <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
                     <span>{e.data.status}</span>
                 </Badge>
@@ -214,8 +219,8 @@ const CropPlan = () => {
                     />
                     
                     <Column
-                        width={100}
-                        minWidth={100}
+                        width={115}
+                        minWidth={115}
                         caption={"Status"}
                         dataField={"status"}
                         alignment={"center"}
@@ -292,3 +297,22 @@ const HeaderSpan = styled.span`
     font-weight: 500;
     font-family: 'RobotoFallback';
 `
+
+const setColor = (e) => {
+    let color
+
+    if(e.data.status === "Pending"){
+        color = 'warning'
+    }
+    else if(e.data.status === "Release"){
+        color = 'info'
+    }
+    else if(e.data.status === "Completed"){
+        color = 'success'
+    }
+    else if(e.data.status === "Closed"){
+        color = 'danger'
+    }
+
+    return color
+}

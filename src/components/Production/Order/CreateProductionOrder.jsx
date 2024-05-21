@@ -17,7 +17,7 @@ import { assignClientId } from '../../../utilities/CommonUtilities'
 import { toggleCreateJobCardPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
 import { getPlannedCrops, updateCropsPlan } from '../../../actions/CropsActions'
-import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages } from '../../../actions/ProductionOrderAction'
+import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages, updateProductionOrder } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
 
@@ -31,7 +31,10 @@ const CreateProductionOrder = () => {
 
     const [formData, setFormData] = useState({ itemId: "", productDescription: "", quantity: "", productionStdCost: "", status: "", startDate: "", endDate: "", warehouseId: "" })
 
-    const [disable, setDisable] = useState(false)
+    const [save, setSave] = useState(false)
+    const [close, setClose] = useState(false)
+    const [release, setRelease] = useState(false)
+    const [complete, setComplete] = useState(false)
     const [treeListData, setTreeListData] = useState([])
     const [selectedItem, setSeletctedItem] = useState("")
 
@@ -45,6 +48,79 @@ const CreateProductionOrder = () => {
             key: 'clientId',
         }
     })
+
+    useEffect(() => {
+        if (formData.status === "Release") {
+            setRelease(true)
+        }
+    }, [formData])
+
+    useEffect(() => {
+        if (formData.status === "Closed") {
+            setClose(true)
+        }
+    }, [formData])
+
+    useEffect(() => {
+        const item = productionOrder.find((item) => item.productionNo === formData.itemId && item.status === "Planned")        
+        if(item && item.productionOrderId !== "" && item.status !== "Release"){
+            setSave(true)
+        }
+    }, [formData])
+    
+    useEffect(() => {
+        if (treeListData.length > 0 && treeListData.every(item => item.PO_Status === "Completed")) {
+            setComplete(true)
+        }
+    }, [treeListData])
+
+    useEffect(() => {
+        const order = productionOrder.find((item) => item.productionNo === formData.itemId && item.status === "Release")
+        if (order && treeListData.length > 0 && treeListData.every(item => item.PO_Status === "Completed")) {
+            const pOrder = productionOrder.find((item) => item.productionOrderId === treeListData[0].PO_productionOrderId)
+            if(pOrder){
+                const { children, ...rest } = pOrder
+                const obj = {
+                    ...rest,
+                    status: "Completed"
+                }
+
+                dispatch(updateProductionOrder(obj, obj.productionOrderId)).then((res) => {
+                    const data = res.payload.data
+                    if(data.success){
+                        setFormData((prev) => ({
+                            ...prev,
+                            status: "Completed"
+                        }))
+
+                        const result = data.result
+                        if (result.status === "Completed" && plannedCrops.some(plannedCrop => plannedCrop.crop === result.productDescription)) {
+                            const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === result.productDescription)
+                            if(crop && crop.length > 0){
+                                crop.forEach((crop) => {
+                                    let dataX = {
+                                        "id": crop.id,
+                                        "season": crop.season,
+                                        "crop": crop.crop,
+                                        "acre": crop.acre,
+                                        "startdate": crop.startdate,
+                                        "enddate": crop.enddate,
+                                        "status": "Completed"
+                                    }
+
+                                    dispatch(updateCropsPlan(dataX.id, dataX))
+                                })
+
+                                dispatch(getPlannedCrops())
+                            }
+                        }
+
+                        notify("Production Order Completed", "info", 2000)
+                    }
+                })
+            }
+        }
+    }, [treeListData])
 
     useEffect(() => {
         dispatch(setProductionOrderItemResource(treelistRef))
@@ -206,10 +282,10 @@ const CreateProductionOrder = () => {
                         })
 
                         setTreeListData(updatedTreeListData)
-                        setDisable(true)
+                        setSave(true)
 
                         dispatch(getProductionOrder(0)).then((res) => {
-                            const data = res.payload.data.result;
+                            const data = res.payload.data.result
 
                             data.forEach((dataItem) => {
                                 if (dataItem.status === "Planned" && plannedCrops.some(plannedCrop => plannedCrop.crop === dataItem.productDescription)) {
@@ -226,13 +302,9 @@ const CreateProductionOrder = () => {
                                                 "status": "Planned"
                                             }
 
-                                            dispatch(updateCropsPlan(dataX.id, dataX)).then((resX) => {
-                                                if (resX.payload.data.success) {
-                                                    dispatch(getPlannedCrops())
-                                                }
-                                            })
+                                            dispatch(updateCropsPlan(dataX.id, dataX))
                                         })
-    
+                                        dispatch(getPlannedCrops())
                                     }
                                 }
                             })
@@ -310,16 +382,121 @@ const CreateProductionOrder = () => {
         dispatch(toggleCreateJobCardPopup(true))
     }
 
+    const handleOnReleaseProduction = () => {
+        setRelease(true)
+        const pOrder  = productionOrder.find((item) => item.productionOrderId === treeListData[0].PO_productionOrderId)
+        if(pOrder){
+            const { children, ...rest } = pOrder
+            const obj = {
+                ...rest,
+                status: "Release"
+            }
+
+            dispatch(updateProductionOrder(obj, obj.productionOrderId)).then((res) => {
+                if(res.payload.data.success){
+                    setFormData((prev) => ({
+                        ...prev,
+                        status: "Release"
+                    }))
+
+                    const result = res.payload.data.result
+                    if (result.status === "Release" && plannedCrops.some(plannedCrop => plannedCrop.crop === result.productDescription)) {
+                        const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === result.productDescription)
+                        if(crop && crop.length > 0){
+                            crop.forEach((crop) => {
+                                let dataX = {
+                                    "id": crop.id,
+                                    "season": crop.season,
+                                    "crop": crop.crop,
+                                    "acre": crop.acre,
+                                    "startdate": crop.startdate,
+                                    "enddate": crop.enddate,
+                                    "status": "Release"
+                                }
+
+                                dispatch(updateCropsPlan(dataX.id, dataX))
+                            })
+
+                            dispatch(getPlannedCrops())
+                        }
+                    }
+                    
+                    notify("Production Order Release", "info", 2000)
+                }
+            })
+        }
+    }
+
+    const handleOnCloseProduction = () => {
+        const pOrder = productionOrder.find((item) => item.productionOrderId === treeListData[0].PO_productionOrderId)
+
+        if(pOrder){
+            const { children, ...rest } = pOrder
+            const obj = {
+                ...rest,
+                status: "Closed"
+            }
+
+            dispatch(updateProductionOrder(obj, obj.productionOrderId)).then((res) => {
+                const data = res.payload.data
+                if(data.success){
+                    setFormData((prev) => ({
+                        ...prev,
+                        status: "Closed"
+                    }))
+
+                    const result = data.result
+                    if (result.status === "Closed" && plannedCrops.some(plannedCrop => plannedCrop.crop === result.productDescription)) {
+                        const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === result.productDescription)
+                        if(crop && crop.length > 0){
+                            crop.forEach((crop) => {
+                                let dataX = {
+                                    "id": crop.id,
+                                    "season": crop.season,
+                                    "crop": crop.crop,
+                                    "acre": crop.acre,
+                                    "startdate": crop.startdate,
+                                    "enddate": crop.enddate,
+                                    "status": "Closed"
+                                }
+
+                                dispatch(updateCropsPlan(dataX.id, dataX))
+                            })
+
+                            dispatch(getPlannedCrops())
+                        }
+                    }
+
+                    notify("Production Order Closed", "info", 2000)
+                }
+            })
+        }
+    }
+
     const renderForm = () => {
         return(
             <Fragment>
 
                 <Header>
                     <HeaderSpan>Create Production Order</HeaderSpan>
-                    <Button size="sm" disabled={handleOnDisable(treeListData, disable, productionOrderAction)} className={"form-action-button"} onClick={() => handleOnStart()}>
-                        <i style={{marginRight: 10}} className='fas fa-play' />
-                        Start Production
-                    </Button>
+                    <div style={{ display: "flex", justifyContent: "space-around" }}>
+                        <Button size="sm" disabled={handleOnDisable(treeListData, save, release)} className={"form-action-button"} onClick={() => handleOnReleaseProduction()}>
+                            <i style={{marginRight: 10}} className='fas fa-check-circle' />
+                            Release Production
+                        </Button>
+                        
+                        <Button size="sm" style={{ marginLeft: 10 }} disabled={!release || complete ? true : false} className={"form-action-button"} onClick={() => handleOnStart()}>
+                            <i style={{marginRight: 10}} className='fas fa-play' />
+                            Start Production
+                        </Button>
+
+                        {complete && close === false && (
+                            <Button size="sm" color={"danger"} style={{ marginLeft: 10 }} onClick={() => handleOnCloseProduction()}>
+                                <i style={{marginRight: 10}} className='fas fa-times-circle' />
+                                Close Production
+                            </Button>
+                        )}
+                    </div>
                 </Header>
 
                 <div style={{ margin: 10 }}><ProgressBar /></div>
@@ -337,7 +514,7 @@ const CreateProductionOrder = () => {
                                         searchTimeout={200}
                                         accessKey={'itemId'}
                                         searchEnabled={true}
-                                        readOnly={disable || productionOrderAction.type === "UPDATE" ? true : false}
+                                        readOnly={save || productionOrderAction.type === "UPDATE" ? true : false}
                                         displayExpr={'itemId'}
                                         searchMode={'contains'}
                                         searchExpr={'itemName'}
@@ -470,7 +647,7 @@ const CreateProductionOrder = () => {
                                     />
                                 </FormGroupItem>
                                 <FormButtonContainer style={{ marginTop: 45 }}>
-                                    <Button disabled={disable || productionOrderAction.type === "UPDATE" ? true : false} size="sm" className={"form-action-button"}>
+                                    <Button disabled={save || productionOrderAction.type === "UPDATE" ? true : false} size="sm" className={"form-action-button"}>
                                         {productionOrderAction.type === "UPDATE" ? "" : "Save"} Production Order
                                     </Button>
                                 </FormButtonContainer>
@@ -785,17 +962,17 @@ const HeaderSpan = styled.span`
     font-family: 'RobotoFallback';
 `
 
-const handleOnDisable = (treeListData, disable, productionOrderAction) => {
+const handleOnDisable = (treeListData, save, release) => {
     
-    if (productionOrderAction.type === 'UPDATE') {
-        return false
+    if (release) {
+        return true
     }
 
     if (treeListData.length === 0) {
         return true
     }
-    
-    if (treeListData.length > 0 && disable === false) {
+
+    if (treeListData.length > 0 && !save) {
         return true
     }
 

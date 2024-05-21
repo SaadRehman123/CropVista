@@ -26,6 +26,18 @@ export const addProductionOrder = (obj) => {
     }
 }
 
+export const updateProductionOrder = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/productionOrder/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_PRODUCTION_ORDER',
+        payload: result
+    }
+}
 
 export const deleteProductionOrder = (obj, id) => {
     const result = axios({

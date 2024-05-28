@@ -76,6 +76,10 @@ const NavigationContainer = () => {
             navigate('/app/Stock_Entries')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        else if(obj.id === "inventory-status"){
+            navigate('/app/Inventory_Status')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
     }
 
     return (
@@ -100,12 +104,13 @@ const Container = styled.div`
 `
 
 const navigations = [
-    {id: "dashboard", name: "Dashboard", icon: "fal fa-analytics", pad: 20, type: "overview"},
-    {id: "resource", name: "Resources", icon: "fal fa-user-plus", pad: 20, type: "inventory"},
-    {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 20, type: "inventory"},
-    {id: "itemMaster", name: "Item Master", icon: "fal fa-cart-plus", pad: 22, type: "inventory"},
-    {id: "stock-entry", name: "Stock Entries", icon: "fal fa-cubes", pad: 25, type: "inventory"},
-    {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 21, type: "production"},
-    {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 21, type: "production"},
-    {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 21, type: "production"}
+    {id: "dashboard", name: "Dashboard", icon: "fal fa-analytics", pad: 10, type: "overview"},
+    {id: "resource", name: "Resources", icon: "fal fa-user-plus", pad: 10, type: "inventory"},
+    {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 10, type: "inventory"},
+    {id: "itemMaster", name: "Item Master", icon: "fal fa-cart-plus", pad: 10, type: "inventory"},
+    {id: "stock-entry", name: "Stock Entries", icon: "fal fa-cubes", pad: 10, type: "inventory"},
+    {id: "inventory-status", name: "Inventory Status", icon: "fal fa-boxes", pad: 10, type: "inventory"},
+    {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 10, type: "production"},
+    {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 10, type: "production"},
+    {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 10, type: "production"},
 ]

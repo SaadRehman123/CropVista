@@ -9,6 +9,7 @@ import CropsReducer from "./CropsReducer"
 import SeasonsReducer from "./SeasonsReducer"
 import ResourceReducer from "./ResourceReducer"
 import WarehouseReducer from "./WarehouseReducer"
+import InventoryReducer from "./InventoryReducer"
 import ProductionReducer from "./ProductionReducer"
 import StockEntriesReducer from "./StockEntriesReducer"
 
@@ -23,6 +24,7 @@ const rootReducers = combineReducers({
     resource: ResourceReducer,
     stock: StockEntriesReducer,
     warehouse: WarehouseReducer,
+    inventory : InventoryReducer,
     production: ProductionReducer
 })
 

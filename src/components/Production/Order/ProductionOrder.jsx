@@ -114,18 +114,36 @@ const ProductionOrder = () => {
         )
     }
 
+    const renderStatusColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.status}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
-                <button
-                    title='Edit Production Order'
-                    className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick(e)} />
+                {e.data.status !== "Closed" && e.data.status !== "Cancelled" && (
+                    <button
+                        title='Edit Production Order'
+                        className='fal fa-pen treelist-edit-button'
+                        onClick={() => handleOnEditClick(e)} />
+                )}
 
-                {/* <button
-                    title='Delete Production Order'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PRODUCTION_ORDER" }))} /> */}
+                {e.data.status !== "Completed" && e.data.status !== "Closed" && e.data.status !== "Cancelled" && (
+                    <button
+                        title='Cancel Production Order'
+                        className='fal fa-trash treelist-delete-button'
+                        onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PRODUCTION_ORDER" }))} />
+                )}
+
+                {(e.data.status === "Closed" || e.data.status === "Cancelled") && (
+                    <button style={{ cursor: "not-allowed" }} className='fal fa-minus treelist-edit-button' />
+                )}
             </ActionCellContainer>
         )
     }
@@ -224,6 +242,16 @@ const ProductionOrder = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderEndDateColumn} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"Status"}
+                        dataField={"status"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderStatusColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

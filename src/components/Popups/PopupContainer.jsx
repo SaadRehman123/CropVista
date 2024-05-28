@@ -1,5 +1,6 @@
 import React from 'react'
 
+import CreateItem from './CreateItem'
 import CreatePlan from './CreatePlan'
 import DeletePopup from './DeletePopup'
 import CreateResource from './CreateResource'
@@ -10,6 +11,7 @@ const PopupContainer = () => {
     return (
         <>
             <CreatePlan />
+            <CreateItem />
             <DeletePopup />
             <CreateResource />
             <CreateWarehouse />

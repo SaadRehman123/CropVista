@@ -15,12 +15,13 @@ import { getResource } from './actions/ResourceAction'
 import { getCookie } from './utilities/CommonUtilities'
 import { getWarehouse } from './actions/WarehouseAction'
 import { getPlannedCrops } from './actions/CropsActions'
+import { getInventory } from './actions/InventoryAction'
 import { renderLoadingView } from './actions/ViewActions'
+import { getStockEntries } from './actions/StockEntriesAction'
 import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
 
 import './App.css'
-import { getStockEntries } from './actions/StockEntriesAction'
 
 const App = () => {
 
@@ -38,6 +39,7 @@ const App = () => {
 		dispatch(getAllUsers()).catch((error) => console.error(error))
 		dispatch(getResource()).catch((error) => console.error(error))
 		dispatch(getWarehouse()).catch((error) => console.error(error))
+		dispatch(getInventory()).catch((error) => console.error(error))
 		dispatch(getItemMaster()).catch((error) => console.error(error))
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
 		dispatch(getStockEntries()).catch((error) => console.error(error))

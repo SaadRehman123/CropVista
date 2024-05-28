@@ -1,5 +1,5 @@
 const INITIAL_STATE = {
-	itemMaster : []
+	itemMaster : [],
 }
 
 const ItemReducer = (state = INITIAL_STATE, action) => {

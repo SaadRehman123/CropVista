@@ -13,6 +13,19 @@ export const getCropsBySeason = (season) => {
     }
 }
 
+export const addCrops = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `/rest/crops/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_CROP',
+        payload: result
+    }
+}
+
 export const getPlannedCrops = () => {
     const result = axios({
         method: 'GET',

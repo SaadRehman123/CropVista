@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import FormBackground from '../../SupportComponents/FormBackground'
@@ -7,29 +6,37 @@ import FormBackground from '../../SupportComponents/FormBackground'
 import { Badge, Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+
+import { getItemMaster } from '../../../actions/ItemActions'
+import { toggleCreateItemPopup } from '../../../actions/PopupActions'
 import { setItemMasterTreeRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
 import styled from 'styled-components'
 
 const ItemMaster = () => {
 
-    const itemDataSource = useSelector(state => state.item.itemMaster)
+    const itemMasterDataSource = useSelector(state => state.item.itemMaster)
     
-    const navigate = useNavigate()
     const treeListRef = useRef(null)
 
     const dispatch = useDispatch()
 
     useEffect(() => {
-
+        dispatch(getItemMaster())
     }, [])
 
     useEffect(() => {
        dispatch(setItemMasterTreeRef(treeListRef))
     }, [])
 
-    const handleOnEditClick = (e) => {
+    const handleOnCreate = () => {
+        dispatch(toggleCreateItemPopup({ open: true, type: "CREATE" }))
+    }
 
+    const handleOnEditClick = () => {
+        setTimeout(() => {
+            dispatch(toggleCreateItemPopup({ open: true, type: "UPDATE" }))
+        }, 0)
     }
     
     const renderItemIdColumn = (e)=> {
@@ -86,7 +93,7 @@ const ItemMaster = () => {
         return(
             <CellContainer>
                 <CellContent>
-                    {e.data.UOM}
+                    {e.data.uom}
                 </CellContent>
             </CellContainer>
         )
@@ -95,9 +102,9 @@ const ItemMaster = () => {
     const renderDisableColumn = (e) => {
         return (
             <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"active-badge"} color={!e.data.disable ? "secondary" : "success"}>
+                <Badge className={"active-badge"} color={!e.data.disable ? "success" : "secondary"}>
                     <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>Disabled</span>
+                    <span>{!e.data.disable ? "Active" : "Disabled"}</span>
                 </Badge>
             </CellContainer>
         )
@@ -110,10 +117,6 @@ const ItemMaster = () => {
                     title='Edit Item Master'
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)}/>
-                <button
-                    title='Delete Item Master'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"ITEM_MASTER" }))} />
             </ActionCellContainer>
         )
     }
@@ -123,7 +126,7 @@ const ItemMaster = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Item Master</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Item')}>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreate()}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
                         Create Item Master
                     </Button>
@@ -140,12 +143,12 @@ const ItemMaster = () => {
                     showRowLines={true}
                     showColumnLines={true}
                     allowColumnResizing={true}
-                    dataSource={itemDataSource}
                     rowAlternationEnabled={true}
-                    noDataText={'Item Not Available'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
-                    columnResizingMode={"nextColumn"}>
+                    noDataText={'Item Not Available'}
+                    columnResizingMode={"nextColumn"}
+                    dataSource={itemMasterDataSource}>
 
                     <Selection mode={"single"} />
 
@@ -202,8 +205,8 @@ const ItemMaster = () => {
                     />
 
                     <Column 
-                        caption={"UOM"}
-                        dataField={"UOM"}
+                        caption={"UoM"}
+                        dataField={"uom"}
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderUOMColumn} 

@@ -1,82 +1,60 @@
 import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
-import { getStockEntries } from '../../../actions/StockEntriesAction'
-
 import styled from 'styled-components'
+import { getInventory } from '../../../actions/InventoryAction'
 
-const StockEntries = () => {
+const InventoryStatus = () => {
 
-    const stockEntries = useSelector(state => state.stock.stockEntries)
-    
-    const dispatch = useDispatch()
+    const inventory = useSelector(state => state.inventory.inventoryStatus)
+
     const treeListRef = useRef(null)
-    
+    const dispatch = useDispatch(null)
+
     useEffect(() => {
-        dispatch(getStockEntries())
+        dispatch(getInventory())
     }, [])
 
-    const renderStockEntryIdColumn = (e) => {
+    const renderInventoryIdColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.stockEntryId}
+                    {e.data.inventoryId}
+                </CellContent>
+            </CellContainer>
+        )
+    }    
+
+    const renderInventoryNameColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.inventoryItem}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+    
+    const renderInventoryQuantityColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.inventoryQuantity}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderStockEntryNameColumn = (e) => {
+    const renderInventoryWarehouseColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.stockEntryName}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderStockEntryWarehouseColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.stockEntryWarehouse}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderStockEntryQuantityColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.stockEntryQuantity}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderStockEntryToColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.stockEntryTo}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderStockEntryDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.stockEntryDate).format("DD/MM/YYYY")}
+                    {e.data.inventoryWarehouse}
                 </CellContent>
             </CellContainer>
         )
@@ -87,23 +65,23 @@ const StockEntries = () => {
             <Fragment>
 
                 <Header>
-                    <HeaderSpan>Stock Entry History</HeaderSpan>
+                    <HeaderSpan>Inventory History</HeaderSpan>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "stock-entry-treelist",
+                        id: "inventory-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"stockEntryId"}
+                    keyExpr={"inventoryId"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={stockEntries}
+                    dataSource={inventory}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Plan'}
+                    noDataText={'No Inventory'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -113,61 +91,41 @@ const StockEntries = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Entry-Id"}
-                        dataField={"stockEntryId"}
+                        caption={"Inventory-Id"}
+                        dataField={"inventoryId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderStockEntryIdColumn} 
+                        cellRender={renderInventoryIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
                         caption={"Item Name"}
-                        dataField={"stockEntryName"}
+                        dataField={"inventoryItem"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderStockEntryNameColumn} 
+                        cellRender={renderInventoryNameColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Warehouse"}
-                        dataField={"stockEntryWarehouse"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderStockEntryWarehouseColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
                         caption={"Quantity"}
-                        dataField={"stockEntryQuantity"}
+                        dataField={"inventoryQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderStockEntryQuantityColumn} 
+                        cellRender={renderInventoryQuantityColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        caption={"Entry To"}
-                        dataField={"stockEntryTo"}
+                        caption={"Warehouse"}
+                        dataField={"inventoryWarehouse"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderStockEntryToColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-                    
-                    <Column
-                        caption={"Entry Date"}
-                        dataField={"stockEntryDate"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        cellRender={renderStockEntryDateColumn} 
+                        cellRender={renderInventoryWarehouseColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -191,7 +149,7 @@ const StockEntries = () => {
     )
 }
 
-export default StockEntries
+export default InventoryStatus
 
 const Header = styled.div`
     padding: 15px;

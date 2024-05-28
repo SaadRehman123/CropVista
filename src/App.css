@@ -169,3 +169,11 @@ input::-webkit-inner-spin-button {
     margin-left: 6px !important;
     align-items: center !important;
 }
+
+.active-badge {
+    display: flex !important;
+    font-size: 12px !important;
+    padding: 6px 15px !important;
+    margin-left: 12px !important;
+    align-items: center !important;
+}

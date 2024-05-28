@@ -26,8 +26,9 @@ const CreateBOM = () => {
     const resources = useSelector(state => state.resource.resources)
     const warehouses = useSelector(state => state.warehouse.warehouses)
 
-    const [treeListData, setTreeListData] = useState([])
+    const [type, setType] = useState("")
     const [deletedRows, setDeletedRows] = useState([])
+    const [treeListData, setTreeListData] = useState([])
     const [itemDataSource, setItemDataSource] = useState({ type: "", dataSource: null })
     const [invalid, setInvalid] = useState({ itemId: false, warehouseId: false, productDescription: false, quantity: false, productionStdCost: false })
     const [formData, setFormData] = useState({ itemId: "", warehouseId: "", productDescription: "", quantity: "", productionStdCost: "" })
@@ -56,7 +57,7 @@ const CreateBOM = () => {
                     const Obj = itemMaster.find((item) => item.itemId === data.productId)
 
                     setFormData({ 
-                        itemId: data.productId, 
+                        itemId: data.productId,
                         warehouseId: data.wrId, 
                         productDescription: Obj ? Obj : "", 
                         quantity: dataX.quantity, 
@@ -287,16 +288,6 @@ const CreateBOM = () => {
                     })
                     notify("Bill Of Material Updated Successfully", "info", 2000)
                 }
-
-                setFormData({
-                    itemId: "",
-                    quantity: "",
-                    warehouseId: "",
-                    productionStdCost: "", 
-                    productDescription: ""
-                })
-
-                setTreeListData([])
             })
         }
     }
@@ -326,7 +317,7 @@ const CreateBOM = () => {
                                         displayExpr={'itemId'}
                                         searchMode={'contains'}
                                         searchExpr={'itemName'}
-                                        dataSource={itemMaster.filter(item => item.itemType === "Finish Good" && !bom.some(bomItem => bomItem.productId === item.itemId))}
+                                        dataSource={itemMaster.filter(item => item.itemType === "Finish Good" && item.disable === false && !bom.some(bomItem => bomItem.productId === item.itemId))}
                                         value={formData.itemId}
                                         openOnFieldClick={true}
                                         acceptCustomValue={true}
@@ -377,7 +368,7 @@ const CreateBOM = () => {
                                         searchEnabled={true}
                                         displayExpr={'wrId'}
                                         searchMode={'contains'}
-                                        dataSource={warehouses}
+                                        dataSource={warehouses.filter((warehouse) => warehouse.wrType === "Finish Good" && warehouse.active === true)}
                                         openOnFieldClick={true}
                                         acceptCustomValue={true}
                                         accessKey={'warehouseId'}
@@ -487,7 +478,7 @@ const CreateBOM = () => {
         const selectRow = instance.getSelectedRowsData()[0]
     
         if (selectRow) {
-            const updatedData = { ...selectRow, type: value, id: "", name: "" }
+            const updatedData = { ...selectRow, type: value, id: "", name: "", uom: "", warehouseId: "", itemquantity: 0, unitPrice: 0 }
     
             itemResourceDatasource.store().update(selectRow.clientId, updatedData).then(() => {
                 itemResourceDatasource.reload()
@@ -506,9 +497,12 @@ const CreateBOM = () => {
                 dataSource: resources
             })
         }
+
+        setType(value)
     }
 
     const handleOnItemValueChanged = (e) => {
+        let uom
         let itemName
 
         const value = e.value
@@ -518,14 +512,20 @@ const CreateBOM = () => {
         if (selectRow) {
             if(selectRow.type === "Resource"){
                 const resource = resources.find((resource) => resource.rId === value)
-                if (resource) itemName = resource.name
+                if (resource) {
+                    itemName = resource.name
+                    uom = resource.rType
+                }
             }
             else if (selectRow.type === "Item") {
                 const item = itemMaster.find((item) => item.itemId === value)
-                if (item) itemName = item.itemName
+                if (item) {
+                    itemName = item.itemName
+                    uom = item.uom                    
+                }
             }
 
-            const updatedData = { ...selectRow, id: value, name: itemName }
+            const updatedData = { ...selectRow, id: value, name: itemName, uom: uom }
 
             itemResourceDatasource.store().update(selectRow.clientId, updatedData).then(() => {
                 itemResourceDatasource.reload()
@@ -534,7 +534,12 @@ const CreateBOM = () => {
     }
 
     const handleOnWarehouseValueChanged = (e) => {
-        const value = e.value
+        let value = e.value
+
+        if(value === null){
+            value = ""
+        }
+
         const instance = itemResourceTreeRef.current.instance
         const selectRow = instance.getSelectedRowsData()[0]
 
@@ -617,6 +622,7 @@ const CreateBOM = () => {
                 noDataText={"Type Not Present"}
                 handleOnValueChanged={handleOnTypeValueChanged}
                 renderContent={() => renderTypeContent(e)}
+                disabled={false}
             />
         )
     }
@@ -644,6 +650,7 @@ const CreateBOM = () => {
                 noDataText={"Item Not Present"}
                 handleOnValueChanged={handleOnItemValueChanged}
                 renderContent={() => renderItemContent(e)}
+                disabled={false}
             />
         )
     }
@@ -687,11 +694,12 @@ const CreateBOM = () => {
                 itemRender={(e) => renderItems(e, "warehouse")}
                 renderType={"wrId"}
                 displayExpr={"wrId"}
-                dataSource={warehouses}
+                dataSource={warehouses.filter((warehouse) => warehouse.wrType === "Raw Material" && warehouse.active === true)}
                 placeholder={"Choose Type"}
                 noDataText={"Type Not Present"}
                 handleOnValueChanged={handleOnWarehouseValueChanged}
                 renderContent={() => renderWarehouseContent(e)}
+                disabled={type === "Resource" ? true : false}
             />
         )
     }

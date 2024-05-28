@@ -16,6 +16,7 @@ const CreatePlan = () => {
     const crops = useSelector(state => state.crops.cropsBySeason)
     const seasons = useSelector(state => state.seasons.getSeasons)
     const cropPlanRef = useSelector(state => state.view.cropPlanRef)
+    const plannedCrops = useSelector(state => state.crops.plannedCrops)
     const createPlanPopup = useSelector(state => state.popup.toggleCreatePlanPopup)
     
     const [validationErrors, setValidationErrors] = useState([])
@@ -123,6 +124,16 @@ const CreatePlan = () => {
         const instance = cropPlanRef.current.instance
         const selectedRow = instance.getSelectedRowsData()
 
+        if (formData.season.trim() === "" || formData.crop.trim() === "" || setFormDataAcre(formData).trim() === "" || moment(formData.startDate).format("DD/MM/yyyy") === "Invalid date" || moment(formData.endDate).format("DD/MM/yyyy") === "Invalid date") {
+            return
+        }
+
+        if (invalid.season === true || invalid.acre === true || invalid.crop === true || invalid.startDate === true || invalid.endDate === true) {
+            return
+        }
+        
+        const data = crops.find((item) => item.name === formData.crop)
+
         const task = {
             id: "",
             season: formData.season,
@@ -130,15 +141,8 @@ const CreatePlan = () => {
             acre: parseInt(formData.acre),
             startdate: moment(formData.startDate).format("YYYY-MM-DD"),
             enddate: moment(formData.endDate).format("YYYY-MM-DD"),
-            status: "Pending"
-        }
-
-        if (formData.season.trim() === "" || formData.crop.trim() === "" || setFormDataAcre(formData).trim() === "" || moment(formData.startDate).format("DD/MM/yyyy") === "Invalid date" || moment(formData.endDate).format("DD/MM/yyyy") === "Invalid date") {
-            return
-        }
-
-        if (invalid.season === true || invalid.acre === true || invalid.crop === true || invalid.startDate === true || invalid.endDate === true) {
-            return
+            status: "Pending",
+            itemId: data.cropId 
         }
 
         if(createPlanPopup.type === "UPDATE"){
@@ -203,6 +207,7 @@ const CreatePlan = () => {
                             placeholder={"Select Season"}
                             onFocusOut={handleOnFocusOut}
                             onValueChanged={(e) => onValueChanged(e, 'season')}
+                            readOnly={createPlanPopup.type === "UPDATE" ? true : false}
                             dataSource={ seasons.map((item) => { return item.seasons }) }
                             validationStatus={invalid.season === false ? "valid" : "invalid"}
                         />
@@ -221,7 +226,11 @@ const CreatePlan = () => {
                             onFocusOut={handleOnFocusOut}
                             onValueChanged={(e) => onValueChanged(e, 'crop')}
                             disabled={formData.season === "" ? true : false}
-                            dataSource={ crops.map((item) => { return item.name }) }
+                            readOnly={createPlanPopup.type === "UPDATE" ? true : false}
+                            dataSource={crops.filter(item => {
+                                const isCropInPlanned = plannedCrops.find(cropItem => cropItem.itemId === item.cropId)
+                                return !isCropInPlanned || ["Closed", "Cancelled"].includes(isCropInPlanned.status)
+                            }).map(item => item.name)}
                             validationStatus={invalid.crop === false ? "valid" : "invalid"}
                         />
                     </FormGroupItem>

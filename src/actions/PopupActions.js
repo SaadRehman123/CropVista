@@ -32,3 +32,10 @@ export const toggleCreateJobCardPopup = (obj) => {
 		payload : obj
 	}
 }
+
+export const toggleCreateItemPopup = (obj) => {
+    return {
+		type : "TOGGLE_CREATE_ITEM_POPUP",
+		payload : obj
+	}
+}

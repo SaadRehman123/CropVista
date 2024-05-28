@@ -24,7 +24,9 @@ const CreateJobCard = (props) => {
     const treelistRef = useRef(null)
 
     useEffect(() => {
-        const dataSource = productionOrder.filter((item) => item.productionNo === props.productionOrder)
+        const excludedStatuses = ["Closed", "Completed", "Cancelled"]
+        const dataSource = productionOrder.filter(item => item.productionNo === props.productionOrder && !excludedStatuses.includes(item.status)) 
+        
         if (dataSource && dataSource.length > 0) {
             let minRouteSequence = Infinity
 
@@ -65,8 +67,9 @@ const CreateJobCard = (props) => {
                 dispatch(updatePoRouteStages(item, item.pO_RouteStageId)).then((res) => {
                     const data = res.payload.data
                     if (data.success) {
-
-                        dispatch(addStockEntries(stockEntries))
+                        if (item.pO_WarehouseId !== "") {
+                            dispatch(addStockEntries(stockEntries))
+                        }
                         dispatch(getProductionOrder(0)).then((resX) => {
                             if (resX.payload.data.success) {
                                 notify("Route Stage Completed", "info", 2000)

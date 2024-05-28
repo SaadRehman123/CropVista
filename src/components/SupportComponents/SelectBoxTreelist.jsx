@@ -36,6 +36,7 @@ const SelectBoxTreelist = (props) => {
                         showDropDownButton={props.event.isEditing ? true : false}
                         placeholder={props.event.isEditing ? props.placeholder : ''}
                         onFocusIn={(e) => props.event.isEditing && e.component.instance().open()}
+                        disabled={props.disabled}
                     />
                 </div>
                 :

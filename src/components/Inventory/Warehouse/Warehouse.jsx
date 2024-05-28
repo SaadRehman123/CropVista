@@ -11,7 +11,6 @@ import { setWarehouseRef, toggleDeletePopup } from '../../../actions/ViewActions
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import styled from 'styled-components'
-import '../styles.css'
 
 const Warehouse = () => {
 

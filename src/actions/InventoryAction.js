@@ -1,40 +1,40 @@
 import axios from "axios"
 import { Properties } from "../utilities/Properties"
 
-export const getItemMaster = () => {
+export const getInventory = () => {
     const result = axios({
         method: 'GET',
-        url: `/rest/itemMaster/getItemMaster`,
+        url: `/rest/inventory/getInventory`,
         ...Properties,
     })
     return {
-        type: 'GET_ITEM_MASTER',
+        type: 'GET_INVENTORY',
         payload: result
     }
 }
 
-export const addItemMaster = (obj) => {
+export const addInventory = (obj) => {
     const result = axios({
         method: 'POST',
-        url: `/rest/itemMaster/create`,
+        url: `/rest/inventory/create`,
         data: obj,
         ...Properties,
     })
     return {
-        type: 'ADD_ITEM',
+        type: 'ADD_INVENTORY',
         payload: result
     }
 }
 
-export const updateItemMaster = (itemId, obj) => {
+export const updateInventory = (id, obj) => {
     const result = axios({
         method: 'POST',
-        url: `/rest/itemMaster/update/${itemId}`,
+        url: `/rest/inventory/update/${id}`,
         data: obj,
         ...Properties,
     })
     return {
-        type: 'UPDATE_ITEM',
+        type: 'UPDATE_INVENTORY',
         payload: result
     }
 }

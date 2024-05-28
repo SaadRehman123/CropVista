@@ -3,105 +3,85 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-
-import { toggleCreateResourcePopup } from '../../../actions/PopupActions'
-import { setResourceRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import styled from 'styled-components'
+import { getInventory } from '../../../actions/InventoryAction'
 
-const Resource = () => {
-    const resources = useSelector(state => state.resource.resources)
+const InventoryStatus = () => {
+
+    const inventory = useSelector(state => state.inventory.inventoryStatus)
 
     const treeListRef = useRef(null)
-
-    const dispatch = useDispatch()
+    const dispatch = useDispatch(null)
 
     useEffect(() => {
-        dispatch(setResourceRef(treeListRef))
+        dispatch(getInventory())
     }, [])
 
-    const handleOnEditClick = () => {
-        setTimeout(() => {
-            dispatch(toggleCreateResourcePopup({ open: true, type: "UPDATE" }))
-        }, 0)
-    }
-
-    const renderResourceIdColumn = (e) => {
+    const renderInventoryIdColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.rId}
+                    {e.data.inventoryId}
+                </CellContent>
+            </CellContainer>
+        )
+    }    
+
+    const renderInventoryNameColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.inventoryItem}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+    
+    const renderInventoryQuantityColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.inventoryQuantity}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderNameColumn = (e) => {
+    const renderInventoryWarehouseColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.name}
+                    {e.data.inventoryWarehouse}
                 </CellContent>
             </CellContainer>
-        )
-    }
-
-    const renderResourceTypeColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.rType}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderActionColumn = (e) => {
-        return (
-            <ActionCellContainer>
-                <button
-                    title='Edit Resource'
-                    className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick()} />
-
-                <button
-                    title='Delete Resource'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"RESOURCE" }))} />
-            </ActionCellContainer>
         )
     }
 
     const renderTreelist = () => {
-
         return (
             <Fragment>
 
                 <Header>
-                    <HeaderSpan>Resource History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => dispatch(toggleCreateResourcePopup({ open: true, type: "CREATE" }))}>
-                        <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Resource
-                    </Button>
+                    <HeaderSpan>Inventory History</HeaderSpan>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "resource-treelist",
+                        id: "inventory-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"rId"}
+                    keyExpr={"inventoryId"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={resources}
+                    dataSource={inventory}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Resource'}
+                    noDataText={'No Inventory'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -111,53 +91,47 @@ const Resource = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Resource-Id"}
-                        dataField={"rId"}
+                        caption={"Inventory-Id"}
+                        dataField={"inventoryId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderResourceIdColumn} 
+                        cellRender={renderInventoryIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Name"}
-                        dataField={"name"}
+                        caption={"Item Name"}
+                        dataField={"inventoryItem"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderNameColumn} 
+                        cellRender={renderInventoryNameColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Type"}
-                        dataField={"rType"}
+                        caption={"Quantity"}
+                        dataField={"inventoryQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderResourceTypeColumn} 
+                        cellRender={renderInventoryQuantityColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
-                    
+
                     <Column
-                        width={98}
-                        minWidth={98}
-                        caption={"Actions"}
-                        dataField={"actions"}
-                        alignment={"center"}
+                        caption={"Warehouse"}
+                        dataField={"inventoryWarehouse"}
+                        alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
+                        cellRender={renderInventoryWarehouseColumn} 
+                        headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                 </TreeList>
             </Fragment>
         )
-    }
-
-    const renderActionHeaderCell = (e) => {
-        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
     }
 
     const renderHeaderCell = (e) => {
@@ -175,14 +149,7 @@ const Resource = () => {
     )
 }
 
-export default Resource
-
-const ActionCellContainer = styled.div`
-    display: flex;
-    font-size: 16px;
-    align-items: center;
-    justify-content: space-evenly;
-`
+export default InventoryStatus
 
 const Header = styled.div`
     padding: 15px;

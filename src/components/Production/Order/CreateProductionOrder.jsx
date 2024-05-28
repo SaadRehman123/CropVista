@@ -7,16 +7,18 @@ import DataSource from 'devextreme/data/data_source'
 import CreateJobCard from '../../Popups/CreateJobCard'
 import FormBackground from '../../SupportComponents/FormBackground'
 
+import { Button } from 'reactstrap'
 import { Badge, Progress } from 'reactstrap'
 import { DateBox, NumberBox, SelectBox, TextBox } from 'devextreme-react'
 import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
-import { Button } from 'reactstrap'
+import { addInventory, updateInventory } from '../../../actions/InventoryAction'
 import { assignClientId } from '../../../utilities/CommonUtilities'
 import { toggleCreateJobCardPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
 import { getPlannedCrops, updateCropsPlan } from '../../../actions/CropsActions'
+import { addStockEntries, getStockEntries } from '../../../actions/StockEntriesAction'
 import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages, updateProductionOrder } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
@@ -24,8 +26,8 @@ import styled from 'styled-components'
 const CreateProductionOrder = () => {
 
     const bom = useSelector(state => state.bom.Bom)
-    const itemMaster = useSelector(state => state.item.itemMaster)
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
+    const inventory = useSelector(state => state.inventory.inventoryStatus)
     const productionOrder = useSelector(state => state.production.productionOrder)
     const productionOrderAction = useSelector(state => state.production.productionOrderAction)
 
@@ -94,8 +96,9 @@ const CreateProductionOrder = () => {
                         }))
 
                         const result = data.result
-                        if (result.status === "Completed" && plannedCrops.some(plannedCrop => plannedCrop.crop === result.productDescription)) {
-                            const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === result.productDescription)
+                        if (plannedCrops.some(plannedCrop => plannedCrop.itemId === result.productionNo)) {
+                            const crop = plannedCrops.filter(plannedCrop => plannedCrop.itemId === result.productionNo && plannedCrop.status !== "Closed" && plannedCrop.status !== "Completed" && plannedCrop.status !== "Cancelled")
+                            
                             if(crop && crop.length > 0){
                                 crop.forEach((crop) => {
                                     let dataX = {
@@ -105,7 +108,8 @@ const CreateProductionOrder = () => {
                                         "acre": crop.acre,
                                         "startdate": crop.startdate,
                                         "enddate": crop.enddate,
-                                        "status": "Completed"
+                                        "status": "Completed",
+                                        "itemId" : crop.itemId
                                     }
 
                                     dispatch(updateCropsPlan(dataX.id, dataX))
@@ -144,7 +148,7 @@ const CreateProductionOrder = () => {
     }, [productionOrderAction.type])
 
     useEffect(() => {
-        const array = productionOrder.filter((item) => item.productionNo === selectedItem)
+        const array = productionOrder.filter((item) => item.productionNo === selectedItem && item.status !== "Closed" && item.status !== "Cancelled")
         
         if (array && array.length > 0) {
             const dataSource = array[0].children.map((child) => ({
@@ -166,7 +170,6 @@ const CreateProductionOrder = () => {
         }
         else {
             const product = bom.find((item) => item.productId === selectedItem)
-            
             if(product) {
                 const dataSource = product.children.map((child) => ({
                     PO_RouteStageId : "",
@@ -193,7 +196,7 @@ const CreateProductionOrder = () => {
         
         if (typeof value === 'object') {
             const product = bom.find((item) => item.productId === value.itemId)
-            const cropPlan = plannedCrops.find((item) => item.crop === product.productDescription)
+            const cropPlan = plannedCrops.find((item) => item.itemId === product.productId)
 
             setSeletctedItem(value.itemId)
 
@@ -219,7 +222,7 @@ const CreateProductionOrder = () => {
                 <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
                     <span>{e.itemId}</span>
                     <span style={{ marginLeft: "auto", }}>
-                        {e.itemName}
+                        {e.crop}
                     </span>
                 </div>
             )
@@ -286,10 +289,10 @@ const CreateProductionOrder = () => {
 
                         dispatch(getProductionOrder(0)).then((res) => {
                             const data = res.payload.data.result
-
                             data.forEach((dataItem) => {
-                                if (dataItem.status === "Planned" && plannedCrops.some(plannedCrop => plannedCrop.crop === dataItem.productDescription)) {
-                                    const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === dataItem.productDescription)
+                                if (dataItem.status === "Planned" && plannedCrops.some(plannedCrop => plannedCrop.itemId === dataItem.productionNo)) {
+                                    const crop = plannedCrops.filter(plannedCrop => plannedCrop.itemId === dataItem.productionNo && plannedCrop.status !== "Closed" && plannedCrop.status !== "Completed" && plannedCrop.status !== "Cancelled")
+
                                     if(crop && crop.length > 0){
                                         crop.forEach((crop) => {
                                             let dataX = {
@@ -299,7 +302,8 @@ const CreateProductionOrder = () => {
                                                 "acre": crop.acre,
                                                 "startdate": crop.startdate,
                                                 "enddate": crop.enddate,
-                                                "status": "Planned"
+                                                "status": "Planned",
+                                                "itemId" : crop.itemId
                                             }
 
                                             dispatch(updateCropsPlan(dataX.id, dataX))
@@ -400,8 +404,9 @@ const CreateProductionOrder = () => {
                     }))
 
                     const result = res.payload.data.result
-                    if (result.status === "Release" && plannedCrops.some(plannedCrop => plannedCrop.crop === result.productDescription)) {
-                        const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === result.productDescription)
+                    if (plannedCrops.some(plannedCrop => plannedCrop.itemId === result.productionNo)) {
+                        const crop = plannedCrops.filter(plannedCrop => plannedCrop.itemId === result.productionNo && plannedCrop.status !== "Closed" && plannedCrop.status !== "Completed" && plannedCrop.status !== "Cancelled")
+
                         if(crop && crop.length > 0){
                             crop.forEach((crop) => {
                                 let dataX = {
@@ -411,7 +416,8 @@ const CreateProductionOrder = () => {
                                     "acre": crop.acre,
                                     "startdate": crop.startdate,
                                     "enddate": crop.enddate,
-                                    "status": "Release"
+                                    "status": "Release",
+                                    "itemId": crop.itemId
                                 }
 
                                 dispatch(updateCropsPlan(dataX.id, dataX))
@@ -446,8 +452,43 @@ const CreateProductionOrder = () => {
                     }))
 
                     const result = data.result
-                    if (result.status === "Closed" && plannedCrops.some(plannedCrop => plannedCrop.crop === result.productDescription)) {
-                        const crop = plannedCrops.filter(plannedCrop => plannedCrop.crop === result.productDescription)
+
+                    const stockEntries = {
+                        StockEntryId : "",
+                        StockEntryName : result.productDescription,
+                        StockEntryWarehouse : result.warehouse,
+                        StockEntryQuantity : result.quantity,
+                        StockEntryTo: "Inventory",
+                        StockEntryDate: moment(Date.now()).format('YYYY-MM-DD')
+                    }
+
+                    if(inventory.some((item) => item.inventoryItem === result.productDescription)){
+                        const item = inventory.find((item) => item.inventoryItem === result.productDescription)
+                        if(item){
+                            dispatch(updateInventory(item.inventoryId, {
+                                ...item,
+                                inventoryQuantity: item.inventoryQuantity + result.quantity
+                            }))
+                        }
+                    }
+                    else {
+                        const item = {
+                            "inventoryId": "",
+                            "inventoryItem": result.productDescription,
+                            "inventoryQuantity": result.quantity,
+                            "inventoryWarehouse": result.warehouse
+                        }
+
+                        dispatch(addInventory(item))
+                    }
+
+                    dispatch(addStockEntries(stockEntries)).then((resX) => {
+                        if(resX.payload.data.success) dispatch(getStockEntries())
+                    })
+
+                    if (plannedCrops.some(plannedCrop => plannedCrop.itemId === result.productionNo)) {
+                        const crop = plannedCrops.filter(plannedCrop => plannedCrop.itemId === result.productionNo  && plannedCrop.status !== "Closed" && plannedCrop.status !== "Cancelled")
+
                         if(crop && crop.length > 0){
                             crop.forEach((crop) => {
                                 let dataX = {
@@ -457,7 +498,8 @@ const CreateProductionOrder = () => {
                                     "acre": crop.acre,
                                     "startdate": crop.startdate,
                                     "enddate": crop.enddate,
-                                    "status": "Closed"
+                                    "status": "Closed",
+                                    "itemId": crop.itemId
                                 }
 
                                 dispatch(updateCropsPlan(dataX.id, dataX))
@@ -518,7 +560,7 @@ const CreateProductionOrder = () => {
                                         displayExpr={'itemId'}
                                         searchMode={'contains'}
                                         searchExpr={'itemName'}
-                                        dataSource={itemMaster.filter(item => item.itemType === "Finish Good" && bom.some(bomItem => bomItem.productId === item.itemId) && plannedCrops.some(cropItem => cropItem.crop === item.itemName) && !productionOrder.some(prodOrder => prodOrder.productionNo === item.itemId))}
+                                        dataSource={plannedCrops.filter((item) => bom.some(bomItem => bomItem.productId === item.itemId) && item.status === "Pending")}
                                         openOnFieldClick={true}
                                         acceptCustomValue={true}
                                         value={formData.itemId}
@@ -613,6 +655,7 @@ const CreateProductionOrder = () => {
                                         value={formData.startDate}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
+                                        validationStatus={"valid"}
                                     />
                                 </FormGroupItem>
 

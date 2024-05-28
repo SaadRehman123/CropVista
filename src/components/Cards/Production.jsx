@@ -16,6 +16,12 @@ const Production = () => {
         if (id === 1) {
             navigate('/app/crop-plan')
         }
+        else if (id === 2) {
+            navigate('/app/Bill_Of_Material')
+        }
+        else if (id === 3) {
+            navigate('/app/Production_Order')
+        }
     }
 
     const renderCards = () => {
@@ -51,4 +57,6 @@ const CardContainer = styled.div`
 
 const card = [
     { id: 1, name: "Crop-Plan", text: "Explore and manage your crop plans to visualize and organize cultivation strategies for different crops"},
+    { id: 2, name: "Bill Of Material", text: "Create and manage detailed Bills of Material to ensure accurate planning and inventory management for your production processes"},
+    { id: 3, name: "Production Order", text: "Track and manage production orders to streamline your manufacturing processes and ensure timely delivery of finished goods"},
 ]

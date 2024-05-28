@@ -67,6 +67,16 @@ const CropPlan = () => {
         )
     }
 
+    const renderItemIdColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.itemId}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
     const renderAcreColumn = (e) => {
         return (
             <CellContainer>
@@ -111,15 +121,23 @@ const CropPlan = () => {
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
-                <button
-                    title='Edit Plan'
-                    className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick()} />
+                {e.data.status === "Pending" && (
+                    <button
+                        title='Edit Plan'
+                        className='fal fa-pen treelist-edit-button'
+                        onClick={() => handleOnEditClick()} />
+                )}
 
-                <button
-                    title='Delete Plan'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
+                {e.data.status === "Pending" && (
+                    <button
+                        title='Delete Plan'
+                        className='fal fa-trash treelist-delete-button'
+                        onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CROP_PLAN" }))} />
+                )}
+
+                {e.data.status !== "Pending" && (
+                    <button style={{ cursor: "not-allowed" }} className='fal fa-minus treelist-edit-button' />
+                )}
             </ActionCellContainer>
         )
     }
@@ -174,6 +192,16 @@ const CropPlan = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderSeasonColumn} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+                    
+                    <Column
+                        caption={"Item Id"}
+                        dataField={"itemId"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderItemIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

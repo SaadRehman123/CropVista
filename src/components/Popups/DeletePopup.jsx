@@ -9,10 +9,10 @@ import notify from 'devextreme/ui/notify'
 import { getItemMaster } from '../../actions/ItemActions'
 import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteResource, getResource } from '../../actions/ResourceAction'
-import { deleteCropsPlan, getPlannedCrops } from '../../actions/CropsActions'
+import { updateProductionOrder } from '../../actions/ProductionOrderAction'
 import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
 import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
-import { deletePoRouteStages, deleteProductionOrder, getProductionOrder } from '../../actions/ProductionOrderAction'
+import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
 
 import styled from 'styled-components'
 
@@ -22,6 +22,7 @@ const DeletePopup = () => {
     const resourceRef = useSelector(state => state.view.resourceRef)
     const cropPlanRef = useSelector((state) => state.view.cropPlanRef)
     const deletePopup = useSelector((state) => state.view.deletePopup)
+    const plannedCrops = useSelector(state => state.crops.plannedCrops)
     const warehouseRef = useSelector((state) => state.view.warehouseRef)
     const itemMasterRef = useSelector((state) => state.view.itemMasterRef)
     const productionOrderRef = useSelector((state) => state.view.productionOrderRef)
@@ -43,11 +44,8 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'BOM') {
             return 'Delete BOM'
         }
-        else if (deletePopup.type === 'ITEM_MASTER') {
-            return 'Delete Item'
-        }
         else if (deletePopup.type === 'PRODUCTION_ORDER') {
-            return 'Delete Production Order'
+            return 'Cancel Production Order'
         }
     }, [deletePopup])
 
@@ -64,11 +62,8 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'BOM') {
             return 'Are you sure you want to delete selected BOM?'
         }
-        else if (deletePopup.type === 'ITEM_MASTER') {
-            return 'Are you sure you want to delete selected Item?'
-        }
         else if (deletePopup.type === 'PRODUCTION_ORDER') {
-            return 'Are you sure you want to delete selected Production Order?'
+            return 'Are you sure you want to cancel selected Production Order?'
         }
     }
 
@@ -86,6 +81,7 @@ const DeletePopup = () => {
                 startdate: moment(selectedRow[0].startdate).format("YYYY-MM-DD"),
                 enddate: moment(selectedRow[0].enddate).format("YYYY-MM-DD"),
                 status: selectedRow[0].status,
+                itemId: selectedRow[0].itemId,
             }
 
             dispatch(deleteCropsPlan(selectedRow[0].id, obj)).then(res => {
@@ -186,33 +182,6 @@ const DeletePopup = () => {
 
             handleOnToggle(deletePopup.type)
         }
-        else if(deletePopup.type === "ITEM_MASTER") {
-            const instance = itemMasterRef.current.instance
-            const selectedRow = instance.getSelectedRowsData()
-            
-            const obj = {
-                itemId: selectedRow[0].itemId,
-                disable: selectedRow[0].disable,
-                itemName: selectedRow[0].itemName,
-                itemType: selectedRow[0].itemType,
-                sellingRate: selectedRow[0].sellingRate,
-                valuationRate: selectedRow[0].valuationRate,
-                UOM: selectedRow[0].UOM
-            }
-
-            dispatch(deleteResource(selectedRow[0].itemId, obj)).then(res => {
-                const data = res.payload.data
-                if(data.success){
-                    instance.getDataSource().store().remove(data.result.itemId)
-                    instance.refresh()
-                }
-                else {
-                    notify(data.message + " ...Refreshing", "info", 2000)
-                    setTimeout(() => dispatch(getItemMaster()), 1000)
-                }
-            })
-            handleOnToggle(deletePopup.type)
-        }
         else if(deletePopup.type === "PRODUCTION_ORDER") {
             const instance = productionOrderRef.current.instance
             const selectedRow = instance.getSelectedRowsData()
@@ -223,24 +192,41 @@ const DeletePopup = () => {
                 "productDescription": selectedRow[0].productDescription,
                 "productionStdCost": selectedRow[0].productionStdCost,
                 "quantity": selectedRow[0].quantity,
-                "status": selectedRow[0].status,
+                "status": "Cancelled",
                 "currentDate": selectedRow[0].currentDate,
                 "startDate": selectedRow[0].startDate,
                 "endDate": selectedRow[0].endDate,
                 "warehouse": selectedRow[0].warehouse,
             }
             
-            dispatch(deleteProductionOrder(obj, selectedRow[0].productionOrderId)).then((res) => {
-                if (res.payload.data.success) {
-                    instance.getDataSource().store().remove(res.payload.data.result.productionOrderId)
-                    instance.refresh()
-                    selectedRow[0].children.map((item) => {
-                        dispatch(deletePoRouteStages(item, item.pO_RouteStageId))
-                    })
-                }
-                else {
-                    notify(res.payload.data.message + " ...Refreshing", "info", 2000)
-                    setTimeout(() => dispatch(getProductionOrder(0)), 1000)
+            dispatch(updateProductionOrder(obj, obj.productionOrderId)).then((res) => {
+                const data = res.payload.data
+                if(data.success){
+                    const result = data.result
+                    if (plannedCrops.some(plannedCrop => plannedCrop.itemId === result.productionNo)) {
+                        const crop = plannedCrops.filter(plannedCrop => plannedCrop.itemId === result.productionNo && plannedCrop.status !== "Closed" && plannedCrop.status !== "Completed" && plannedCrop.status !== "Cancelled")
+                        if(crop && crop.length > 0){
+                            crop.forEach((crop) => {
+                                let dataX = {
+                                    "id": crop.id,
+                                    "season": crop.season,
+                                    "crop": crop.crop,
+                                    "acre": crop.acre,
+                                    "startdate": crop.startdate,
+                                    "enddate": crop.enddate,
+                                    "status": "Cancelled",
+                                    "itemId": crop.itemId
+                                }
+
+                                dispatch(updateCropsPlan(dataX.id, dataX))
+                            })
+
+                            instance.getDataSource().store().update(result.productionOrderId, result).then(() => instance.refresh())
+                            dispatch(getPlannedCrops())
+                        }
+                    }
+
+                    notify("Production Order Cancelled", "info", 2000)
                 }
             })
             handleOnToggle(deletePopup.type)
@@ -256,8 +242,15 @@ const DeletePopup = () => {
                         <span style={{ fontSize:14 }}>{renderText()}</span>
                     </form>
                     <div style={{ display: "flex", flexDirection: "row-reverse", marginTop: 10 }}>
-                        <ConfirmButton onClick={handleOnSubmit}>Delete</ConfirmButton>
-                        <CancelButton onClick={handleOnToggle}>Cancel</CancelButton>
+                        {deletePopup.type === "PRODUCTION_ORDER" ? (
+                            <>
+                                <ConfirmButton onClick={handleOnSubmit}>Cancel</ConfirmButton>
+                            </>
+                        ) : 
+                        <>
+                            <ConfirmButton onClick={handleOnSubmit}>Delete</ConfirmButton>
+                            <CancelButton onClick={handleOnToggle}>Cancel</CancelButton>
+                        </>}
                     </div>
                 </div>
             </ModalBody>

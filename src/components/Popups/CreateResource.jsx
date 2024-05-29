@@ -72,11 +72,11 @@ const CreateResource = () => {
         }
 
         if (formData.name.trim() === "" || formData.rType.trim() === "") {
-            return
+            return notify("Form fields cannot be empty", "error", 2000)
         }
 
         if (invalid.name === true || invalid.rType === true) {
-            return
+            return notify("Please correct the invalid fields", "error", 2000)
         }
 
         if(createResource.type === "UPDATE"){

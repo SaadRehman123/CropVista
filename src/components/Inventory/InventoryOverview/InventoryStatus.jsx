@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import FormBackground from '../../SupportComponents/FormBackground'
 
+import { getInventory } from '../../../actions/InventoryAction'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import styled from 'styled-components'
-import { getInventory } from '../../../actions/InventoryAction'
 
 const InventoryStatus = () => {
 

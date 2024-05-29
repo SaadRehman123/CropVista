@@ -8,8 +8,8 @@ import { NumberBox, SelectBox, TextBox, CheckBox } from 'devextreme-react'
 import { FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../SupportComponents/StyledComponents'
 
 import { addCrops } from '../../actions/CropsActions'
-import { addItemMaster, getItemMaster, updateItemMaster } from '../../actions/ItemActions'
 import { toggleCreateItemPopup } from '../../actions/PopupActions'
+import { addItemMaster, getItemMaster, updateItemMaster } from '../../actions/ItemActions'
 
 const CreateItem = () => {
 
@@ -21,6 +21,14 @@ const CreateItem = () => {
     const [invalid, setInvalid] = useState({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false })
 
     const dispatch = useDispatch()
+
+    const toggle = () => {
+        dispatch(toggleCreateItemPopup({ open: false, type: "" }))
+
+        setItemType("")
+        setFormData({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "" })
+        setInvalid({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false })
+    }
 
     useEffect(() => {
         if (createItemPopup.type === "UPDATE") {            
@@ -38,14 +46,6 @@ const CreateItem = () => {
             })
         }
     }, [createItemPopup.type])
-
-    const toggle = () => {
-        dispatch(toggleCreateItemPopup({ open: false, type: "" }))
-
-        setItemType("")
-        setFormData({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "" })
-        setInvalid({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false })
-    }
 
     const onValueChanged = (e, name) => {
         const value = e.value
@@ -79,12 +79,32 @@ const CreateItem = () => {
         
         if (formData[name] === null) {
             formData[name] = ""
-        }    
+        }
 
         if(name === "season"){
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 season: itemType === "Finish Good" && formData.season === "" ? true : false
+            }))
+        }
+        else if (name === "sellingRate") {
+            let flag = false
+            if(parseInt(formData.sellingRate) <= 0){
+                flag = true
+            }
+            setInvalid((prevInvalid) => ({
+                ...prevInvalid,
+                [name]: setFormateNumber(formData).trim() === "" || flag === true ? true : false,
+            }))
+        }
+        else if (name === "valuationRate") {
+            let flag = false
+            if(parseInt(formData.valuationRate) <= 0){
+                flag = true
+            }
+            setInvalid((prevInvalid) => ({
+                ...prevInvalid,
+                [name]: setFormateNumber(formData).trim() === "" || flag === true ? true : false,
             }))
         }
         else {
@@ -101,10 +121,14 @@ const CreateItem = () => {
         const instance = itemMasterRef.current.instance
         const selectedRow = instance.getSelectedRowsData()
 
-        if (formData.itemName === "" || formData.itemType === "" || formData.sellingRate === "" || formData.valuationRate === "" || formData.UOM === "") {
-            return
+        if (formData.itemName === "" || formData.itemType === "" || setFormateNumber(formData).trim() === "" ||  formData.UOM === "") {
+            return notify("Form fields cannot be empty", "error", 2000)
         }
 
+        if (invalid.itemName === true || invalid.itemType === true || invalid.sellingRate === true || invalid.valuationRate === true) {
+            return notify("Please correct the invalid fields", "error", 2000)
+        }
+    
         if (itemType === "Finish Good" && formData.season === "") {
             return
         }
@@ -247,6 +271,7 @@ const CreateItem = () => {
                                 elementAttr={{
                                     class: "form-numberbox"
                                 }}
+                                step={1}
                                 width={225}
                                 type={'number'}
                                 accessKey={'sellingRate'}
@@ -265,6 +290,7 @@ const CreateItem = () => {
                                 elementAttr={{
                                     class: "form-numberbox"
                                 }}
+                                step={1}
                                 width={225}
                                 type={'number'}
                                 accessKey={'valuationRate'}
@@ -328,3 +354,14 @@ const CreateItem = () => {
 }
 
 export default CreateItem
+
+const setFormateNumber = (formData) => {
+    let result = ''
+    if (formData.sellingRate !== null && formData.sellingRate !== undefined) {
+        result = formData.sellingRate.toString()
+    } 
+    else if (formData.valuationRate !== null && formData.valuationRate !== undefined) {
+        result = formData.valuationRate.toString()
+    }
+    return result
+}

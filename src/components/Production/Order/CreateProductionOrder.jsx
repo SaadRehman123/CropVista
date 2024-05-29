@@ -246,6 +246,12 @@ const CreateProductionOrder = () => {
             return notify("Form fields cannot be empty", "error", 2000)
         }
 
+        for (const row of treeListData) {
+            if (row.PO_Quantity <= 0 || row.PO_Total <= 0) {
+                return notify("Some rows have incomplete or incorrect info please fix them before saving", "error", 2000)
+            }
+        }
+
         const productionOrder = {
             productionOrderId: "",
             productionNo: formData.itemId,
@@ -322,6 +328,16 @@ const CreateProductionOrder = () => {
                 notify(data.message, "info", 2000)
             }
         })
+    }
+
+    const handleOnCellPrepared = (e) => {
+        if (e.rowType === "data") {
+            if (e.column.dataField === "PO_Quantity" || e.column.dataField === "PO_Total") {
+                if (e.value < 0 || (e.values[4] * e.values[7]) < 0) {
+                    e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
+                }
+            }
+        }
     }
 
     const handleOnEditorPreparing = (e) => {
@@ -793,7 +809,7 @@ const CreateProductionOrder = () => {
     }
 
     const renderTotalCell = ({ data }) => {
-        const value = data.PO_Quantity * data.PO_UnitPrice 
+        const value = data.PO_Quantity * data.PO_UnitPrice
         return (
             <CellContainer>
                 <CellContent>
@@ -850,7 +866,8 @@ const CreateProductionOrder = () => {
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}
                     onSaved={handleOnSaved}
-                    onEditorPreparing={handleOnEditorPreparing}>
+                    onEditorPreparing={handleOnEditorPreparing}
+                    onCellPrepared={handleOnCellPrepared}>
                     
                     <Selection mode={"single"} />
 

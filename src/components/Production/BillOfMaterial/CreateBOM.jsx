@@ -209,6 +209,24 @@ const CreateBOM = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
 
+        if (formData.productDescription.trim() === "" || setFormDataNumber(formData).trim() === "") {
+            return notify("Form fields cannot be empty", "error", 2000)
+        }
+
+        if (invalid.itemId === true || invalid.warehouseId === true || invalid.productDescription === true || invalid.quantity === true || invalid.productionStdCost === true){
+            return notify("Please correct the invalid fields", "error", 2000)
+        }
+
+        if (treeListData.length === 0) {
+            return notify("Please add atleast one item or resource to be used in BOM", "error", 2000)
+        }
+
+        for (const row of treeListData) {
+            if (!row.type || !row.id || !row.name || row.itemquantity <= 0 || !row.uom || row.unitPrice <= 0 || !row.total) {
+                return notify("Some rows have incomplete or incorrect info please fix them before saving", "error", 2000)
+            }
+        }
+
         const task = {
             BID : "",  
             productId : formData.itemId.itemId ? formData.itemId.itemId : formData.itemId,
@@ -220,18 +238,6 @@ const CreateBOM = () => {
             productPrice : 0,
             creationDate : moment(Date.now()).format('YYYY-MM-DD'),
             itemBID : ''
-        }
-
-        if (formData.productDescription.trim() === "" || setFormDataNumber(formData).trim() === "") {
-            return
-        }
-
-        if (invalid.itemId === true || invalid.warehouseId === true || invalid.productDescription === true || invalid.quantity === true || invalid.productionStdCost === true){
-            return 
-        }
-
-        if (treeListData.length === 0) {
-            return notify("Please add atleast one item or resource to be used in BOM")
         }
 
         if(bomAction.type === "CREATE"){
@@ -283,7 +289,9 @@ const CreateBOM = () => {
                         }
 
                         deletedRows.forEach((item) => {
-                            dispatch(deleteBomItemResource(item, item.itemResourceId))
+                            if(item.itemResourceId !== "" && item.itemResourceId !== null && item.itemResourceId !== undefined){
+                                dispatch(deleteBomItemResource(item, item.itemResourceId))
+                            }
                         })
                     })
                     notify("Bill Of Material Updated Successfully", "info", 2000)
@@ -431,6 +439,17 @@ const CreateBOM = () => {
     }
 
     //Treelist Rendering
+
+    const handleOnCellPrepared = (e) => {
+        if (e.rowType === "data") {
+            if (e.column.dataField === "itemquantity" || e.column.dataField === "unitPrice" || e.column.dataField === "total") {
+                if (e.value < 0) {
+                    e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
+                }
+            }
+        }
+    }
+
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
         if (!data.itemquantity) data.itemquantity = 0 
@@ -774,7 +793,8 @@ const CreateBOM = () => {
                     noDataText={'No Data'}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}
-                    onSaved={handleOnSaved}>
+                    onSaved={handleOnSaved}
+                    onCellPrepared={handleOnCellPrepared}>
                     
                     <Selection mode={"single"} />
 

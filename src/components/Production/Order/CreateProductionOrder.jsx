@@ -13,11 +13,11 @@ import { DateBox, NumberBox, SelectBox, TextBox } from 'devextreme-react'
 import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
-import { addInventory, updateInventory } from '../../../actions/InventoryAction'
 import { assignClientId } from '../../../utilities/CommonUtilities'
 import { toggleCreateJobCardPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
 import { getPlannedCrops, updateCropsPlan } from '../../../actions/CropsActions'
+import { addInventory, updateInventory } from '../../../actions/InventoryAction'
 import { addStockEntries, getStockEntries } from '../../../actions/StockEntriesAction'
 import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages, updateProductionOrder } from '../../../actions/ProductionOrderAction'
 
@@ -243,7 +243,7 @@ const CreateProductionOrder = () => {
         e.preventDefault()
         
         if(formData.itemId === "" || formData.productDescription === "" || formData.quantity === "" || formData.productionStdCost === "" || formData.status === "" || formData.startDate === "" || formData.endDate === "" || formData.warehouseId === "" ) {
-            return
+            return notify("Form fields cannot be empty", "error", 2000)
         }
 
         const productionOrder = {

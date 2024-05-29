@@ -76,11 +76,11 @@ const CreateWarehouse = () => {
         }
 
         if (formData.name.trim() === "" || formData.wrType.trim() === "" || formData.location.trim() === "") {
-            return
+            return notify("Form fields cannot be empty", "error", 2000)
         }
 
         if (invalid.name === true || invalid.wrType === true || invalid.location === true) {
-            return
+            return notify("Please correct the invalid fields", "error", 2000)
         }
 
         if(createWarehouse.type === "UPDATE"){

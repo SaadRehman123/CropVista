@@ -125,11 +125,11 @@ const CreatePlan = () => {
         const selectedRow = instance.getSelectedRowsData()
 
         if (formData.season.trim() === "" || formData.crop.trim() === "" || setFormDataAcre(formData).trim() === "" || moment(formData.startDate).format("DD/MM/yyyy") === "Invalid date" || moment(formData.endDate).format("DD/MM/yyyy") === "Invalid date") {
-            return
+            return notify("Form fields cannot be empty", "error", 2000)
         }
 
         if (invalid.season === true || invalid.acre === true || invalid.crop === true || invalid.startDate === true || invalid.endDate === true) {
-            return
+            return notify("Please correct the invalid fields", "error", 2000)
         }
         
         const data = crops.find((item) => item.name === formData.crop)

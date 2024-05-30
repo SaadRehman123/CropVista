@@ -13,6 +13,7 @@ import { addItemMaster, getItemMaster, updateItemMaster } from '../../actions/It
 
 const CreateItem = () => {
 
+    const itemMaster = useSelector(state => state.item.itemMaster)
     const itemMasterRef = useSelector(state => state.view.itemMasterRef)
     const createItemPopup = useSelector(state => state.popup.toggleCreateItemPopup)
 
@@ -81,7 +82,19 @@ const CreateItem = () => {
             formData[name] = ""
         }
 
-        if(name === "season"){
+        if(name === "itemName"){
+            const flag = itemMaster.some(item => item.itemName.toLowerCase() === formData.itemName.toLowerCase())
+
+            if (flag) {
+                notify("Item already exists!", "error", 2000)
+            }
+
+            setInvalid((prevInvalid) => ({
+                ...prevInvalid,
+                [name]: formData[name].trim() === "" || flag === true ? true : false
+            }))
+        }
+        else if(name === "season"){
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 season: itemType === "Finish Good" && formData.season === "" ? true : false

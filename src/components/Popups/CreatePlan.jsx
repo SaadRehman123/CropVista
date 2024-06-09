@@ -39,7 +39,7 @@ const CreatePlan = () => {
         if (createPlanPopup.type === "UPDATE") {            
             const instance = cropPlanRef.current.instance
             const selectedRow = instance.getSelectedRowsData()
-            
+
             setFormData({
                 season: selectedRow[0].season,
                 crop: selectedRow[0].crop,
@@ -93,8 +93,8 @@ const CreatePlan = () => {
 
     const validateStartAndEndDate = (startDate, endDate) => {
         let flag = false
-        const startDateObj = new Date(startDate)
         const endDateObj = new Date(endDate)
+        const startDateObj = new Date(startDate)
             
         if (startDateObj >= endDateObj) {
             flag = true
@@ -243,7 +243,7 @@ const CreatePlan = () => {
                             }}
                             step={1}
                             accessKey={'acre'}
-                            value={formData.acre && formData.acre.toLocaleString("en", { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
+                            value={formData.acre}
                             onFocusIn={handleOnFocusIn}
                             onFocusOut={handleOnFocusOut}
                             placeholder={"Enter Acre i.e (1 - 5000)"}

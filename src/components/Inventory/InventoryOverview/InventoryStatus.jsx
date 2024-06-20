@@ -1,16 +1,24 @@
 import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { saveAs } from 'file-saver'
+import { pdf } from '@react-pdf/renderer'
+
+
+import InventoryReport from '../../Reports/InventoryReport'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { getInventory } from '../../../actions/InventoryAction'
+import { Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+
+import { getInventory } from '../../../actions/InventoryAction'
 
 import styled from 'styled-components'
 
 const InventoryStatus = () => {
 
+    const user = useSelector(state => state.user.loginUser)
     const inventory = useSelector(state => state.inventory.inventoryStatus)
 
     const treeListRef = useRef(null)
@@ -19,6 +27,16 @@ const InventoryStatus = () => {
     useEffect(() => {
         dispatch(getInventory())
     }, [])
+
+    const handlePdfGenrating = async () => {
+        const blob = await pdf(
+            <InventoryReport
+                user={user}
+                reportGridRef={treeListRef}
+            />
+        ).toBlob()
+        saveAs(blob, `Inventory Report.pdf`)
+    }
 
     const renderInventoryIdColumn = (e) => {
         return (
@@ -66,6 +84,10 @@ const InventoryStatus = () => {
 
                 <Header>
                     <HeaderSpan>Inventory History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handlePdfGenrating()}>
+                        <i style={{marginRight: 10}} className='fal fa-file-pdf' />
+                        Generate Pdf
+                    </Button>
                 </Header>
 
                 <TreeList

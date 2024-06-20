@@ -475,7 +475,8 @@ const CreateProductionOrder = () => {
                         StockEntryWarehouse : result.warehouse,
                         StockEntryQuantity : result.quantity,
                         StockEntryTo: "Inventory",
-                        StockEntryDate: moment(Date.now()).format('YYYY-MM-DD')
+                        StockEntryDate: moment(Date.now()).format('YYYY-MM-DD'),
+                        ProductionOrderId: result.productionOrderId
                     }
 
                     if(inventory.some((item) => item.inventoryItem === result.productDescription)){

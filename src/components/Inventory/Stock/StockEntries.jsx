@@ -1,9 +1,14 @@
 import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { saveAs } from 'file-saver'
+import { pdf } from '@react-pdf/renderer'
+
 import moment from 'moment'
+import StockEntryReport from '../../Reports/StockEntryReport'
 import FormBackground from '../../SupportComponents/FormBackground'
 
+import { Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
@@ -13,6 +18,7 @@ import styled from 'styled-components'
 
 const StockEntries = () => {
 
+    const user = useSelector(state => state.user.loginUser)
     const stockEntries = useSelector(state => state.stock.stockEntries)
     
     const dispatch = useDispatch()
@@ -21,6 +27,16 @@ const StockEntries = () => {
     useEffect(() => {
         dispatch(getStockEntries())
     }, [])
+
+    const handlePdfGenrating = async () => {
+        const blob = await pdf(
+            <StockEntryReport
+                user={user}
+                reportGridRef={treeListRef}
+            />
+        ).toBlob()
+        saveAs(blob, `Stock Entry Report.pdf`)
+    }
 
     const renderStockEntryIdColumn = (e) => {
         return (
@@ -88,6 +104,10 @@ const StockEntries = () => {
 
                 <Header>
                     <HeaderSpan>Stock Entry History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handlePdfGenrating()}>
+                        <i style={{marginRight: 10}} className='fal fa-file-pdf' />
+                        Generate Pdf
+                    </Button>
                 </Header>
 
                 <TreeList

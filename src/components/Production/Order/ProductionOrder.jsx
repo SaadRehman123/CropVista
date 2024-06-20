@@ -2,8 +2,12 @@ import React, { Fragment, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { saveAs } from 'file-saver'
+import { pdf } from '@react-pdf/renderer'
+
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
+import ProductionOrderReport from '../../Reports/ProductionOrderReport'
 
 import { Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
@@ -11,13 +15,14 @@ import { CellContainer, CellContent } from '../../SupportComponents/StyledCompon
 
 import { getBom } from '../../../actions/BomActions'
 import { getPlannedCrops } from '../../../actions/CropsActions'
+import { setProductionOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getProductionOrder, productionOrderActionType } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
-import { setProductionOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
 const ProductionOrder = () => {
 
+    const user = useSelector(state => state.user.loginUser)
     const productionOrder = useSelector(state => state.production.productionOrder)
     
     const navigate = useNavigate()
@@ -34,6 +39,16 @@ const ProductionOrder = () => {
         dispatch(getPlannedCrops())
         dispatch(getProductionOrder(0))
     }, [])
+
+    const handlePdfGenrating = async () => {
+        const blob = await pdf(
+            <ProductionOrderReport
+                user={user}
+                reportGridRef={treeListRef}
+            />
+        ).toBlob()
+        saveAs(blob, `Production Order Report.pdf`)
+    }
 
     const handleOnEditClick = (e) => {
         dispatch(productionOrderActionType({ node: e, type: "UPDATE" }))
@@ -158,10 +173,16 @@ const ProductionOrder = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Production Order History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreateProductionOrder()}>
-                        <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Production Order
-                    </Button>
+                    <div>
+                        <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreateProductionOrder()}>
+                            <i style={{marginRight: 10}} className='fal fa-plus' />
+                            Create Production Order
+                        </Button>
+                        <Button style={{ marginLeft: 10 }} size="sm" className={"form-action-button"} onClick={() => handlePdfGenrating()}>
+                            <i style={{marginRight: 10}} className='fal fa-file-pdf' />
+                            Generate Pdf
+                        </Button>
+                    </div>
                 </Header>
                 
                 <TreeList

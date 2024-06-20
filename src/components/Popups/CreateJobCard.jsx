@@ -61,7 +61,8 @@ const CreateJobCard = (props) => {
                     StockEntryWarehouse : item.pO_WarehouseId,
                     StockEntryQuantity : item.pO_Quantity,
                     StockEntryTo: "Production",
-                    StockEntryDate: moment(Date.now()).format('YYYY-MM-DD')
+                    StockEntryDate: moment(Date.now()).format('YYYY-MM-DD'),
+                    productionOrderId: ""
                 }
 
                 dispatch(updatePoRouteStages(item, item.pO_RouteStageId)).then((res) => {

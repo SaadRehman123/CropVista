@@ -12,6 +12,7 @@ import WarehouseReducer from "./WarehouseReducer"
 import InventoryReducer from "./InventoryReducer"
 import ProductionReducer from "./ProductionReducer"
 import StockEntriesReducer from "./StockEntriesReducer"
+import VendorMasterReducer from "./VendorMasterReducer"
 
 const rootReducers = combineReducers({
     bom: BomReducer,
@@ -24,6 +25,7 @@ const rootReducers = combineReducers({
     resource: ResourceReducer,
     stock: StockEntriesReducer,
     warehouse: WarehouseReducer,
+    vendor: VendorMasterReducer,
     inventory : InventoryReducer,
     production: ProductionReducer
 })

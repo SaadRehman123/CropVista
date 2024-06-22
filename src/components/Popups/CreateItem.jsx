@@ -18,7 +18,7 @@ const CreateItem = () => {
     const createItemPopup = useSelector(state => state.popup.toggleCreateItemPopup)
 
     const [itemType, setItemType] = useState("")
-    const [formData,setFormData]= useState ({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "" })
+    const [formData, setFormData]= useState({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "" })
     const [invalid, setInvalid] = useState({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false })
 
     const dispatch = useDispatch()
@@ -173,9 +173,9 @@ const CreateItem = () => {
                     }
 
                     instance.getDataSource().store().insert(data.result).then(() => instance.refresh())                    
-                    
-                    toggle()
+                    dispatch(getItemMaster())
                     notify("Item Created Successfully", "info", 2000)
+                    toggle()
                 }
                 else {
                     notify(data.message, "info", 2000)
@@ -189,6 +189,7 @@ const CreateItem = () => {
                     if(data.success){
                         instance.getDataSource().store().update(data.result.itemId, data.result).then(() => instance.refresh())
                         notify("Item Updated Successfully", "info", 2000)
+                        dispatch(getItemMaster())
                     }
                     else {
                         notify(data.message + " ...Refreshing", "info", 2000)
@@ -241,7 +242,6 @@ const CreateItem = () => {
                             dataSource={["Finish Good", "Raw Material" ]}
                             value={formData.itemType}
                             openOnFieldClick={true}
-                            acceptCustomValue={true}
                             onFocusIn={handleOnFocusIn}
                             onFocusOut={handleOnFocusOut}
                             placeholder={"Select Product No"}
@@ -267,7 +267,6 @@ const CreateItem = () => {
                             disabled={itemType === "Finish Good" ? false : true}
                             value={formData.season}
                             openOnFieldClick={true}
-                            acceptCustomValue={true}
                             onFocusIn={handleOnFocusIn}
                             onFocusOut={handleOnFocusOut}
                             placeholder={"Select Season No"}

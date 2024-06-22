@@ -253,6 +253,7 @@ const CreateBOM = () => {
                         const data = resX.payload.data
                         if(data.success) {
                             notify("Bill Of Material Created Successfully", "info", 2000)
+                            dispatch(getBom(0))
                         }
                     })
                 }

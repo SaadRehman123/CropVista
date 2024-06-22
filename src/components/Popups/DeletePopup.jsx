@@ -6,10 +6,10 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap'
 import moment from 'moment'
 import notify from 'devextreme/ui/notify'
 
-import { getItemMaster } from '../../actions/ItemActions'
 import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteResource, getResource } from '../../actions/ResourceAction'
 import { updateProductionOrder } from '../../actions/ProductionOrderAction'
+import { deleteVendor, getVendorMaster } from '../../actions/VendorActions'
 import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
 import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
 import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
@@ -24,7 +24,7 @@ const DeletePopup = () => {
     const deletePopup = useSelector((state) => state.view.deletePopup)
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
     const warehouseRef = useSelector((state) => state.view.warehouseRef)
-    const itemMasterRef = useSelector((state) => state.view.itemMasterRef)
+    const vendorMasterRef = useSelector((state) => state.view.vendorMasterRef)
     const productionOrderRef = useSelector((state) => state.view.productionOrderRef)
 
     const dispatch = useDispatch()
@@ -47,6 +47,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'PRODUCTION_ORDER') {
             return 'Cancel Production Order'
         }
+        else if (deletePopup.type === 'VENDOR_MASTER') {
+            return 'Delete Vendor'
+        }
     }, [deletePopup])
 
     const renderText = () => {
@@ -64,6 +67,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'PRODUCTION_ORDER') {
             return 'Are you sure you want to cancel selected Production Order?'
+        }
+        else if (deletePopup.type === 'VENDOR_MASTER') {
+            return 'Are you sure you want to delete selected Vendor?'
         }
     }
 
@@ -227,6 +233,34 @@ const DeletePopup = () => {
                     }
 
                     notify("Production Order Cancelled", "info", 2000)
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "VENDOR_MASTER") {
+            const instance = vendorMasterRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                vendorId: selectedRow[0].vendorId,
+                vendorName: selectedRow[0].vendorName,
+                vendorGroup: selectedRow[0].vendorGroup,
+                vendorType: selectedRow[0].vendorType,
+                isDisabled: selectedRow[0].isDisabled,
+                vendorAddress: selectedRow[0].vendorAddress,
+                vendorNumber: selectedRow[0].vendorNumber.toString(),
+                vendorEmail: selectedRow[0].vendorEmail 
+            }
+
+            dispatch(deleteVendor(selectedRow[0].vendorId, obj)).then(res => {
+                const data = res.payload.data
+                if(data.success){
+                    instance.getDataSource().store().remove(data.result.vendorId)
+                    instance.refresh()
+                }
+                else {
+                    notify(data.message + " ...Refreshing", "info", 2000)
+                    setTimeout(() => dispatch(getVendorMaster()), 1000)
                 }
             })
             handleOnToggle(deletePopup.type)

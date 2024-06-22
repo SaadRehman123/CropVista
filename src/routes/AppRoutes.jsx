@@ -9,6 +9,8 @@ import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import StockEntries from '../components/Inventory/Stock/StockEntries'
 import ItemMaster from '../components/Inventory/ItemMaster/ItemMaster'
 import CreateBOM from '../components/Production/BillOfMaterial/CreateBOM'
+import VendorMaster from '../components/Purchase/VendorMaster/VendorMaster'
+import CreateVendor from '../components/Purchase/VendorMaster/CreateVendor'
 import ProductionOrder from '../components/Production/Order/ProductionOrder'
 import BillOfMaterial from '../components/Production/BillOfMaterial/BillOfMaterial'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
@@ -71,6 +73,14 @@ const AppRoutes = () => {
                 <Route
                     path="Inventory_Status"
                     element={<InventoryStatus />}>
+                </Route>
+                <Route
+                    path="Vendor_Master"
+                    element={<VendorMaster />}>
+                </Route>
+                <Route
+                    path="Create_Vendor"
+                    element={<CreateVendor />}>
                 </Route>
             </Routes>
         </div>

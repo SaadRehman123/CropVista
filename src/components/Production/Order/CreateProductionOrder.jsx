@@ -579,7 +579,6 @@ const CreateProductionOrder = () => {
                                         searchExpr={'itemName'}
                                         dataSource={plannedCrops.filter((item) => bom.some(bomItem => bomItem.productId === item.itemId) && item.status === "Pending")}
                                         openOnFieldClick={true}
-                                        acceptCustomValue={true}
                                         value={formData.itemId}
                                         onFocusOut={handleOnFocusOut}
                                         placeholder={"Select Product No"}

@@ -89,3 +89,10 @@ export const setProductionOrderRef = (value) => {
 		payload: value
 	}
 }
+
+export const setVendorMasterRef = (value) => {
+	return {
+		type: "SET_VENDOR_MASTER_REF",
+		payload: value
+	}
+}

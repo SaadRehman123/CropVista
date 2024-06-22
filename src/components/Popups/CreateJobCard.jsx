@@ -13,20 +13,20 @@ import { toggleCreateJobCardPopup } from '../../actions/PopupActions'
 import { getProductionOrder, updatePoRouteStages } from '../../actions/ProductionOrderAction'
 
 const CreateJobCard = (props) => {
-    
+
     const productionOrder = useSelector(state => state.production.productionOrder)
     const createJobCard = useSelector(state => state.popup.toggleCreateJobCardPopup)
 
     const [dataSource, setDataSource] = useState([])
-    
+
     const dispatch = useDispatch()
-    
+
     const treelistRef = useRef(null)
 
     useEffect(() => {
         const excludedStatuses = ["Closed", "Completed", "Cancelled"]
-        const dataSource = productionOrder.filter(item => item.productionNo === props.productionOrder && !excludedStatuses.includes(item.status)) 
-        
+        const dataSource = productionOrder.filter(item => item.productionNo === props.productionOrder && !excludedStatuses.includes(item.status))
+
         if (dataSource && dataSource.length > 0) {
             let minRouteSequence = Infinity
 
@@ -35,7 +35,7 @@ const CreateJobCard = (props) => {
                     minRouteSequence = item.pO_RouteStage
                 }
             })
-    
+
             if (minRouteSequence !== Infinity) {
                 const filteredData = dataSource[0].children.filter(item => item.pO_RouteStage === minRouteSequence && item.pO_Status === "Pending")
                 setDataSource(filteredData)
@@ -45,7 +45,7 @@ const CreateJobCard = (props) => {
             }
         }
     }, [productionOrder, props.productionOrder])
-    
+
     const handleOnClick = () => {
         const instance = treelistRef.current.instance
         const selectedRow = instance.getSelectedRowsData().sort((a, b) => a.pO_RouteStageId - b.pO_RouteStageId)
@@ -54,12 +54,12 @@ const CreateJobCard = (props) => {
             selectedRow.forEach((item) => {
                 delete item.clientId
                 item.pO_Status = "Completed"
-    
+
                 const stockEntries = {
-                    StockEntryId : "",
-                    StockEntryName : item.pO_ItemDescription,
-                    StockEntryWarehouse : item.pO_WarehouseId,
-                    StockEntryQuantity : item.pO_Quantity,
+                    StockEntryId: "",
+                    StockEntryName: item.pO_ItemDescription,
+                    StockEntryWarehouse: item.pO_WarehouseId,
+                    StockEntryQuantity: item.pO_Quantity,
                     StockEntryTo: "Production",
                     StockEntryDate: moment(Date.now()).format('YYYY-MM-DD'),
                     productionOrderId: ""
@@ -96,7 +96,7 @@ const CreateJobCard = (props) => {
             </div>
         )
     }
-    
+
     const renderRouteStageHeaderCell = (e) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8, paddingTop: 8 }}>
@@ -188,7 +188,7 @@ const CreateJobCard = (props) => {
     }
 
     const renderTotalCell = ({ data }) => {
-        const value = data.pO_Quantity * data.pO_UnitPrice 
+        const value = data.pO_Quantity * data.pO_UnitPrice
         return (
             <CellContainer>
                 <CellContent>
@@ -217,9 +217,9 @@ const CreateJobCard = (props) => {
                     noDataText={'No Route Stage Pending'}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
-                    
-                    <Selection 
-                        mode="multiple" 
+
+                    <Selection
+                        mode="multiple"
                         showCheckBoxesMode={'none'} />
 
                     <Scrolling mode={"standard"} />
@@ -228,7 +228,7 @@ const CreateJobCard = (props) => {
                         mode='cell'
                         allowUpdating={true}
                         startEditAction='dblClick'
-                        selectTextOnEditStart={true} 
+                        selectTextOnEditStart={true}
                         texts={{ confirmDeleteMessage: '' }}
                     />
 
@@ -271,11 +271,11 @@ const CreateJobCard = (props) => {
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderNameCell} 
+                        cellRender={renderNameCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
-                        
+
                     <Column
                         caption={"Quantity"}
                         dataField={"pO_Quantity"}
@@ -294,7 +294,7 @@ const CreateJobCard = (props) => {
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderUomCell} 
+                        cellRender={renderUomCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -304,7 +304,7 @@ const CreateJobCard = (props) => {
                         dataField={"pO_WarehouseId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderWarehouseCell} 
+                        cellRender={renderWarehouseCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -316,7 +316,7 @@ const CreateJobCard = (props) => {
                         allowSorting={false}
                         editorOptions={"dxNumberBox"}
                         allowEditing={false}
-                        cellRender={renderUnitPriceCell} 
+                        cellRender={renderUnitPriceCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -327,12 +327,12 @@ const CreateJobCard = (props) => {
                         alignment={"left"}
                         allowSorting={false}
                         allowEditing={false}
-                        cellRender={renderTotalCell} 
+                        cellRender={renderTotalCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                 </TreeList>
-                
+
                 <Button size="sm" className={"form-action-button"} style={{ marginTop: 10, float: "right" }} onClick={() => handleOnClick()}>
                     Complete
                 </Button>

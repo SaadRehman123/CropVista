@@ -8,6 +8,7 @@ const INITIAL_STATE = {
 	warehouseRef: null,
 	itemMasterRef: null,
 	itemResourceRef: null,
+	vendorMasterRef: null,
 	productionOrderRef: null,
 	setProductionOrderItemResourceRef: null,
 	setNavToolbarTitle: 'Dashboard',
@@ -92,6 +93,12 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
 			return {
 				...state,
 				productionOrderRef: action.payload
+			}
+		}
+		case "SET_VENDOR_MASTER_REF": {
+			return {
+				...state,
+				vendorMasterRef: action.payload
 			}
 		}
 		default: return state

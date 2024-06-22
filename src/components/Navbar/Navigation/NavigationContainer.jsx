@@ -41,6 +41,9 @@ const NavigationContainer = () => {
         else if (section === "inventory"){
             navigate('/app/inventory')
         }
+        else if (section === "purchase"){
+            navigate('/app/purchase')
+        }
     }
 
     const handleOnClick = (obj) => {
@@ -80,6 +83,10 @@ const NavigationContainer = () => {
             navigate('/app/Inventory_Status')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        else if(obj.id === "vendorMaster"){
+            navigate('/app/Vendor_Master')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
     }
 
     return (
@@ -87,7 +94,7 @@ const NavigationContainer = () => {
             <DashboardNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} />
             <ProductionNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
             <InventoryNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
-            {/* <PurchaseNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} /> */}
+            <PurchaseNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
             {/* <SalesNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} /> */}
         </Container>
     )
@@ -113,4 +120,5 @@ const navigations = [
     {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 10, type: "production"},
     {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 10, type: "production"},
     {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 10, type: "production"},
+    {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-user", pad: 10, type: "purchase"},
 ]

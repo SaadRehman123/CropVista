@@ -17,6 +17,7 @@ import { getWarehouse } from './actions/WarehouseAction'
 import { getPlannedCrops } from './actions/CropsActions'
 import { getInventory } from './actions/InventoryAction'
 import { renderLoadingView } from './actions/ViewActions'
+import { getVendorMaster } from './actions/VendorActions'
 import { getStockEntries } from './actions/StockEntriesAction'
 import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
@@ -43,6 +44,7 @@ const App = () => {
 		dispatch(getItemMaster()).catch((error) => console.error(error))
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
 		dispatch(getStockEntries()).catch((error) => console.error(error))
+		dispatch(getVendorMaster()).catch((error) => console.error(error))
 		dispatch(getProductionOrder(0)).catch((error) => console.error(error))
         setUpApplication()
     }, [login])

@@ -87,6 +87,10 @@ const NavigationContainer = () => {
             navigate('/app/Vendor_Master')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        else if(obj.id === "create-purchase-request"){
+            navigate('/app/Create_Purchase_Request')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
     }
 
     return (
@@ -121,4 +125,5 @@ const navigations = [
     {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 10, type: "production"},
     {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 10, type: "production"},
     {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-user", pad: 10, type: "purchase"},
+    {id: "create-purchase-request", name: "Create Purchase Request", icon: "fal fa-user", pad: 10, type: "purchase"},
 ]

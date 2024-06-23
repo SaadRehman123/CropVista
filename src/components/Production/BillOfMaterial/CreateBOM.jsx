@@ -33,6 +33,9 @@ const CreateBOM = () => {
     const [invalid, setInvalid] = useState({ itemId: false, warehouseId: false, productDescription: false, quantity: false, productionStdCost: false })
     const [formData, setFormData] = useState({ itemId: "", warehouseId: "", productDescription: "", quantity: "", productionStdCost: "" })
 
+    const itemResourceTreeRef = useRef(null)
+    const dispatch = useDispatch()
+
     const itemResourceDatasource = new DataSource({
         store: {
             data: assignClientId(treeListData),
@@ -40,9 +43,6 @@ const CreateBOM = () => {
             key: 'clientId',
         }
     })
-
-    const itemResourceTreeRef = useRef(null)
-    const dispatch = useDispatch()
 
     useEffect(() => {
         setItemResourceTreeRef(itemResourceTreeRef)
@@ -440,11 +440,10 @@ const CreateBOM = () => {
     }
 
     //Treelist Rendering
-
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
             if (e.column.dataField === "itemquantity" || e.column.dataField === "unitPrice" || e.column.dataField === "total") {
-                if (e.value < 0) {
+                if (e.value <= 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
             }

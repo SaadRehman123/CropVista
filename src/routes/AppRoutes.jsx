@@ -16,6 +16,8 @@ import BillOfMaterial from '../components/Production/BillOfMaterial/BillOfMateri
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
 import InventoryStatus from '../components/Inventory/InventoryOverview/InventoryStatus'
 import CreateProductionOrder from '../components/Production/Order/CreateProductionOrder'
+import CreatePurchaseOrder from '../components/Purchase/PurchaseOrder/CreatePurchaseOrder'
+import CreatePurchaseRequest from '../components/Purchase/PurchaseRequest/CreatePurchaseRequest'
 
 const AppRoutes = () => {
     return (
@@ -81,6 +83,10 @@ const AppRoutes = () => {
                 <Route
                     path="Create_Vendor"
                     element={<CreateVendor />}>
+                </Route>
+                <Route
+                    path="Create_Purchase_Request"
+                    element={<CreatePurchaseOrder />}>
                 </Route>
             </Routes>
         </div>

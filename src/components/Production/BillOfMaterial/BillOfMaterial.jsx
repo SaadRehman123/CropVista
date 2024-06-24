@@ -34,7 +34,7 @@ const BillOfMaterial = () => {
 
     const handleOnEditClick = (e) => {
         dispatch(bomActionType({ node: e, type: "UPDATE" }))
-        navigate('/app/create_bom')
+        navigate('/app/Create_Bom')
     }
 
     const renderBomIdColumn = (e) => {

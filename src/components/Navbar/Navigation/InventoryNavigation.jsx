@@ -11,7 +11,7 @@ const InventoryNavigation = (props) => {
                 {props.navigations.map(item => {
                     return (
                         item.type === 'inventory' && (
-                            <ItemContainer pad={item.pad} active={props.activeTab === item.id} onClick={() => props.handleOnClick(item)} key={item.id}>
+                            <ItemContainer pad={item.pad} active={props.activeTab === item.name} onClick={() => props.handleOnClick(item)} key={item.id}>
                                 <Icon className={item.icon} />
                                 <NavigationButton style={{ paddingTop: 2 }}>{item.name}</NavigationButton>
                             </ItemContainer>

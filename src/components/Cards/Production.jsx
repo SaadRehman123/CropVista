@@ -14,7 +14,7 @@ const Production = () => {
 
     const handleOnCardClick = (id) => {
         if (id === 1) {
-            navigate('/app/crop-plan')
+            navigate('/app/Crop-Plan')
         }
         else if (id === 2) {
             navigate('/app/Bill_Of_Material')

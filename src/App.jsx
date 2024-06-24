@@ -61,7 +61,7 @@ const App = () => {
 					if(response.payload.data.success && response.payload.data.result !== null){
 						setAppReady(true)
 						dispatch(renderLoadingView(false))
-						navigate("/app/dashboard")
+						navigate("/app/Dashboard")
 					}
 				}).catch((error) => {
 					console.error(error)

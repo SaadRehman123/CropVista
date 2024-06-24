@@ -6,7 +6,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
-import { DateBox, TreeList } from 'devextreme-react'
+import { DateBox, TextBox, TreeList } from 'devextreme-react'
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
@@ -27,7 +27,7 @@ const CreateRequestForQuotation = () => {
     const [vendorTreeListData, setVendorTreeListData] = useState([])
 
     const [invalid, setInvalid] = useState({ requiredBy: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "" })
+    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", requestForQuotationStatus: "" })
 
     const dispatch = useDispatch()
     
@@ -57,7 +57,8 @@ const CreateRequestForQuotation = () => {
         else if (requestForQuotationAction.type === "UPDATE") {
             setFormData({
                 creationDate: "",
-                requiredBy: ""
+                requiredBy: "",
+                requestForQuotationStatus: ""
             })            
         }
     }, [])
@@ -181,6 +182,19 @@ const CreateRequestForQuotation = () => {
                                         displayFormat={"dd/MM/yyyy"}
                                     />
                                 </FormGroupItem>
+                                
+                                <FormGroupItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'requestForQuotationStatus'}
+                                        value={formData.requestForQuotationStatus}
+                                        placeholder={'Status'}
+                                    />
+                                </FormGroupItem>
                             </div>
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
@@ -202,7 +216,7 @@ const CreateRequestForQuotation = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 30 }}>
+                                <FormButtonContainer style={{ marginTop: 45 }}>
                                     <Button size="sm" className={"form-action-button"}>
                                         {requestForQuotationAction.type === "UPDATE" ? "Update" : "Save"} Request For Quotation
                                     </Button>

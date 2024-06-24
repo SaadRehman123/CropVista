@@ -11,7 +11,7 @@ const DashboardNavigation = (props) => {
                 {props.navigations.map(item => {
                     return (
                         item.type === 'overview' && (
-                            <ItemContainer pad={item.pad} active={props.activeTab === item.id} onClick={() => props.handleOnClick(item)} key={item.id}>
+                            <ItemContainer pad={item.pad} active={props.activeTab === item.name} onClick={() => props.handleOnClick(item)} key={item.id}>
                                 <Icon className={item.icon} />
                                 <NavigationButton>{item.name}</NavigationButton>
                             </ItemContainer>

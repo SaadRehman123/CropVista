@@ -48,19 +48,19 @@ const NavigationContainer = () => {
 
     const handleOnClick = (obj) => {
         if(obj.id === "dashboard"){
-            navigate('/app/dashboard')
+            navigate('/app/Dashboard')
             dispatch(setNavToolbarTitle(obj.name))
         }
         else if(obj.id === "crop-plan"){
-            navigate('/app/crop-plan')
+            navigate('/app/Crop-Plan')
             dispatch(setNavToolbarTitle(obj.name))
         }
         else if(obj.id === "warehouse"){
-            navigate('/app/warehouse')
+            navigate('/app/Warehouse')
             dispatch(setNavToolbarTitle(obj.name))
         }
         else if(obj.id === "resource"){
-            navigate('/app/resource')
+            navigate('/app/Resources')
             dispatch(setNavToolbarTitle(obj.name))
         }
         else if(obj.id === "bom"){
@@ -144,11 +144,11 @@ const navigations = [
     {id: "crop-plan", name: "Crop-Plan", icon: "fal fa-ballot-check", pad: 10, type: "production"},
     {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 10, type: "production"},
     {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 10, type: "production"},
-    {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-users", pad: 5, type: "purchase"},
     {id: "purchase-request", name: "Purchase Request", icon: "fal fa-file-alt", pad: 10, type: "purchase"},
     {id: "purchase-order", name: "Purchase Order", icon: "fal fa-file-contract", pad: 10, type: "purchase"},
     {id: "request-for-quotation", name: "Req For Quotation", icon: "fal fa-file-signature", pad: 8, type: "purchase"},
     {id: "vendor-quotation", name: "Vendor Quotation", icon: "fal fa-file-user", pad: 10, type: "purchase"},
     {id: "good-receipt", name: "Good Receipt", icon: "fal fa-receipt", pad: 10, type: "purchase"},
     {id: "purchase-invoice", name: "Purchase Invoice", icon: "fal fa-file-invoice-dollar", pad: 10, type: "purchase"},
+    {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-users", pad: 5, type: "purchase"}
 ]

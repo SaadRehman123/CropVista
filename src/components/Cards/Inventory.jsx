@@ -13,10 +13,10 @@ const Inventory = () => {
 
     const handleOnCardClick = (id) => {
         if (id === 1) {
-            navigate('/app/warehouse')
+            navigate('/app/Warehouse')
         }
         else if (id === 2) {
-            navigate('/app/resource')
+            navigate('/app/Resources')
         }
         else if (id === 3) {
             navigate('/app/Item_Master')

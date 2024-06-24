@@ -24,7 +24,7 @@ const CreateVendorQuotation = () => {
     const [treeListData, setTreeListData] = useState([])
 
     const [invalid, setInvalid] = useState({ vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
+    const [formData, setFormData] = useState({ creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", vendorQuotationStatus: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
@@ -47,7 +47,8 @@ const CreateVendorQuotation = () => {
                 vendorId: "",
                 vendorName: "",
                 vendorAddress: "",
-                vendorNumber: ""
+                vendorNumber: "",
+                vendorQuotationStatus: ""
             })            
         }
     }, [])
@@ -243,7 +244,20 @@ const CreateVendorQuotation = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 45 }}>
+                                <FormGroupItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'vendorQuotationStatus'}
+                                        value={formData.vendorQuotationStatus}
+                                        placeholder={'Status'}
+                                    />
+                                </FormGroupItem>
+
+                                <FormButtonContainer style={{ marginTop: 30 }}>
                                     <Button size="sm" className={"form-action-button"}>
                                         {vendorQuotationAction.type === "UPDATE" ? "Update" : "Save"} Vendor Quotation
                                     </Button>

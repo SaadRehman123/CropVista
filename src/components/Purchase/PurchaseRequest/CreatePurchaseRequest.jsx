@@ -6,7 +6,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
-import { DateBox, TreeList } from 'devextreme-react'
+import { DateBox, TextBox, TreeList } from 'devextreme-react'
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
@@ -23,7 +23,7 @@ const CreatePurchaseRequest = () => {
     const [treeListData, setTreeListData] = useState([])
 
     const [invalid, setInvalid] = useState({ requiredBy: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "" })
+    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", purchaseReqStatus: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
@@ -43,7 +43,8 @@ const CreatePurchaseRequest = () => {
         else if (purchaseRequestAction.type === "UPDATE") {
             setFormData({
                 creationDate: "",
-                requiredBy: ""
+                requiredBy: "",
+                purchaseReqStatus: ""
             })            
         }
     }, [])
@@ -129,6 +130,19 @@ const CreatePurchaseRequest = () => {
                                         displayFormat={"dd/MM/yyyy"}
                                     />
                                 </FormGroupItem>
+
+                                <FormGroupItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'purchaseReqStatus'}
+                                        value={formData.purchaseReqStatus}
+                                        placeholder={'Status'}
+                                    />
+                                </FormGroupItem>
                             </div>
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
@@ -150,7 +164,7 @@ const CreatePurchaseRequest = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 30 }}>
+                                <FormButtonContainer style={{ marginTop: 45 }}>
                                     <Button size="sm" className={"form-action-button"}>
                                         {purchaseRequestAction.type === "UPDATE" ? "Update" : "Save"} Purchase Request
                                     </Button>

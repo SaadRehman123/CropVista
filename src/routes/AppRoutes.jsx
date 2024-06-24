@@ -48,19 +48,19 @@ const AppRoutes = () => {
                 </Route>
                 <Route
                     index
-                    path="dashboard"
+                    path="Dashboard"
                     element={<DashboardContainer />}>
                 </Route>
                 <Route
-                    path="crop-plan"
+                    path="Crop-Plan"
                     element={<CropPlan />}>
                 </Route>
                 <Route
-                    path="warehouse"
+                    path="Warehouse"
                     element={<Warehouse />}>
                 </Route>
                 <Route
-                    path="resource"
+                    path="Resources"
                     element={<Resource />}>
                 </Route>
                 <Route
@@ -68,7 +68,7 @@ const AppRoutes = () => {
                     element={<BillOfMaterial />}>
                 </Route>
                 <Route
-                    path="create_bom"
+                    path="Create_Bom"
                     element={<CreateBOM />}>
                 </Route>
                 <Route

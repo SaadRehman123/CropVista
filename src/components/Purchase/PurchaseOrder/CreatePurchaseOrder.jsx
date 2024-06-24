@@ -24,7 +24,7 @@ const CreatePurchaseOrder = () => {
     const [treeListData, setTreeListData] = useState([])
 
     const [invalid, setInvalid] = useState({ requiredBy: false, vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
+    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", purchaseOrderStatus: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
@@ -48,7 +48,8 @@ const CreatePurchaseOrder = () => {
                 vendorId: "",
                 vendorName: "",
                 vendorAddress: "",
-                vendorNumber: ""
+                vendorNumber: "",
+                purchaseOrderStatus: ""
             })            
         }
     }, [])
@@ -226,6 +227,19 @@ const CreatePurchaseOrder = () => {
                                         accessKey={'vendorAddress'}
                                         placeholder={"Enter Address"}
                                         value={formData.vendorAddress}
+                                    />
+                                </FormGroupItem>
+
+                                <FormGroupItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'purchaseOrderStatus'}
+                                        value={formData.purchaseOrderStatus}
+                                        placeholder={'Status'}
                                     />
                                 </FormGroupItem>
                             </div>

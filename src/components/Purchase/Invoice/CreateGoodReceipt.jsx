@@ -19,7 +19,7 @@ const CreateGoodReceipt = () => {
     const [treeListData, setTreeListData] = useState([])
 
     const [invalid, setInvalid] = useState({ vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
+    const [formData, setFormData] = useState({ creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", goodReceiptStatus: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
@@ -42,7 +42,8 @@ const CreateGoodReceipt = () => {
                 vendorId: "",
                 vendorName: "",
                 vendorAddress: "",
-                vendorNumber: ""
+                vendorNumber: "",
+                goodReceiptStatus: ""
             })            
         }
     }, [])
@@ -195,8 +196,21 @@ const CreateGoodReceipt = () => {
                                         value={formData.vendorNumber}
                                     />
                                 </FormGroupItem>
+                                
+                                <FormGroupItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'goodReceiptStatus'}
+                                        value={formData.goodReceiptStatus}
+                                        placeholder={'Status'}
+                                    />
+                                </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 45 }}>
+                                <FormButtonContainer style={{ marginTop: 30 }}>
                                     <Button size="sm" className={"form-action-button"}>
                                         {goodReceiptAction.type === "UPDATE" ? "Update" : "Save"} Good Receipt
                                     </Button>

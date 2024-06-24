@@ -14,22 +14,22 @@ import { assignClientId } from '../../../utilities/CommonUtilities'
 
 import styled from 'styled-components'
 
-const CreatePurchaseOrder = () => {
+const CreateVendorQuotation = () => {
 
     const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
-    const purchaseOrderAction = useSelector(state => state.purchase.purchaseOrderAction)
-    
+    const vendorQuotationAction = useSelector(state => state.purchase.vendorQuotationAction)
+
     const [deletedRows, setDeletedRows] = useState([])
     const [treeListData, setTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ requiredBy: false, vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
+    const [invalid, setInvalid] = useState({ vendorId: false })
+    const [formData, setFormData] = useState({ creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
 
-    const purchaseOrderDataSource = new DataSource({
+    const vendorQuotationDataSource = new DataSource({
         store: {
             data: assignClientId(treeListData),
             type: 'array',
@@ -38,13 +38,12 @@ const CreatePurchaseOrder = () => {
     })
 
     useEffect(() => {
-        if (purchaseOrderAction.type === "CREATE") {
+        if (vendorQuotationAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
         }
-        else if (purchaseOrderAction.type === "UPDATE") {
+        else if (vendorQuotationAction.type === "UPDATE") {
             setFormData({
                 creationDate: "",
-                requiredBy: "",
                 vendorId: "",
                 vendorName: "",
                 vendorAddress: "",
@@ -53,30 +52,18 @@ const CreatePurchaseOrder = () => {
         }
     }, [])
 
-    const onValueChanged = (e, name) => {
+    const onValueChanged = (e) => {
         let value = e.value
         if (value === null) value = ""
 
-        if (name === "vendorId") {
-            const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId) 
-            if(vendor){
-                setFormData((prevState) => ({ 
-                    ...prevState,
-                    vendorId: vendor.vendorId,
-                    vendorName: vendor.vendorName,
-                    vendorAddress: vendor.vendorAddress,
-                    vendorNumber: vendor.vendorNumber
-                }))
-            }
-        }
-        else {
-            setFormData((prevState) => ({ ...prevState, [name]: value }))
-        }
-
-        if (name === "requiredBy") {
-            setInvalid((prevInvalid) => ({
-                ...prevInvalid,
-                requiredBy: value === "" || !value ? true : false
+        const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId) 
+        if(vendor){
+            setFormData((prevState) => ({ 
+                ...prevState,
+                vendorId: vendor.vendorId,
+                vendorName: vendor.vendorName,
+                vendorAddress: vendor.vendorAddress,
+                vendorNumber: vendor.vendorNumber
             }))
         }
     }
@@ -103,7 +90,7 @@ const CreatePurchaseOrder = () => {
 
     const handleOnAddRow = () => {
         const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
-        const newRow = getPurchaseOrderObj(newClientID)
+        const newRow = getItemObj(newClientID)
         setTreeListData([...treeListData, newRow])
     }
 
@@ -114,8 +101,8 @@ const CreatePurchaseOrder = () => {
         const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
         setTreeListData(updatedData)
         
-        purchaseOrderDataSource.store().remove(e.row.key).then(() => {
-            purchaseOrderDataSource.reload()
+        vendorQuotationDataSource.store().remove(e.row.key).then(() => {
+            vendorQuotationDataSource.reload()
         })
     }
 
@@ -136,8 +123,8 @@ const CreatePurchaseOrder = () => {
             if (selectedItem) {
                 const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, rate: selectedItem.sellingRate }
     
-                purchaseOrderDataSource.store().update(selectRow.clientId, updatedData).then(() => {
-                    purchaseOrderDataSource.reload()
+                vendorQuotationDataSource.store().update(selectRow.clientId, updatedData).then(() => {
+                    vendorQuotationDataSource.reload()
                 })
             }
         }
@@ -231,25 +218,6 @@ const CreatePurchaseOrder = () => {
                             </div>
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
-                                    <FormLabel>Required By</FormLabel>
-                                    <DateBox
-                                        elementAttr={{
-                                            class: "form-datebox",
-                                        }}
-                                        type={"date"}
-                                        min={new Date()}
-                                        accessKey={'requiredBy'}
-                                        openOnFieldClick={true}
-                                        value={formData.requiredBy}
-                                        placeholder={"DD/MM/YYYY"}
-                                        displayFormat={"dd/MM/yyyy"}
-                                        validationMessagePosition={"bottom"}
-                                        onValueChanged={(e) => onValueChanged(e, 'requiredBy')}
-                                        validationStatus={invalid.requiredBy === false ? "valid" : "invalid"}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
                                     <FormLabel>Vendor Name</FormLabel>
                                     <TextBox
                                         elementAttr={{
@@ -277,7 +245,7 @@ const CreatePurchaseOrder = () => {
 
                                 <FormButtonContainer style={{ marginTop: 45 }}>
                                     <Button size="sm" className={"form-action-button"}>
-                                        {purchaseOrderAction.type === "UPDATE" ? "Update" : "Save"} Purchase Order
+                                        {vendorQuotationAction.type === "UPDATE" ? "Update" : "Save"} Vendor Quotation
                                     </Button>
                                 </FormButtonContainer>
                             </div>
@@ -294,7 +262,6 @@ const CreatePurchaseOrder = () => {
             return sum + total
         }, 0)
     }
-
     
     const renderTotal = () => {
         const totalSum = calculateTotal()
@@ -315,7 +282,7 @@ const CreatePurchaseOrder = () => {
 
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (!data.itemQuantity) data.itemQuantity = 1
+        if (!data.itemQuantity) data.itemQuantity = 0
         if (!data.rate) data.rate = 0
 
         //For Now
@@ -327,7 +294,7 @@ const CreatePurchaseOrder = () => {
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
             if (e.column.dataField === "itemQuantity") {
-                if (e.value <= 0) {
+                if (e.value < 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
             }
@@ -464,12 +431,14 @@ const CreatePurchaseOrder = () => {
                     <Header>
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
-                    <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
-                </div>
 
+                    <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
+                        Add Row
+                    </AddButton>
+                </div>
                 <TreeList
                     elementAttr={{
-                        id: "create-purchase-order-treelist",
+                        id: "create-vendor-quotation-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"clientId"}
@@ -477,7 +446,7 @@ const CreatePurchaseOrder = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={purchaseOrderDataSource}
+                    dataSource={vendorQuotationDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     noDataText={'No Data'}
@@ -590,13 +559,13 @@ const CreatePurchaseOrder = () => {
     )
 }
 
-export default CreatePurchaseOrder
+export default CreateVendorQuotation
 
-const getPurchaseOrderObj = (clientId) => {
+const getItemObj = (clientId) => {
     return {
         itemId: "",
         itemName: "",
-        itemQuantity: 1,
+        itemQuantity: 0,
         uom: "",
         rate: "",
         amount: "",

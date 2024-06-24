@@ -6,127 +6,104 @@ import FormBackground from '../../SupportComponents/FormBackground'
 import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
-import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
+import { DateBox, TreeList } from 'devextreme-react'
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
+import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
 
 import styled from 'styled-components'
 
-const CreatePurchaseOrder = () => {
+const CreateRequestForQuotation = () => {
 
     const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
-    const purchaseOrderAction = useSelector(state => state.purchase.purchaseOrderAction)
+    const requestForQuotationAction = useSelector(state => state.purchase.requestForQuotationAction)
     
-    const [deletedRows, setDeletedRows] = useState([])
-    const [treeListData, setTreeListData] = useState([])
+    const [itemDeletedRows, setItemDeletedRows] = useState([])
+    const [itemTreeListData, setItemTreeListData] = useState([])
+    
+    const [vendorDeletedRows, setVendorDeletedRows] = useState([])
+    const [vendorTreeListData, setVendorTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ requiredBy: false, vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
+    const [invalid, setInvalid] = useState({ requiredBy: false })
+    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "" })
 
     const dispatch = useDispatch()
-    const treelistRef = useRef(null)
+    
+    const itemTreelistRef = useRef(null)
+    const vendorTreelistRef = useRef(null)
 
-    const purchaseOrderDataSource = new DataSource({
+    const vendorDataSource = new DataSource({
         store: {
-            data: assignClientId(treeListData),
+            data: assignClientId(vendorTreeListData),
+            type: 'array',
+            key: 'clientId',
+        }
+    })
+
+    const itemDataSource = new DataSource({
+        store: {
+            data: assignClientId(itemTreeListData),
             type: 'array',
             key: 'clientId',
         }
     })
 
     useEffect(() => {
-        if (purchaseOrderAction.type === "CREATE") {
+        if (requestForQuotationAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
         }
-        else if (purchaseOrderAction.type === "UPDATE") {
+        else if (requestForQuotationAction.type === "UPDATE") {
             setFormData({
                 creationDate: "",
-                requiredBy: "",
-                vendorId: "",
-                vendorName: "",
-                vendorAddress: "",
-                vendorNumber: ""
+                requiredBy: ""
             })            
         }
     }, [])
 
-    const onValueChanged = (e, name) => {
-        let value = e.value
-        if (value === null) value = ""
-
-        if (name === "vendorId") {
-            const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId) 
-            if(vendor){
-                setFormData((prevState) => ({ 
-                    ...prevState,
-                    vendorId: vendor.vendorId,
-                    vendorName: vendor.vendorName,
-                    vendorAddress: vendor.vendorAddress,
-                    vendorNumber: vendor.vendorNumber
-                }))
-            }
-        }
-        else {
-            setFormData((prevState) => ({ ...prevState, [name]: value }))
-        }
-
-        if (name === "requiredBy") {
-            setInvalid((prevInvalid) => ({
-                ...prevInvalid,
-                requiredBy: value === "" || !value ? true : false
-            }))
-        }
+    const handleOnVendorAddRow = () => {
+        const newClientID = vendorTreeListData.length > 0 ? Math.max(...vendorTreeListData.map(item => item.clientId)) + 1 : 1
+        const newRow = getVendorObj(newClientID)
+        setVendorTreeListData([...vendorTreeListData, newRow])
     }
 
-    const handleOnFocusIn = (e) => {
-        const name = e.event.target.accessKey
-        setInvalid((prevInvalid) => ({
-            ...prevInvalid,
-            [name]: false
-        }))
+    const handleOnItemAddRow = () => {
+        const newClientID = itemTreeListData.length > 0 ? Math.max(...itemTreeListData.map(item => item.clientId)) + 1 : 1
+        const newRow = getItemObj(newClientID)
+        setItemTreeListData([...itemTreeListData, newRow])
     }
 
-    const handleOnFocusOut = (e) => {
-        const name = e.event.target.accessKey
-        if (formData[name] === null) formData[name] = ""
+    const handleOnVendorRowRemove = (e) => {
+        const deletedRow = vendorTreeListData.find(item => item.clientId === e.row.key)
+        setVendorDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
+
+        const updatedData = vendorTreeListData.filter(item => item.clientId !== e.row.key)
+        setVendorTreeListData(updatedData)
         
-        if(name === "vendorId"){
-            setInvalid((prevInvalid) => ({
-                ...prevInvalid,
-                [name]: formData[name].trim() === "" ? true : false
-            }))
-        }
+        vendorDataSource.store().remove(e.row.key).then(() => {
+            vendorDataSource.reload()
+        })
     }
+    
+    const handleOnItemRowRemove = (e) => {
+        const deletedRow = itemTreeListData.find(item => item.clientId === e.row.key)
+        setItemDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
 
-    const handleOnAddRow = () => {
-        const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
-        const newRow = getPurchaseOrderObj(newClientID)
-        setTreeListData([...treeListData, newRow])
-    }
-
-    const handleOnRowRemove = (e) => {
-        const deletedRow = treeListData.find(item => item.clientId === e.row.key)
-        setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
-
-        const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
-        setTreeListData(updatedData)
+        const updatedData = itemTreeListData.filter(item => item.clientId !== e.row.key)
+        setItemTreeListData(updatedData)
         
-        purchaseOrderDataSource.store().remove(e.row.key).then(() => {
-            purchaseOrderDataSource.reload()
+        itemDataSource.store().remove(e.row.key).then(() => {
+            itemDataSource.reload()
         })
     }
 
     const handleOnItemValueChanged = (e) => {
         let value = e.value
 
-        if(value === null){
-            value = ""
-        }
+        if (value === null) value = ""
 
-        const instance = treelistRef.current.instance
+        const instance = itemTreelistRef.current.instance
         const selectRow = instance.getSelectedRowsData()[0]
 
         if (selectRow) {
@@ -134,13 +111,42 @@ const CreatePurchaseOrder = () => {
             const selectedItem = itemMaster.find((item) => item.itemId === value)
 
             if (selectedItem) {
-                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, rate: selectedItem.sellingRate }
+                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom }
     
-                purchaseOrderDataSource.store().update(selectRow.clientId, updatedData).then(() => {
-                    purchaseOrderDataSource.reload()
+                itemDataSource.store().update(selectRow.clientId, updatedData).then(() => {
+                    itemDataSource.reload()
                 })
             }
         }
+    }
+
+    const handleOnVendorValueChanged = (e) => {
+        let value = e.value
+
+        if (value === null) value = ""
+
+        const instance = vendorTreelistRef.current.instance
+        const selectRow = instance.getSelectedRowsData()[0]
+
+        if (selectRow) {
+            
+            const selectedItem = vendorMaster.find((item) => item.vendorId === value)
+
+            if (selectedItem) {
+                const updatedData = { ...selectRow, vendorId: selectedItem.vendorId, vendorName: selectedItem.vendorName, vendorNumber: selectedItem.vendorNumber }
+    
+                vendorDataSource.store().update(selectRow.clientId, updatedData).then(() => {
+                    vendorDataSource.reload()
+                })
+            }
+        }
+    }
+
+    const onValueChanged = (e) => {
+        let value = e.value
+        if (value === null) value = ""
+        setFormData(prevState => ({ ...prevState, requiredBy: value }))
+        setInvalid({ requiredBy: value === "" || !value ? true : false })
     }
 
     const handleOnSubmit = (e) => {
@@ -152,7 +158,7 @@ const CreatePurchaseOrder = () => {
         return(
             <Fragment>
                 <Header>
-                    <HeaderSpan>Create Purchase Order</HeaderSpan>
+                    <HeaderSpan>Create Request For Quotation</HeaderSpan>
                 </Header>
 
                 <form onSubmit={handleOnSubmit}>
@@ -166,66 +172,13 @@ const CreatePurchaseOrder = () => {
                                             class: "form-datebox",
                                         }}
                                         type={"date"}
-                                        readOnly={true}
                                         min={new Date()}
-                                        openOnFieldClick={true}
                                         accessKey={'creationDate'}
+                                        openOnFieldClick={true}
+                                        readOnly={true}
+                                        value={formData.creationDate}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
-                                        value={formData.creationDate}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Id</FormLabel>
-                                    <SelectBox
-                                        elementAttr={{
-                                            class: "form-selectbox"
-                                        }}
-                                        searchTimeout={200}
-                                        accessKey={'vendorId'}
-                                        searchEnabled={true}
-                                        displayExpr={'vendorId'}
-                                        searchMode={'contains'}
-                                        searchExpr={'vendorName'}
-                                        dataSource={vendorMaster.filter((vendor) => vendor.isDisabled === false).map((item) => {
-                                            return {
-                                                vendorId: item.vendorId,
-                                                vendorName: item.vendorName
-                                            }
-                                        })}
-                                        value={formData.vendorId}
-                                        openOnFieldClick={true}
-                                        acceptCustomValue={true}
-                                        onFocusIn={handleOnFocusIn}
-                                        onFocusOut={handleOnFocusOut}
-                                        itemRender={(e) => {
-                                            return (
-                                                <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                                                    <span>{e.vendorId}</span>
-                                                    <span style={{ marginLeft: "auto", }}>
-                                                        {e.vendorName}
-                                                    </span>
-                                                </div>
-                                            )
-                                        }}
-                                        placeholder={"Select Vendor"}
-                                        dropDownOptions={{ maxHeight: 300 }}
-                                        onValueChanged={(e) => onValueChanged(e, 'vendorId')}
-                                        validationStatus={invalid.vendorId === false ? "valid" : "invalid"}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Address</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorAddress'}
-                                        placeholder={"Enter Address"}
-                                        value={formData.vendorAddress}
                                     />
                                 </FormGroupItem>
                             </div>
@@ -244,40 +197,14 @@ const CreatePurchaseOrder = () => {
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
                                         validationMessagePosition={"bottom"}
-                                        onValueChanged={(e) => onValueChanged(e, 'requiredBy')}
+                                        onValueChanged={(e) => onValueChanged(e)}
                                         validationStatus={invalid.requiredBy === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
 
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Name</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorName'}
-                                        placeholder={"Enter Name"}
-                                        value={formData.vendorName}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Contact</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorNumber'}
-                                        placeholder={"Enter Contact"}
-                                        value={formData.vendorNumber}
-                                    />
-                                </FormGroupItem>
-
-                                <FormButtonContainer style={{ marginTop: 45 }}>
+                                <FormButtonContainer style={{ marginTop: 30 }}>
                                     <Button size="sm" className={"form-action-button"}>
-                                        {purchaseOrderAction.type === "UPDATE" ? "Update" : "Save"} Purchase Order
+                                        {requestForQuotationAction.type === "UPDATE" ? "Update" : "Save"} Request For Quotation
                                     </Button>
                                 </FormButtonContainer>
                             </div>
@@ -288,46 +215,15 @@ const CreatePurchaseOrder = () => {
         )
     }
 
-    const calculateTotal = () => {
-        return treeListData.reduce((sum, item) => {
-            const total = item.itemQuantity * item.rate
-            return sum + total
-        }, 0)
-    }
-
-    
-    const renderTotal = () => {
-        const totalSum = calculateTotal()
-        return (
-            <div style={{ padding: 10, float: "right", fontSize: 15, fontWeight: 700, borderRadius: 5, marginTop: 10, marginBottom: 10, backgroundColor: "lightgray" }}>
-                Total: {totalSum.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
-            </div>
-        )
-    }
-
-    const renderTotalQuantity = () => {
-        return (
-            <div style={{ padding: 10, float: "right", fontSize: 15, fontWeight: 700, borderRadius: 5, marginTop: 10, marginBottom: 10, marginRight: 10, backgroundColor: "lightgray" }}>
-                Total Item Quantity: {treeListData.length.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
-            </div>
-        )
-    }
-
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (!data.itemQuantity) data.itemQuantity = 1
-        if (!data.rate) data.rate = 0
-
-        //For Now
-        setTreeListData(prevData => {
-            return [...prevData].sort((a, b) => a.clientId - b.clientId)
-        })
+        if (!data.itemQuantity) data.itemQuantity = 0
     }
 
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
             if (e.column.dataField === "itemQuantity") {
-                if (e.value <= 0) {
+                if (e.value < 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
             }
@@ -380,7 +276,7 @@ const CreatePurchaseOrder = () => {
     }
 
     const filterItems = () => {
-        const selectedIds = treeListData.map(item => item.itemId)
+        const selectedIds = itemTreeListData.map(item => item.itemId)
         return itemMaster.filter(item => item.itemType === "Raw Material" && item.disable === false && !selectedIds.includes(item.itemId))
     }
     
@@ -404,7 +300,7 @@ const CreatePurchaseOrder = () => {
             />
         )
     }
-
+    
     const renderQuantityColumn = ({ data }) => {
         return (
             <CellContainer>
@@ -425,59 +321,41 @@ const CreatePurchaseOrder = () => {
         )
     }
 
-    const renderRateCell = ({ data }) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {data.rate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderAmountCell = ({ data }) => {
-        const value = data.itemQuantity * data.rate
-        return (
-            <CellContainer>
-                <CellContent>
-                    {value.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderActionColumn = (e) => {
+    const renderItemActionColumn = (e) => {
         return (
             <ActionCellContainer>
                 <button
                     title='Delete Item'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => handleOnRowRemove(e)} />
+                    onClick={() => handleOnItemRowRemove(e)} />
             </ActionCellContainer>
         )
     }
-
-    const renderTreelist = () => {
+    
+    const renderItemTreelist = () => {
         return (
             <Fragment>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Header>
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
-                    <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
+
+                    <AddButton onClick={() => handleOnItemAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
+                        Add Row
+                    </AddButton>
                 </div>
 
                 <TreeList
                     elementAttr={{
-                        id: "create-purchase-order-treelist",
+                        id: "create-rfq-item-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"clientId"}
-                    ref={treelistRef}
+                    ref={itemTreelistRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={purchaseOrderDataSource}
+                    dataSource={itemDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     noDataText={'No Data'}
@@ -545,23 +423,171 @@ const CreatePurchaseOrder = () => {
                     />
 
                     <Column
-                        caption={"Rate"}
-                        dataField={"rate"}
-                        alignment={"left"}
-                        allowEditing={false}
+                        width={75}
+                        minWidth={75}
+                        caption={"Actions"}
+                        dataField={"actions"}
+                        alignment={"center"}
                         allowSorting={false}
-                        cellRender={renderRateCell} 
+                        allowEditing={false}
+                        cellRender={renderItemActionColumn}
+                        headerCellRender={renderActionHeaderCell} 
+                        cssClass={"project-treelist-column"}
+                    />
+                </TreeList>
+            </Fragment>
+        )
+    }
+    
+    const renderVendors = (e) => {
+        return (
+            <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
+                <span>{e.vendorId}</span>
+                <span style={{ marginLeft: "auto", }}>
+                    {e.vendorName}
+                </span>
+            </div>
+        )
+    }
+
+    const filterVendor = () => {
+        const selectedIds = vendorTreeListData.map(item => item.vendorId)
+        return vendorMaster.filter(item => item.isDisabled === false && !selectedIds.includes(item.vendorId))
+    }
+
+    const renderVendorIdCell = (e) => {
+        const filteredDataSource = filterVendor()
+
+        return (
+            <SelectBoxTreelist
+                event={e}
+                valueExpr={"vendorId"}
+                searchExpr={"vendorName"}
+                itemRender={(e) => renderVendors(e)}
+                renderType={"vendorId"}
+                displayExpr={"vendorId"}
+                dataSource={filteredDataSource}
+                placeholder={"Choose Item"}
+                noDataText={"Item Not Present"}
+                handleOnValueChanged={handleOnVendorValueChanged}
+                renderContent={() => renderVendorContent(e)}
+                disabled={false}
+            />
+        )
+    }
+    
+    const renderVendorContent = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.vendorId}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderVendorNameCell = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.vendorName}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderVendorContact = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.vendorNumber}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+    
+    const renderVendorActionColumn = (e) => {
+        return (
+            <ActionCellContainer>
+                <button
+                    title='Delete Vendor'
+                    className='fal fa-trash treelist-delete-button'
+                    onClick={() => handleOnVendorRowRemove(e)} />
+            </ActionCellContainer>
+        )
+    }
+
+    const renderVendorTreelist = () => {
+        return (
+            <Fragment>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Header>
+                        <HeaderSpan>Vendors</HeaderSpan>
+                    </Header>
+
+                    <AddButton onClick={() => handleOnVendorAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
+                        Add Row
+                    </AddButton>
+                </div>
+                <TreeList
+                    elementAttr={{
+                        id: "create-rfq-vendor-treelist",
+                        class: "project-treelist"
+                    }}
+                    keyExpr={"clientId"}
+                    ref={vendorTreelistRef}
+                    showBorders={true}
+                    showRowLines={true}
+                    showColumnLines={true}
+                    dataSource={vendorDataSource}
+                    allowColumnResizing={true}
+                    rowAlternationEnabled={true}
+                    noDataText={'No Data'}
+                    className={'dev-form-treelist'}
+                    columnResizingMode={"nextColumn"}>
+                    
+                    <Selection mode={"single"} />
+
+                    <Scrolling mode={"standard"} />
+
+                    <Editing
+                        mode='cell'
+                        allowUpdating={true}
+                        startEditAction='dblClick'
+                        selectTextOnEditStart={true} 
+                        texts={{ confirmDeleteMessage: '' }}
+                    />
+
+                    <Column
+                        caption={"vendor Id"}
+                        dataField={"vendorId"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={true}
+                        cellRender={renderVendorIdCell}
+                        editCellRender={renderVendorIdCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
- 
+                    
                     <Column
-                        caption={"Amount"}
-                        dataField={"amount"}
+                        caption={"Vendor Name"}
+                        dataField={"vendorName"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={false}
+                        cellRender={renderVendorNameCell}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+                        
+                    <Column
+                        caption={"Contact"}
+                        dataField={"vendorNumber"}
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderAmountCell} 
+                        cellRender={renderVendorContact} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -574,35 +600,54 @@ const CreatePurchaseOrder = () => {
                         alignment={"center"}
                         allowSorting={false}
                         allowEditing={false}
-                        cellRender={renderActionColumn}
+                        cellRender={renderVendorActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}
                     />
                 </TreeList>
-                {renderTotal()}
-                {renderTotalQuantity()}
             </Fragment>
         )
     }
 
     return (
-        <FormBackground Form={[renderContent(), renderTreelist()]} />
+        <FormBackground Form={[renderContent(), renderVendorTreelist(), renderItemTreelist()]} />
     )
 }
 
-export default CreatePurchaseOrder
+export default CreateRequestForQuotation
 
-const getPurchaseOrderObj = (clientId) => {
+const getVendorObj = (clientId) => {
     return {
-        itemId: "",
-        itemName: "",
-        itemQuantity: 1,
-        uom: "",
-        rate: "",
-        amount: "",
+        vendorId: "",
+        vendorName: "",
+        vendorNumber: "",
         clientId: clientId
     }
 }
+
+const getItemObj = (clientId) => {
+    return {
+        uom: "",
+        itemId: "",
+        itemName: "",
+        itemQuantity: 0,
+        clientId: clientId
+    }
+}
+
+const Header = styled.div`
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`
+
+const HeaderSpan = styled.span`
+    color: #495057;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'RobotoFallback';
+`
 
 const ActionCellContainer = styled.div`
     display: flex;

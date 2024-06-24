@@ -283,9 +283,13 @@ const CreatePurchaseRequest = () => {
     const renderTreelist = () => {
         return (
             <Fragment>
-                <div style={{ display: "flex", flexFlow: "row-reverse" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Header>
+                        <HeaderSpan>Items</HeaderSpan>
+                    </Header>
                     <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
                 </div>
+
                 <TreeList
                     elementAttr={{
                         id: "create-purchase-request-treelist",

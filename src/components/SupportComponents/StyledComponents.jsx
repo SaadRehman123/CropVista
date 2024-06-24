@@ -36,3 +36,17 @@ export const CellContent = styled.div`
     padding-left: 8px;
     padding-right: 8px;
 `
+
+export const Header = styled.div`
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`
+
+export const HeaderSpan = styled.span`
+    color: #495057;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'RobotoFallback';
+`

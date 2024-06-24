@@ -443,7 +443,7 @@ const CreateBOM = () => {
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
             if (e.column.dataField === "itemquantity" || e.column.dataField === "unitPrice" || e.column.dataField === "total") {
-                if (e.value <= 0) {
+                if (e.value < 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
             }
@@ -774,9 +774,13 @@ const CreateBOM = () => {
     const renderTreelist = () => {
         return (
             <Fragment>
-                <div style={{ display: "flex", flexFlow: "row-reverse" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Header>
+                        <HeaderSpan>Route Stages</HeaderSpan>
+                    </Header>
                     <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
                 </div>
+
                 <TreeList
                     elementAttr={{
                         id: "create-bom-treelist",

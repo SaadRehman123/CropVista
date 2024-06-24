@@ -1,35 +1,30 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { Fragment, useEffect, useRef, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 
-import DataSource from 'devextreme/data/data_source'
-import FormBackground from '../../SupportComponents/FormBackground'
-import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
+import DataSource from "devextreme/data/data_source"
+import FormBackground from "../../SupportComponents/FormBackground"
 
-import { Button } from 'reactstrap'
-import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
+import { Button } from "reactstrap"
+import { DateBox, SelectBox, TextBox, TreeList } from "devextreme-react"
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
+import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from "../../SupportComponents/StyledComponents"
 
-import { assignClientId } from '../../../utilities/CommonUtilities'
+import { assignClientId } from "../../../utilities/CommonUtilities"
 
-import styled from 'styled-components'
+const CreateGoodReceipt = () => {
 
-const CreatePurchaseOrder = () => {
-
-    const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
-    const purchaseOrderAction = useSelector(state => state.purchase.purchaseOrderAction)
-    
-    const [deletedRows, setDeletedRows] = useState([])
+    const goodReceiptAction = useSelector(state => state.purchase.goodReceiptAction)
+
     const [treeListData, setTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ requiredBy: false, vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
+    const [invalid, setInvalid] = useState({ vendorId: false })
+    const [formData, setFormData] = useState({ creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
 
-    const purchaseOrderDataSource = new DataSource({
+    const goodReceiptDataSource = new DataSource({
         store: {
             data: assignClientId(treeListData),
             type: 'array',
@@ -38,13 +33,12 @@ const CreatePurchaseOrder = () => {
     })
 
     useEffect(() => {
-        if (purchaseOrderAction.type === "CREATE") {
+        if (goodReceiptAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
         }
-        else if (purchaseOrderAction.type === "UPDATE") {
+        else if (goodReceiptAction.type === "UPDATE") {
             setFormData({
                 creationDate: "",
-                requiredBy: "",
                 vendorId: "",
                 vendorName: "",
                 vendorAddress: "",
@@ -53,30 +47,18 @@ const CreatePurchaseOrder = () => {
         }
     }, [])
 
-    const onValueChanged = (e, name) => {
+    const onValueChanged = (e) => {
         let value = e.value
         if (value === null) value = ""
 
-        if (name === "vendorId") {
-            const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId) 
-            if(vendor){
-                setFormData((prevState) => ({ 
-                    ...prevState,
-                    vendorId: vendor.vendorId,
-                    vendorName: vendor.vendorName,
-                    vendorAddress: vendor.vendorAddress,
-                    vendorNumber: vendor.vendorNumber
-                }))
-            }
-        }
-        else {
-            setFormData((prevState) => ({ ...prevState, [name]: value }))
-        }
-
-        if (name === "requiredBy") {
-            setInvalid((prevInvalid) => ({
-                ...prevInvalid,
-                requiredBy: value === "" || !value ? true : false
+        const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId) 
+        if(vendor){
+            setFormData((prevState) => ({ 
+                ...prevState,
+                vendorId: vendor.vendorId,
+                vendorName: vendor.vendorName,
+                vendorAddress: vendor.vendorAddress,
+                vendorNumber: vendor.vendorNumber
             }))
         }
     }
@@ -101,48 +83,6 @@ const CreatePurchaseOrder = () => {
         }
     }
 
-    const handleOnAddRow = () => {
-        const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
-        const newRow = getPurchaseOrderObj(newClientID)
-        setTreeListData([...treeListData, newRow])
-    }
-
-    const handleOnRowRemove = (e) => {
-        const deletedRow = treeListData.find(item => item.clientId === e.row.key)
-        setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
-
-        const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
-        setTreeListData(updatedData)
-        
-        purchaseOrderDataSource.store().remove(e.row.key).then(() => {
-            purchaseOrderDataSource.reload()
-        })
-    }
-
-    const handleOnItemValueChanged = (e) => {
-        let value = e.value
-
-        if(value === null){
-            value = ""
-        }
-
-        const instance = treelistRef.current.instance
-        const selectRow = instance.getSelectedRowsData()[0]
-
-        if (selectRow) {
-            
-            const selectedItem = itemMaster.find((item) => item.itemId === value)
-
-            if (selectedItem) {
-                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, rate: selectedItem.sellingRate }
-    
-                purchaseOrderDataSource.store().update(selectRow.clientId, updatedData).then(() => {
-                    purchaseOrderDataSource.reload()
-                })
-            }
-        }
-    }
-
     const handleOnSubmit = (e) => {
         e.preventDefault()
     
@@ -152,30 +92,13 @@ const CreatePurchaseOrder = () => {
         return(
             <Fragment>
                 <Header>
-                    <HeaderSpan>Create Purchase Order</HeaderSpan>
+                    <HeaderSpan>Create Good Receipt</HeaderSpan>
                 </Header>
 
                 <form onSubmit={handleOnSubmit}>
                     <FormGroupContainer>
                         <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>
                             <div style={{width: 500, margin: "0 20px 20px 20px"}}>
-                                <FormGroupItem>
-                                    <FormLabel>Creation Date</FormLabel>
-                                    <DateBox
-                                        elementAttr={{
-                                            class: "form-datebox",
-                                        }}
-                                        type={"date"}
-                                        readOnly={true}
-                                        min={new Date()}
-                                        openOnFieldClick={true}
-                                        accessKey={'creationDate'}
-                                        placeholder={"DD/MM/YYYY"}
-                                        displayFormat={"dd/MM/yyyy"}
-                                        value={formData.creationDate}
-                                    />
-                                </FormGroupItem>
-
                                 <FormGroupItem>
                                     <FormLabel>Vendor Id</FormLabel>
                                     <SelectBox
@@ -228,27 +151,25 @@ const CreatePurchaseOrder = () => {
                                         value={formData.vendorAddress}
                                     />
                                 </FormGroupItem>
-                            </div>
-                            <div style={{width: 500, margin: "0 20px"}}>
+
                                 <FormGroupItem>
-                                    <FormLabel>Required By</FormLabel>
+                                    <FormLabel>Creation Date</FormLabel>
                                     <DateBox
                                         elementAttr={{
                                             class: "form-datebox",
                                         }}
                                         type={"date"}
+                                        readOnly={true}
                                         min={new Date()}
-                                        accessKey={'requiredBy'}
                                         openOnFieldClick={true}
-                                        value={formData.requiredBy}
+                                        accessKey={'creationDate'}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
-                                        validationMessagePosition={"bottom"}
-                                        onValueChanged={(e) => onValueChanged(e, 'requiredBy')}
-                                        validationStatus={invalid.requiredBy === false ? "valid" : "invalid"}
+                                        value={formData.creationDate}
                                     />
                                 </FormGroupItem>
-
+                            </div>
+                            <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Vendor Name</FormLabel>
                                     <TextBox
@@ -277,7 +198,7 @@ const CreatePurchaseOrder = () => {
 
                                 <FormButtonContainer style={{ marginTop: 45 }}>
                                     <Button size="sm" className={"form-action-button"}>
-                                        {purchaseOrderAction.type === "UPDATE" ? "Update" : "Save"} Purchase Order
+                                        {goodReceiptAction.type === "UPDATE" ? "Update" : "Save"} Good Receipt
                                     </Button>
                                 </FormButtonContainer>
                             </div>
@@ -290,12 +211,11 @@ const CreatePurchaseOrder = () => {
 
     const calculateTotal = () => {
         return treeListData.reduce((sum, item) => {
-            const total = item.itemQuantity * item.rate
+            const total = item.acceptedQuantity * item.rate
             return sum + total
         }, 0)
     }
 
-    
     const renderTotal = () => {
         const totalSum = calculateTotal()
         return (
@@ -315,7 +235,7 @@ const CreatePurchaseOrder = () => {
 
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (!data.itemQuantity) data.itemQuantity = 1
+        if (!data.acceptedQuantity) data.acceptedQuantity = 0
         if (!data.rate) data.rate = 0
 
         //For Now
@@ -326,16 +246,12 @@ const CreatePurchaseOrder = () => {
 
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
-            if (e.column.dataField === "itemQuantity") {
-                if (e.value <= 0) {
+            if (e.column.dataField === "acceptedQuantity") {
+                if (e.value < 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
             }
         }
-    }
-
-    const renderActionHeaderCell = (e) => {
-        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
     }
 
     const renderHeaderCell = (e) => {
@@ -358,68 +274,21 @@ const CreatePurchaseOrder = () => {
         )
     }
 
-    const renderItemContent = (e) => {
+    const renderItemIdCell = ({ data }) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.itemId}
+                    {data.itemId}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderItems = (e) => {
-        return (
-            <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                <span>{e.itemId}</span>
-                <span style={{ marginLeft: "auto", }}>
-                    {e.itemName}
-                </span>
-            </div>
-        )
-    }
-
-    const filterItems = () => {
-        const selectedIds = treeListData.map(item => item.itemId)
-        return itemMaster.filter(item => item.itemType === "Raw Material" && item.disable === false && !selectedIds.includes(item.itemId))
-    }
-    
-    const renderItemIdCell = (e) => {
-        const filteredDataSource = filterItems()
-
-        return (
-            <SelectBoxTreelist
-                event={e}
-                valueExpr={"itemId"}
-                searchExpr={"itemName"}
-                itemRender={(e) => renderItems(e)}
-                renderType={"itemId"}
-                displayExpr={"itemId"}
-                dataSource={filteredDataSource}
-                placeholder={"Choose Item"}
-                noDataText={"Item Not Present"}
-                handleOnValueChanged={handleOnItemValueChanged}
-                renderContent={() => renderItemContent(e)}
-                disabled={false}
-            />
-        )
-    }
-
-    const renderQuantityColumn = ({ data }) => {
+    const renderAcceptedQuantityColumn = ({ data }) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {data.itemQuantity}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderUomCell = ({ data }) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {data.uom}
+                    {data.acceptedQuantity}
                 </CellContent>
             </CellContainer>
         )
@@ -436,24 +305,13 @@ const CreatePurchaseOrder = () => {
     }
 
     const renderAmountCell = ({ data }) => {
-        const value = data.itemQuantity * data.rate
+        const value = data.acceptedQuantity * data.rate
         return (
             <CellContainer>
                 <CellContent>
                     {value.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                 </CellContent>
             </CellContainer>
-        )
-    }
-
-    const renderActionColumn = (e) => {
-        return (
-            <ActionCellContainer>
-                <button
-                    title='Delete Item'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => handleOnRowRemove(e)} />
-            </ActionCellContainer>
         )
     }
 
@@ -464,12 +322,11 @@ const CreatePurchaseOrder = () => {
                     <Header>
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
-                    <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
                 </div>
 
                 <TreeList
                     elementAttr={{
-                        id: "create-purchase-order-treelist",
+                        id: "create-good-receipt-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"clientId"}
@@ -477,7 +334,7 @@ const CreatePurchaseOrder = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={purchaseOrderDataSource}
+                    dataSource={goodReceiptDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     noDataText={'No Data'}
@@ -522,26 +379,15 @@ const CreatePurchaseOrder = () => {
                     />
                         
                     <Column
-                        caption={"Quantity"}
-                        dataField={"itemQuantity"}
+                        caption={"Accepted Quantity"}
+                        dataField={"acceptedQuantity"}
                         alignment={"left"}
                         allowSorting={false}
                         allowEditing={true}
                         editorOptions={"dxNumberBox"}
-                        cellRender={renderQuantityColumn}
+                        cellRender={renderAcceptedQuantityColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"UoM"}
-                        dataField={"uom"}
-                        alignment={"left"}
-                        allowEditing={false}
-                        allowSorting={false}
-                        cellRender={renderUomCell} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
@@ -565,19 +411,6 @@ const CreatePurchaseOrder = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
-                    <Column
-                        width={75}
-                        minWidth={75}
-                        caption={"Actions"}
-                        dataField={"actions"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        allowEditing={false}
-                        cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
-                        cssClass={"project-treelist-column"}
-                    />
                 </TreeList>
                 {renderTotal()}
                 {renderTotalQuantity()}
@@ -590,46 +423,4 @@ const CreatePurchaseOrder = () => {
     )
 }
 
-export default CreatePurchaseOrder
-
-const getPurchaseOrderObj = (clientId) => {
-    return {
-        itemId: "",
-        itemName: "",
-        itemQuantity: 1,
-        uom: "",
-        rate: "",
-        amount: "",
-        clientId: clientId
-    }
-}
-
-const ActionCellContainer = styled.div`
-    display: flex;
-    font-size: 16px;
-    align-items: center;
-    justify-content: space-evenly;
-`
-
-const AddButton = styled.button`
-    font-size: 13px;
-        
-    color: #4285f4b5;
-    background-color: #FFFFFF;
-
-    border: 1px solid #eeeeee; 
-    cursor: pointer;
-
-    width: auto;
-    height: 30px;
-    margin: 10px;
-    border-radius: 5px;
-
-    transition: 0.2s background-color, color;
-    &:hover,
-    &:focus,
-    &:focus-within {
-        background-color: #4285f4b5;
-        color: #FFFFFF;
-    }
-`
+export default CreateGoodReceipt

@@ -72,3 +72,28 @@
 #select-data.dx-texteditor.dx-editor-filled .dx-texteditor-input {
     padding: 0px 10px !important;
 }
+
+.year-picker-dropdown {
+    position: absolute;
+    top: 35px; /* Adjust as needed */
+    width: 100px; /* Adjust as needed */
+    max-height: 100px; /* Adjust as needed */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #fff;
+  }
+  
+  .year-picker-options {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .year-picker-options > div {
+    padding: 5px;
+    cursor: pointer;
+  }
+  
+  .year-picker-options > div:hover {
+    background-color: #f0f0f0; /* Hover background color */
+  }
+  

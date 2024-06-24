@@ -317,14 +317,14 @@ const CreateItem = () => {
                         </FormGroupItem>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>
+                    <div style={{ display: 'flex', marginTop: 5, marginBottom: 5 }}>
                         <FormGroupItem>
                             <FormLabel>UoM</FormLabel>
                             <SelectBox
                                 elementAttr={{
                                     class: "form-selectbox"
                                 }}
-                                width={225}
+                                width={400}
                                 searchTimeout={200}
                                 accessKey={'UOM'}
                                 searchEnabled={true}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
+import Purchase from '../components/Cards/Purchase'
 import Inventory from '../components/Cards/Inventory'
 import Production from '../components/Cards/Production'
 import CropPlan from '../components/Production/Crops/CropPlan'
@@ -34,21 +35,25 @@ const AppRoutes = () => {
         <div style={{ backgroundColor: '#F9FAFA', height: '100vh' }}>
             <Routes>
                 <Route
+                    path="production"
+                    element={<Production />}>
+                </Route>
+                <Route
+                    path="inventory"
+                    element={<Inventory />}>
+                </Route>
+                <Route
+                    path="purchase"
+                    element={<Purchase />}>
+                </Route>
+                <Route
                     index
                     path="dashboard"
                     element={<DashboardContainer />}>
                 </Route>
                 <Route
-                    path="production"
-                    element={<Production />}>
-                </Route>
-                <Route
                     path="crop-plan"
                     element={<CropPlan />}>
-                </Route>
-                <Route
-                    path="inventory"
-                    element={<Inventory />}>
                 </Route>
                 <Route
                     path="warehouse"

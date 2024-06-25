@@ -535,7 +535,6 @@ const CreateProductionOrder = () => {
     const renderForm = () => {
         return(
             <Fragment>
-
                 <Header>
                     <HeaderSpan>Create Production Order</HeaderSpan>
                     <div style={{ display: "flex", justifyContent: "space-around" }}>
@@ -566,26 +565,38 @@ const CreateProductionOrder = () => {
                             <div style={{width: 500, margin: "0 20px 20px 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Product No</FormLabel>
-                                    <SelectBox
-                                        elementAttr={{
-                                            class: "form-selectbox"
-                                        }}
-                                        searchTimeout={200}
-                                        accessKey={'itemId'}
-                                        searchEnabled={true}
-                                        readOnly={save || productionOrderAction.type === "UPDATE" ? true : false}
-                                        displayExpr={'itemId'}
-                                        searchMode={'contains'}
-                                        searchExpr={'itemName'}
-                                        dataSource={plannedCrops.filter((item) => bom.some(bomItem => bomItem.productId === item.itemId) && item.status === "Pending")}
-                                        openOnFieldClick={true}
-                                        value={formData.itemId}
-                                        onFocusOut={handleOnFocusOut}
-                                        placeholder={"Select Product No"}
-                                        dropDownOptions={{ maxHeight: 300 }}
-                                        itemRender={(e) => renderItems(e, "product")}
-                                        onValueChanged={(e) => onValueChanged(e)}
-                                    />
+                                    {productionOrderAction.type !== "UPDATE" ? 
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            accessKey={'itemId'}
+                                            searchEnabled={true}
+                                            readOnly={save || productionOrderAction.type === "UPDATE" ? true : false}
+                                            displayExpr={'itemId'}
+                                            searchMode={'contains'}
+                                            searchExpr={'itemName'}
+                                            dataSource={plannedCrops.filter((item) => bom.some(bomItem => bomItem.productId === item.itemId) && item.status === "Pending")}
+                                            openOnFieldClick={true}
+                                            value={formData.itemId}
+                                            onFocusOut={handleOnFocusOut}
+                                            placeholder={"Select Product No"}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            itemRender={(e) => renderItems(e, "product")}
+                                            onValueChanged={(e) => onValueChanged(e)}
+                                        />
+                                        : 
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'itemId'}
+                                            placeholder='Select Product No'
+                                            value={formData.itemId}
+                                        />
+                                    }
                                 </FormGroupItem>
                             
                                 <FormGroupItem>

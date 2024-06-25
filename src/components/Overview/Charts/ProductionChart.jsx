@@ -16,16 +16,17 @@ const ProductionChart = ({ selectedYear }) => {
         })
 
         const formattedData = filteredData.reduce((acc, stock) => {
-            const existingCrop = acc.find(item => item.crop === stock.stockEntryName);
+            const existingCrop = acc.find(item => item.crop === stock.stockEntryName)
             if (existingCrop) {
-                existingCrop.val += stock.stockEntryQuantity;
-            } else {
-                acc.push({ crop: stock.stockEntryName, val: stock.stockEntryQuantity });
+                existingCrop.val += stock.stockEntryQuantity
             }
-            return acc;
-        }, []);
+            else {
+                acc.push({ crop: stock.stockEntryName, val: stock.stockEntryQuantity })
+            }
+            return acc
+        }, [])
 
-        setDataSource(formattedData);
+        setDataSource(formattedData)
     }, [selectedYear])
 
 

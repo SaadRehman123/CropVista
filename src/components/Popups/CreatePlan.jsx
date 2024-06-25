@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment/moment'
 import notify from 'devextreme/ui/notify'
 
-import { DateBox, NumberBox, SelectBox } from 'devextreme-react'
+import { DateBox, NumberBox, SelectBox, TextBox } from 'devextreme-react'
 import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap'
 import { FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../SupportComponents/StyledComponents'
 
@@ -25,21 +25,15 @@ const CreatePlan = () => {
     
     const dispatch = useDispatch()
 
-    const toggle = () => {
-        dispatch(toggleCreatePlanPopup({ open: false, type: "" }))
-        setFormData({ season: "", crop: "", acre: "", startDate: "", endDate: "", status: "" })
-        setInvalid({ season: false, crop: false, acre: false, startDate: false, endDate: false })
-    }
-
     useEffect(() => {
         validateStartAndEndDate(formData.startDate, formData.endDate)
     }, [formData.startDate, formData.endDate])
-
+    
     useEffect(() => {
         if (createPlanPopup.type === "UPDATE") {            
             const instance = cropPlanRef.current.instance
             const selectedRow = instance.getSelectedRowsData()
-
+            
             setFormData({
                 season: selectedRow[0].season,
                 crop: selectedRow[0].crop,
@@ -51,6 +45,12 @@ const CreatePlan = () => {
         }
     }, [createPlanPopup.type])
     
+    const toggle = () => {
+        dispatch(toggleCreatePlanPopup({ open: false, type: "" }))
+        setFormData({ season: "", crop: "", acre: "", startDate: "", endDate: "", status: "" })
+        setInvalid({ season: false, crop: false, acre: false, startDate: false, endDate: false })
+    }
+
     const onValueChanged = (e, name) => {
         const value = e.value
         if (name === "season" && value !== "") dispatch(getCropsBySeason(value))
@@ -192,6 +192,15 @@ const CreatePlan = () => {
     }
 
     const renderBody = () => {
+
+        const dataSource = crops.filter(item => {
+            const cropPlans = plannedCrops.filter(cropItem => cropItem.itemId === item.cropId)
+            const hasClosedOrCancelled = cropPlans.some(cropItem => ["Closed", "Cancelled"].includes(cropItem.status))
+            const hasExcludedStatuses = cropPlans.some(cropItem => ["Pending", "Planned", "Release", "Completed"].includes(cropItem.status))
+        
+            return hasClosedOrCancelled && !hasExcludedStatuses
+        }).map(item => item.name)
+        
         return (
             <form onSubmit={handleOnSubmit}>
                 <FormGroupContainer>
@@ -215,24 +224,33 @@ const CreatePlan = () => {
                 
                     <FormGroupItem>
                         <FormLabel>Crop</FormLabel>
-                        <SelectBox
-                            elementAttr={{
-                                class: "form-selectbox"
-                            }}
-                            accessKey={'crop'}
-                            value={formData.crop}
-                            placeholder={"Select Crop"}
-                            onFocusIn={handleOnFocusIn}
-                            onFocusOut={handleOnFocusOut}
-                            onValueChanged={(e) => onValueChanged(e, 'crop')}
-                            disabled={formData.season === "" ? true : false}
-                            readOnly={createPlanPopup.type === "UPDATE" ? true : false}
-                            dataSource={crops.filter(item => {
-                                const isCropInPlanned = plannedCrops.find(cropItem => cropItem.itemId === item.cropId)
-                                return !isCropInPlanned || ["Closed", "Cancelled"].includes(isCropInPlanned.status)
-                            }).map(item => item.name)}
-                            validationStatus={invalid.crop === false ? "valid" : "invalid"}
-                        />
+                        {createPlanPopup.type !== "UPDATE" ? 
+                            <SelectBox
+                                elementAttr={{
+                                    class: "form-selectbox"
+                                }}
+                                accessKey={'crop'}
+                                value={formData.crop}
+                                dataSource={dataSource}
+                                placeholder={"Select Crop"}
+                                onFocusIn={handleOnFocusIn}
+                                onFocusOut={handleOnFocusOut}
+                                onValueChanged={(e) => onValueChanged(e, 'crop')}
+                                disabled={formData.season === "" ? true : false}
+                                readOnly={createPlanPopup.type === "UPDATE" ? true : false}
+                                validationStatus={invalid.crop === false ? "valid" : "invalid"}
+                            /> 
+                            : 
+                            <TextBox
+                                elementAttr={{
+                                    class: "form-textbox"
+                                }}
+                                readOnly={true}
+                                accessKey={'crop'}
+                                placeholder='Select Crop'
+                                value={formData.crop}
+                            />
+                        }
                     </FormGroupItem>
 
                     <FormGroupItem>

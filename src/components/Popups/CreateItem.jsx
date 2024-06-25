@@ -264,8 +264,8 @@ const CreateItem = () => {
                             searchExpr={'season'}
                             searchMode={'contains'}
                             dataSource={["Kharif", "Rabi"]}
-                            readOnly={createItemPopup.type !== "CREATE" ? true : false}
                             disabled={itemType === "Finish Good" ? false : true}
+                            readOnly={createItemPopup.type !== "CREATE" ? true : false}
                             value={formData.season}
                             openOnFieldClick={true}
                             onFocusIn={handleOnFocusIn}

@@ -121,6 +121,7 @@ const CreatePlan = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
+        
         const instance = cropPlanRef.current.instance
         const selectedRow = instance.getSelectedRowsData()
 

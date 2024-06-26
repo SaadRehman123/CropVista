@@ -145,9 +145,9 @@ const navigations = [
     {id: "bom", name: "Bill Of Material", icon: "fal fa-file-invoice", pad: 10, type: "production"},
     {id: "production-order", name: "Production Order", icon: "fal fa-file-chart-line", pad: 10, type: "production"},
     {id: "purchase-request", name: "Purchase Request", icon: "fal fa-file-alt", pad: 10, type: "purchase"},
-    {id: "purchase-order", name: "Purchase Order", icon: "fal fa-file-contract", pad: 10, type: "purchase"},
     {id: "request-for-quotation", name: "Req For Quotation", icon: "fal fa-file-signature", pad: 8, type: "purchase"},
-    {id: "vendor-quotation", name: "Vendor Quotation", icon: "fal fa-file-user", pad: 10, type: "purchase"},
+    {id: "vendor-quotation", name: "Vendor Quotation", icon: "fal fa-file-user", pad: 10, type: "purchase"}, // Addition hatani, rate uthana nahi hy
+    {id: "purchase-order", name: "Purchase Order", icon: "fal fa-file-contract", pad: 10, type: "purchase"},
     {id: "good-receipt", name: "Good Receipt", icon: "fal fa-receipt", pad: 10, type: "purchase"},
     {id: "purchase-invoice", name: "Purchase Invoice", icon: "fal fa-file-invoice-dollar", pad: 10, type: "purchase"},
     {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-users", pad: 5, type: "purchase"}

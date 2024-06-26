@@ -1,6 +1,8 @@
-import React, { Fragment, useState, useRef, useEffect } from 'react'
+import React, { Fragment, useState, useRef, useEffect, Children } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import moment from 'moment'
+import notify from 'devextreme/ui/notify'
 import DataSource from 'devextreme/data/data_source'
 import FormBackground from '../../SupportComponents/FormBackground'
 import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
@@ -11,6 +13,7 @@ import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-lis
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
+import { addPurchaseRequest, addPurchaseRequestItems, deletePurchaseRequestItems, getPurchaseRequest, updatePurchaseRequest } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
 
@@ -38,14 +41,15 @@ const CreatePurchaseRequest = () => {
 
     useEffect(() => {
         if (purchaseRequestAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), purchaseReqStatus: "Pending" }))            
         }
         else if (purchaseRequestAction.type === "UPDATE") {
             setFormData({
-                creationDate: "",
-                requiredBy: "",
-                purchaseReqStatus: ""
-            })            
+                creationDate: purchaseRequestAction.node.data.pR_CreationDate,
+                requiredBy: purchaseRequestAction.node.data.pR_RequiredBy,
+                purchaseReqStatus: purchaseRequestAction.node.data.pR_Status
+            })
+            setTreeListData([...purchaseRequestAction.node.data.children])
         }
     }, [])
 
@@ -70,9 +74,7 @@ const CreatePurchaseRequest = () => {
     const handleOnItemValueChanged = (e) => {
         let value = e.value
 
-        if(value === null){
-            value = ""
-        }
+        if (value === null) value = ""
 
         const instance = treelistRef.current.instance
         const selectRow = instance.getSelectedRowsData()[0]
@@ -82,7 +84,7 @@ const CreatePurchaseRequest = () => {
             const selectedItem = itemMaster.find((item) => item.itemId === value)
 
             if (selectedItem) {
-                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, sellingRate: selectedItem.sellingRate }
+                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom }
     
                 purchaseRequestDataSource.store().update(selectRow.clientId, updatedData).then(() => {
                     purchaseRequestDataSource.reload()
@@ -100,7 +102,76 @@ const CreatePurchaseRequest = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
-    
+
+        if (formData.creationDate === "" || formData.requiredBy === "" || formData.purchaseReqStatus === "") {
+            return notify("Form fields cannot be empty", "error", 2000)
+        }
+
+        if (invalid.requiredBy === true){
+            return notify("Please correct the invalid fields", "error", 2000)
+        }
+
+        if(treeListData.length === 0){
+            return notify("Please add atleast one item for creating purchase request", "error", 2000)
+        }
+
+        for (const row of treeListData) {
+            if (!row.itemId || !row.itemName || row.itemQuantity <= 0 || !row.uom) {
+                return notify("Some rows have incomplete or incorrect info please fix them before saving", "error", 2000)
+            }
+        }
+
+        const purchaseRequest = {
+            purchaseRequestId: "",
+            pR_CreationDate: moment(formData.creationDate).format('YYYY-MM-DD'),
+            pR_RequiredBy: moment(formData.requiredBy).format('YYYY-MM-DD'),
+            pR_Status: "Created",
+            children: [...treeListData]
+        }
+
+        if (purchaseRequestAction.type === "CREATE") {
+            dispatch(addPurchaseRequest(purchaseRequest)).then((res) => {
+                const response = res.payload.data
+                if (response.success) {
+                    setFormData({
+                        creationDate: Date.now(),
+                        requiredBy: "",
+                        purchaseReqStatus: "Pending"
+                    })
+                    setTreeListData([])
+                    notify("Purhase Request Created Successfully", "info", 2000)
+                }
+            })
+        }
+        else if (purchaseRequestAction.type === "UPDATE") {
+            dispatch(updatePurchaseRequest(purchaseRequest, purchaseRequestAction.node.data.purchaseRequestId)).then((resX) => {
+                const data = resX.payload.data
+                if (data.success) {
+
+                    const filteredChildren = purchaseRequest.children.filter(child => child.pR_itemId === "").map((item) => {
+                        return {
+                            ...item,
+                            pR_Id: purchaseRequestAction.node.data.purchaseRequestId
+                        }
+                    })
+
+                    if (filteredChildren.length !== 0) {
+                        dispatch(addPurchaseRequestItems(purchaseRequestAction.node.data.purchaseRequestId, filteredChildren)).then((res) => {
+                            const data = res.payload.data
+                            if (data.success) {
+                                dispatch(getPurchaseRequest(0))
+                            }
+                        })
+                    }
+
+                    if(deletedRows.length !== 0) {
+                        dispatch(deletePurchaseRequestItems(deletedRows))
+                    }
+
+                    notify("Purchase Request Updated Successfully", "info", 2000)
+                }
+            })
+        }
     }
 
     const renderContent = () => {
@@ -179,7 +250,7 @@ const CreatePurchaseRequest = () => {
 
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (!data.itemQuantity) data.itemQuantity = 1
+        if (!data.itemQuantity) data.itemQuantity = 0
     }
 
     const handleOnCellPrepared = (e) => {
@@ -407,11 +478,12 @@ export default CreatePurchaseRequest
 
 const getPurchaseRequestObj = (clientId) => {
     return {
+        pR_itemId: "",
         itemId: "",
         itemName: "",
         itemQuantity: 1,
         uom: "",
-        sellingRate: "",
+        pR_Id: "",
         clientId: clientId
     }
 }

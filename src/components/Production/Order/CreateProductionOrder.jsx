@@ -77,6 +77,27 @@ const CreateProductionOrder = () => {
     }, [treeListData])
 
     useEffect(() => {
+        dispatch(setProductionOrderItemResource(treelistRef))
+    }, [])
+
+    useEffect(() => {
+        if (productionOrderAction.type === "UPDATE") {
+            setFormData({
+                itemId: productionOrderAction.node.data.productionNo, 
+                productDescription: productionOrderAction.node.data.productDescription, 
+                quantity: productionOrderAction.node.data.quantity, 
+                productionStdCost: productionOrderAction.node.data.productionStdCost, 
+                startDate: productionOrderAction.node.data.startDate, 
+                endDate: productionOrderAction.node.data.endDate,
+                warehouseId: productionOrderAction.node.data.warehouse,
+                status: productionOrderAction.node.data.status
+            })
+
+            setSeletctedItem(productionOrderAction.node.data.productionNo)
+        }
+    }, [productionOrderAction.type])
+
+    useEffect(() => {
         const order = productionOrder.find((item) => item.productionNo === formData.itemId && item.status === "Release")
         if (order && treeListData.length > 0 && treeListData.every(item => item.PO_Status === "Completed")) {
             const pOrder = productionOrder.find((item) => item.productionOrderId === treeListData[0].PO_productionOrderId)
@@ -125,27 +146,6 @@ const CreateProductionOrder = () => {
             }
         }
     }, [treeListData])
-
-    useEffect(() => {
-        dispatch(setProductionOrderItemResource(treelistRef))
-    }, [])
-
-    useEffect(() => {
-        if (productionOrderAction.type === "UPDATE") {
-            setFormData({
-                itemId: productionOrderAction.node.data.productionNo, 
-                productDescription: productionOrderAction.node.data.productDescription, 
-                quantity: productionOrderAction.node.data.quantity, 
-                productionStdCost: productionOrderAction.node.data.productionStdCost, 
-                startDate: productionOrderAction.node.data.startDate, 
-                endDate: productionOrderAction.node.data.endDate,
-                warehouseId: productionOrderAction.node.data.warehouse,
-                status: productionOrderAction.node.data.status
-            })
-
-            setSeletctedItem(productionOrderAction.node.data.productionNo)
-        }
-    }, [productionOrderAction.type])
 
     useEffect(() => {
         const array = productionOrder.filter((item) => item.productionNo === selectedItem && item.status !== "Closed" && item.status !== "Cancelled")

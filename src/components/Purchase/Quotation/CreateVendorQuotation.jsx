@@ -89,23 +89,23 @@ const CreateVendorQuotation = () => {
         }
     }
 
-    const handleOnAddRow = () => {
-        const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
-        const newRow = getItemObj(newClientID)
-        setTreeListData([...treeListData, newRow])
-    }
+    // const handleOnAddRow = () => {
+    //     const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
+    //     const newRow = getItemObj(newClientID)
+    //     setTreeListData([...treeListData, newRow])
+    // }
 
-    const handleOnRowRemove = (e) => {
-        const deletedRow = treeListData.find(item => item.clientId === e.row.key)
-        setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
+    // const handleOnRowRemove = (e) => {
+    //     const deletedRow = treeListData.find(item => item.clientId === e.row.key)
+    //     setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
 
-        const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
-        setTreeListData(updatedData)
+    //     const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
+    //     setTreeListData(updatedData)
         
-        vendorQuotationDataSource.store().remove(e.row.key).then(() => {
-            vendorQuotationDataSource.reload()
-        })
-    }
+    //     vendorQuotationDataSource.store().remove(e.row.key).then(() => {
+    //         vendorQuotationDataSource.reload()
+    //     })
+    // }
 
     const handleOnItemValueChanged = (e) => {
         let value = e.value
@@ -140,7 +140,7 @@ const CreateVendorQuotation = () => {
         return(
             <Fragment>
                 <Header>
-                    <HeaderSpan>Create Purchase Order</HeaderSpan>
+                    <HeaderSpan>Create Vendor Quotation</HeaderSpan>
                 </Header>
 
                 <form onSubmit={handleOnSubmit}>
@@ -430,10 +430,10 @@ const CreateVendorQuotation = () => {
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
-                <button
+                {/* <button
                     title='Delete Item'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => handleOnRowRemove(e)} />
+                    onClick={() => handleOnRowRemove(e)} /> */}
             </ActionCellContainer>
         )
     }
@@ -446,9 +446,9 @@ const CreateVendorQuotation = () => {
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
 
-                    <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
+                    {/* <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
                         Add Row
-                    </AddButton>
+                    </AddButton> */}
                 </div>
                 <TreeList
                     elementAttr={{

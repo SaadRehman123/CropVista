@@ -1,5 +1,6 @@
 const INITIAL_STATE = {
     purchaseRequest: [],
+    requestForQuotation: [],
 	goodReceiptAction: { node: null, type: "CREATE" },
 	purchaseOrderAction: { node: null, type: "CREATE" },
 	purchaseRequestAction: { node: null, type: "CREATE" },
@@ -13,6 +14,12 @@ const PurchaseReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 purchaseRequest: action.payload.data.result
+            }
+        }
+        case "GET_REQUEST_FOR_QUOTATION": {
+            return {
+                ...state,
+                requestForQuotation: action.payload.data.result
             }
         }
         case "PURCHASE_REQUEST_ACTION_TYPE": {

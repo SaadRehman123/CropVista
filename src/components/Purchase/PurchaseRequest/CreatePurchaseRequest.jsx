@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef, useEffect, Children } from 'react'
+import React, { Fragment, useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import moment from 'moment'
@@ -192,7 +192,6 @@ const CreatePurchaseRequest = () => {
                                             class: "form-datebox",
                                         }}
                                         type={"date"}
-                                        min={new Date()}
                                         accessKey={'creationDate'}
                                         openOnFieldClick={true}
                                         readOnly={true}

@@ -1,16 +1,19 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import moment from 'moment'
+import notify from 'devextreme/ui/notify'
 import DataSource from 'devextreme/data/data_source'
 import FormBackground from '../../SupportComponents/FormBackground'
 import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
-import { DateBox, TextBox, TreeList } from 'devextreme-react'
+import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
+import { addRequestForQuotation, addRequestForQuotationItems, addRequestForQuotationVendors, deleteRequestForQuotationItems, deleteRequestForQuotationVendor, getPurchaseRequest, getRequestForQuotation, updatePurchaseRequest, updateRequestForQuotation } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
 
@@ -18,6 +21,7 @@ const CreateRequestForQuotation = () => {
 
     const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
+    const purchaseRequest = useSelector(state => state.purchase.purchaseRequest)
     const requestForQuotationAction = useSelector(state => state.purchase.requestForQuotationAction)
     
     const [itemDeletedRows, setItemDeletedRows] = useState([])
@@ -26,8 +30,8 @@ const CreateRequestForQuotation = () => {
     const [vendorDeletedRows, setVendorDeletedRows] = useState([])
     const [vendorTreeListData, setVendorTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ requiredBy: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", requestForQuotationStatus: "" })
+    const [invalid, setInvalid] = useState({ requiredBy: false, purchaseRequestId: false })
+    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", purchaseRequestId: "", requestForQuotationStatus: "" })
 
     const dispatch = useDispatch()
     
@@ -51,15 +55,37 @@ const CreateRequestForQuotation = () => {
     })
 
     useEffect(() => {
+        dispatch(getRequestForQuotation(0))
+    }, [])
+
+    useEffect(() => {
         if (requestForQuotationAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), requestForQuotationStatus: "Pending" }))            
         }
         else if (requestForQuotationAction.type === "UPDATE") {
             setFormData({
-                creationDate: "",
-                requiredBy: "",
-                requestForQuotationStatus: ""
-            })            
+                creationDate: requestForQuotationAction.node.data.rfq_CreationDate,
+                requiredBy: requestForQuotationAction.node.data.rfq_RequiredBy,
+                requestForQuotationStatus: requestForQuotationAction.node.data.rfq_Status,
+                purchaseRequestId: requestForQuotationAction.node.data.pr_Id
+            })
+            
+            const uniqueItemData = requestForQuotationAction.node.data.childrenItems.reduce((acc, current) => {
+                if (!acc.some(item => item.rfq_ItemId === current.rfq_ItemId)) {
+                    acc.push(current)
+                }
+                return acc
+            }, [])
+    
+            const uniqueVendorData = requestForQuotationAction.node.data.childrenVendors.reduce((acc, current) => {
+                if (!acc.some(vendor => vendor.rfq_VendorId === current.rfq_VendorId)) {
+                    acc.push(current)
+                }
+                return acc
+            }, [])
+
+            setItemTreeListData([...uniqueItemData])          
+            setVendorTreeListData([...uniqueVendorData])
         }
     }, [])
 
@@ -89,7 +115,10 @@ const CreateRequestForQuotation = () => {
     
     const handleOnItemRowRemove = (e) => {
         const deletedRow = itemTreeListData.find(item => item.clientId === e.row.key)
-        setItemDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
+        console.log(deletedRow);
+        if(deletedRow.rfq_itemId !== ""){
+            setItemDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
+        }
 
         const updatedData = itemTreeListData.filter(item => item.clientId !== e.row.key)
         setItemTreeListData(updatedData)
@@ -143,16 +172,171 @@ const CreateRequestForQuotation = () => {
         }
     }
 
-    const onValueChanged = (e) => {
+    const onValueChanged = (e, name) => {
         let value = e.value
         if (value === null) value = ""
-        setFormData(prevState => ({ ...prevState, requiredBy: value }))
-        setInvalid({ requiredBy: value === "" || !value ? true : false })
+        
+        if(name === "requiredBy"){
+            setFormData(prevState => ({ ...prevState, requiredBy: value }))
+        }
+        else if (name === "purchaseRequestId") {
+            setFormData(prevState => ({ ...prevState, purchaseRequestId: value }))
+
+            if (value !== "") {
+                dispatch(getPurchaseRequest(value)).then((res) => {
+                    const response = res.payload.data
+                    if(response.success){
+                        const arr = response.result[0].children.map((item) => {
+                            return {
+                                rfq_Id: "",
+                                uom: item.uom,
+                                rfq_itemId: "",
+                                itemId: item.itemId,
+                                itemName: item.itemName,
+                                itemQuantity: item.itemQuantity,
+                            }
+                        })
+    
+                        setItemTreeListData(arr)
+                    }
+                })
+            }
+            else {
+                setItemTreeListData([])
+            }
+        }
+
+        if (name === "requiredBy") {
+            setInvalid(prevState => ({...prevState, requiredBy: value === "" || !value ? true : false}))  
+        }
+        else if (name === "purchaseRequestId") {
+            setInvalid(prevState => ({...prevState, purchaseRequestId: value === "" || !value ? true : false}))  
+        }
     }
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
     
+        if (formData.creationDate === "" || formData.requiredBy === "" || formData.purchaseRequestId === "") {
+            return notify("Form fields cannot be empty", "error", 2000)
+        }
+
+        if (invalid.requiredBy === true || invalid.purchaseRequestId === true) {
+            return notify("Please correct the invalid fields", "error", 2000)
+        }
+
+        if(itemTreeListData.length === 0){
+            return notify("Please add atleast one item for creating request for quotation", "error", 2000)
+        }
+
+        if(vendorTreeListData.length === 0){
+            return notify("Please add atleast one vendor for creating request for quotation", "error", 2000)
+        }
+
+        for (const row of itemTreeListData) {
+            if (!row.itemId || !row.itemName || row.itemQuantity <= 0 || !row.uom) {
+                return notify("Some rows have incomplete or incorrect info please fix them before saving", "error", 2000)
+            }
+        }
+        
+        for (const row of vendorTreeListData) {
+            if (!row.vendorId || !row.vendorName || !row.vendorNumber) {
+                return notify("Some rows have incomplete or incorrect info please fix them before saving", "error", 2000)
+            }
+        }
+
+        const requestForQuotation = {
+            rfq_Id: "",
+            pr_Id: formData.purchaseRequestId,
+            rfq_CreationDate: moment(formData.creationDate).format('YYYY-MM-DD'),
+            rfq_RequiredBy: moment(formData.requiredBy).format('YYYY-MM-DD'),
+            rfq_Status: "Created",
+            childrenItems: [...itemTreeListData],
+            childrenVendors: [...vendorTreeListData]
+        }
+
+        if (requestForQuotationAction.type === "CREATE") {
+            dispatch(addRequestForQuotation(requestForQuotation)).then((res) => {
+                const response = res.payload.data
+                if (response.success) {
+
+                    const data = purchaseRequest.find((item) => item.purchaseRequestId === formData.purchaseRequestId)
+                    if (data) {
+                        const dataX = {
+                            ...data,
+                            pR_Status: "RFQ Created"
+                        }
+
+                        dispatch(updatePurchaseRequest(dataX, dataX.purchaseRequestId)).then((res) => {
+                            if(res.payload.data.success){
+                                dispatch(getPurchaseRequest(0))
+                            }
+                        })
+                    }
+
+                    setFormData({
+                        creationDate: Date.now(),
+                        requiredBy: "",
+                        purchaseRequestId: "",
+                        requestForQuotationStatus: "Pending"
+                    })
+                    setItemTreeListData([])
+                    setVendorTreeListData([])
+                    notify("Request For Quotation Created Successfully", "info", 2000)
+                }
+            })
+        }
+        else if (requestForQuotationAction.type === "UPDATE") {
+            dispatch(updateRequestForQuotation(requestForQuotation, requestForQuotationAction.node.data.rfq_Id)).then((resX) => {
+                const data = resX.payload.data
+                if (data.success) {
+
+                    const filteredChildrenItems = requestForQuotation.childrenItems.filter(child => child.rfq_itemId === "").map((item) => {
+                        return {
+                            ...item,
+                            rfq_Id: requestForQuotationAction.node.data.rfq_Id
+                        }
+                    })
+
+                    const filteredChildrenVendors = requestForQuotation.childrenVendors.filter(child => child.rfq_VendorId === "").map((vendor) => {
+                        return {
+                            ...vendor,
+                            rfq_Id: requestForQuotationAction.node.data.rfq_Id
+                        }
+                    })
+
+                    if (filteredChildrenItems.length !== 0) {
+                        dispatch(addRequestForQuotationItems(requestForQuotationAction.node.data.rfq_Id, filteredChildrenItems)).then((res) => {
+                            const data = res.payload.data
+                            if (data.success) {
+                                dispatch(getRequestForQuotation(0))
+                            }
+                        })
+                    }
+
+                    if (filteredChildrenVendors.length !== 0) {
+                        dispatch(addRequestForQuotationVendors(requestForQuotationAction.node.data.rfq_Id, filteredChildrenVendors)).then((res) => {
+                            const data = res.payload.data
+                            if (data.success) {
+                                dispatch(getRequestForQuotation(0))
+                            }
+                        })
+                    }
+
+                    if(itemDeletedRows.length !== 0) {
+                        dispatch(deleteRequestForQuotationItems(itemDeletedRows))
+                        setItemDeletedRows([])
+                    }
+
+                    if(vendorDeletedRows.length !== 0) {
+                        dispatch(deleteRequestForQuotationVendor(vendorDeletedRows))
+                        setVendorDeletedRows([])
+                    }
+
+                    notify("Request For Quotation Updated Successfully", "info", 2000)
+                }
+            })
+        }
     }
 
     const renderContent = () => {
@@ -173,7 +357,6 @@ const CreateRequestForQuotation = () => {
                                             class: "form-datebox",
                                         }}
                                         type={"date"}
-                                        min={new Date()}
                                         accessKey={'creationDate'}
                                         openOnFieldClick={true}
                                         readOnly={true}
@@ -196,7 +379,42 @@ const CreateRequestForQuotation = () => {
                                     />
                                 </FormGroupItem>
                             </div>
+
                             <div style={{width: 500, margin: "0 20px"}}>
+                                <FormGroupItem>
+                                    <FormLabel>Purchase Request</FormLabel>
+                                    {requestForQuotationAction.type !== "UPDATE" ? 
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            searchEnabled={true}
+                                            searchMode={'contains'}
+                                            accessKey={'purchaseRequestId'}
+                                            dataSource={purchaseRequest.filter((purchase) => purchase.pR_Status === "Created").map((item) => {
+                                                return item.purchaseRequestId
+                                            })}
+                                            value={formData.purchaseRequestId}
+                                            openOnFieldClick={true}
+                                            placeholder={"Select Purchase Request"}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            onValueChanged={(e) => onValueChanged(e, 'purchaseRequestId')}
+                                            validationStatus={invalid.purchaseRequestId === false ? "valid" : "invalid"}
+                                        />
+                                        : 
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'purchaseRequestId'}
+                                            placeholder='Select PR-Id'
+                                            value={formData.purchaseRequestId}
+                                        />
+                                    }
+                                </FormGroupItem>
+
                                 <FormGroupItem>
                                     <FormLabel>Required By</FormLabel>
                                     <DateBox
@@ -211,12 +429,12 @@ const CreateRequestForQuotation = () => {
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
                                         validationMessagePosition={"bottom"}
-                                        onValueChanged={(e) => onValueChanged(e)}
+                                        onValueChanged={(e) => onValueChanged(e, "requiredBy")}
                                         validationStatus={invalid.requiredBy === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 45 }}>
+                                <FormButtonContainer style={{ marginTop: 30 }}>
                                     <Button size="sm" className={"form-action-button"}>
                                         {requestForQuotationAction.type === "UPDATE" ? "Update" : "Save"} Request For Quotation
                                     </Button>
@@ -553,9 +771,9 @@ const CreateRequestForQuotation = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={vendorDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
+                    dataSource={vendorDataSource}
                     noDataText={'No Data'}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -632,9 +850,11 @@ export default CreateRequestForQuotation
 
 const getVendorObj = (clientId) => {
     return {
+        rfq_Id: "",
         vendorId: "",
         vendorName: "",
         vendorNumber: "",
+        rfq_VendorId: "",
         clientId: clientId
     }
 }
@@ -643,7 +863,9 @@ const getItemObj = (clientId) => {
     return {
         uom: "",
         itemId: "",
+        rfq_Id: "",
         itemName: "",
+        rfq_itemId: "",
         itemQuantity: 0,
         clientId: clientId
     }

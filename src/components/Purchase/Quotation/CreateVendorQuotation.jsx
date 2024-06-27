@@ -89,24 +89,6 @@ const CreateVendorQuotation = () => {
         }
     }
 
-    // const handleOnAddRow = () => {
-    //     const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
-    //     const newRow = getItemObj(newClientID)
-    //     setTreeListData([...treeListData, newRow])
-    // }
-
-    // const handleOnRowRemove = (e) => {
-    //     const deletedRow = treeListData.find(item => item.clientId === e.row.key)
-    //     setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
-
-    //     const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
-    //     setTreeListData(updatedData)
-        
-    //     vendorQuotationDataSource.store().remove(e.row.key).then(() => {
-    //         vendorQuotationDataSource.reload()
-    //     })
-    // }
-
     const handleOnItemValueChanged = (e) => {
         let value = e.value
 
@@ -315,10 +297,6 @@ const CreateVendorQuotation = () => {
         }
     }
 
-    const renderActionHeaderCell = (e) => {
-        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
-    }
-
     const renderHeaderCell = (e) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
@@ -427,17 +405,6 @@ const CreateVendorQuotation = () => {
         )
     }
 
-    const renderActionColumn = (e) => {
-        return (
-            <ActionCellContainer>
-                {/* <button
-                    title='Delete Item'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => handleOnRowRemove(e)} /> */}
-            </ActionCellContainer>
-        )
-    }
-
     const renderTreelist = () => {
         return (
             <Fragment>
@@ -445,11 +412,8 @@ const CreateVendorQuotation = () => {
                     <Header>
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
-
-                    {/* <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
-                        Add Row
-                    </AddButton> */}
                 </div>
+                
                 <TreeList
                     elementAttr={{
                         id: "create-vendor-quotation-treelist",
@@ -548,19 +512,6 @@ const CreateVendorQuotation = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
-                    <Column
-                        width={75}
-                        minWidth={75}
-                        caption={"Actions"}
-                        dataField={"actions"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        allowEditing={false}
-                        cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
-                        cssClass={"project-treelist-column"}
-                    />
                 </TreeList>
                 {renderTotal()}
                 {renderTotalQuantity()}
@@ -586,33 +537,3 @@ const getItemObj = (clientId) => {
         clientId: clientId
     }
 }
-
-const ActionCellContainer = styled.div`
-    display: flex;
-    font-size: 16px;
-    align-items: center;
-    justify-content: space-evenly;
-`
-
-const AddButton = styled.button`
-    font-size: 13px;
-        
-    color: #4285f4b5;
-    background-color: #FFFFFF;
-
-    border: 1px solid #eeeeee; 
-    cursor: pointer;
-
-    width: auto;
-    height: 30px;
-    margin: 10px;
-    border-radius: 5px;
-
-    transition: 0.2s background-color, color;
-    &:hover,
-    &:focus,
-    &:focus-within {
-        background-color: #4285f4b5;
-        color: #FFFFFF;
-    }
-`

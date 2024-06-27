@@ -65,6 +65,96 @@ export const updatePurchaseRequest = (obj, id) => {
     }
 }
 
+export const getRequestForQuotation = (id) => {
+    const result = axios({
+        method: 'GET',
+        url: `rest/rfq/getRFQ/${id}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_REQUEST_FOR_QUOTATION',
+        payload: result
+    }
+}
+
+export const addRequestForQuotation = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/rfq/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_REQUEST_FOR_QUOTATION',
+        payload: result
+    }
+}
+
+export const addRequestForQuotationItems = (rfq_Id, obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/rfq/create/rfq_Items/${rfq_Id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_REQUEST_FOR_QUOTATION_ITEMS',
+        payload: result
+    }
+}
+
+export const addRequestForQuotationVendors = (rfq_Id, obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/rfq/create/rfq_Vendors/${rfq_Id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_REQUEST_FOR_QUOTATION_VENDOR',
+        payload: result
+    }
+}
+
+export const deleteRequestForQuotationItems = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/rfq/delete/rfq_Items`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'DELETE_PURCHASE_REQUEST_ITEMS',
+        payload: result
+    }
+}
+
+export const deleteRequestForQuotationVendor = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/rfq/delete/rfq_Vendor`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'DELETE_REQUEST_FOR_QUOTATION_VENDOR',
+        payload: result
+    }
+}
+
+export const updateRequestForQuotation = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/rfq/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_REQUEST_FOR_QUOTATION',
+        payload: result
+    }
+}
+
 export const purchaseRequestActionType = (obj) => {
     return {
         type: "PURCHASE_REQUEST_ACTION_TYPE",

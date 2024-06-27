@@ -12,8 +12,6 @@ import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, Fo
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
 
-import styled from 'styled-components'
-
 const CreateVendorQuotation = () => {
 
     const itemMaster = useSelector(state => state.item.itemMaster)

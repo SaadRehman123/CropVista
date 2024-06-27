@@ -525,15 +525,3 @@ const CreateVendorQuotation = () => {
 }
 
 export default CreateVendorQuotation
-
-const getItemObj = (clientId) => {
-    return {
-        itemId: "",
-        itemName: "",
-        itemQuantity: 0,
-        uom: "",
-        rate: "",
-        amount: "",
-        clientId: clientId
-    }
-}

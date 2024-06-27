@@ -18,7 +18,6 @@ const CreateVendorQuotation = () => {
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
     const vendorQuotationAction = useSelector(state => state.purchase.vendorQuotationAction)
 
-    const [deletedRows, setDeletedRows] = useState([])
     const [treeListData, setTreeListData] = useState([])
 
     const [invalid, setInvalid] = useState({ vendorId: false })

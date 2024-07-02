@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+/* eslint-disable jsx-a11y/no-access-key */
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -19,7 +22,7 @@ const CreatePurchaseOrder = () => {
     const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
     const purchaseOrderAction = useSelector(state => state.purchase.purchaseOrderAction)
-    
+
     const [deletedRows, setDeletedRows] = useState([])
     const [treeListData, setTreeListData] = useState([])
 
@@ -39,7 +42,7 @@ const CreatePurchaseOrder = () => {
 
     useEffect(() => {
         if (purchaseOrderAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))
         }
         else if (purchaseOrderAction.type === "UPDATE") {
             setFormData({
@@ -50,7 +53,7 @@ const CreatePurchaseOrder = () => {
                 vendorAddress: "",
                 vendorNumber: "",
                 purchaseOrderStatus: ""
-            })            
+            })
         }
     }, [])
 
@@ -59,9 +62,9 @@ const CreatePurchaseOrder = () => {
         if (value === null) value = ""
 
         if (name === "vendorId") {
-            const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId) 
-            if(vendor){
-                setFormData((prevState) => ({ 
+            const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId)
+            if (vendor) {
+                setFormData((prevState) => ({
                     ...prevState,
                     vendorId: vendor.vendorId,
                     vendorName: vendor.vendorName,
@@ -93,8 +96,8 @@ const CreatePurchaseOrder = () => {
     const handleOnFocusOut = (e) => {
         const name = e.event.target.accessKey
         if (formData[name] === null) formData[name] = ""
-        
-        if(name === "vendorId"){
+
+        if (name === "vendorId") {
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 [name]: formData[name].trim() === "" ? true : false
@@ -114,7 +117,7 @@ const CreatePurchaseOrder = () => {
 
         const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
         setTreeListData(updatedData)
-        
+
         purchaseOrderDataSource.store().remove(e.row.key).then(() => {
             purchaseOrderDataSource.reload()
         })
@@ -123,7 +126,7 @@ const CreatePurchaseOrder = () => {
     const handleOnItemValueChanged = (e) => {
         let value = e.value
 
-        if(value === null){
+        if (value === null) {
             value = ""
         }
 
@@ -131,12 +134,12 @@ const CreatePurchaseOrder = () => {
         const selectRow = instance.getSelectedRowsData()[0]
 
         if (selectRow) {
-            
+
             const selectedItem = itemMaster.find((item) => item.itemId === value)
 
             if (selectedItem) {
                 const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, rate: selectedItem.sellingRate }
-    
+
                 purchaseOrderDataSource.store().update(selectRow.clientId, updatedData).then(() => {
                     purchaseOrderDataSource.reload()
                 })
@@ -146,11 +149,11 @@ const CreatePurchaseOrder = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
-    
+
     }
 
     const renderContent = () => {
-        return(
+        return (
             <Fragment>
                 <Header>
                     <HeaderSpan>Create Purchase Order</HeaderSpan>
@@ -159,7 +162,7 @@ const CreatePurchaseOrder = () => {
                 <form onSubmit={handleOnSubmit}>
                     <FormGroupContainer>
                         <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>
-                            <div style={{width: 500, margin: "0 20px 20px 20px"}}>
+                            <div style={{ width: 500, margin: "0 20px 20px 20px" }}>
                                 <FormGroupItem>
                                     <FormLabel>Creation Date</FormLabel>
                                     <DateBox
@@ -243,7 +246,7 @@ const CreatePurchaseOrder = () => {
                                     />
                                 </FormGroupItem>
                             </div>
-                            <div style={{width: 500, margin: "0 20px"}}>
+                            <div style={{ width: 500, margin: "0 20px" }}>
                                 <FormGroupItem>
                                     <FormLabel>Required By</FormLabel>
                                     <DateBox
@@ -309,7 +312,7 @@ const CreatePurchaseOrder = () => {
         }, 0)
     }
 
-    
+
     const renderTotal = () => {
         const totalSum = calculateTotal()
         return (
@@ -397,7 +400,7 @@ const CreatePurchaseOrder = () => {
         const selectedIds = treeListData.map(item => item.itemId)
         return itemMaster.filter(item => item.itemType === "Raw Material" && item.disable === false && !selectedIds.includes(item.itemId))
     }
-    
+
     const renderItemIdCell = (e) => {
         const filteredDataSource = filterItems()
 
@@ -499,7 +502,7 @@ const CreatePurchaseOrder = () => {
                     columnResizingMode={"nextColumn"}
                     onSaved={handleOnSaved}
                     onCellPrepared={handleOnCellPrepared}>
-                    
+
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
@@ -508,7 +511,7 @@ const CreatePurchaseOrder = () => {
                         mode='cell'
                         allowUpdating={true}
                         startEditAction='dblClick'
-                        selectTextOnEditStart={true} 
+                        selectTextOnEditStart={true}
                         texts={{ confirmDeleteMessage: '' }}
                     />
 
@@ -523,7 +526,7 @@ const CreatePurchaseOrder = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-                    
+
                     <Column
                         caption={"Item Name"}
                         dataField={"itemName"}
@@ -534,7 +537,7 @@ const CreatePurchaseOrder = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-                        
+
                     <Column
                         caption={"Quantity"}
                         dataField={"itemQuantity"}
@@ -553,7 +556,7 @@ const CreatePurchaseOrder = () => {
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderUomCell} 
+                        cellRender={renderUomCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -564,18 +567,18 @@ const CreatePurchaseOrder = () => {
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderRateCell} 
+                        cellRender={renderRateCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
- 
+
                     <Column
                         caption={"Amount"}
                         dataField={"amount"}
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderAmountCell} 
+                        cellRender={renderAmountCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -589,7 +592,7 @@ const CreatePurchaseOrder = () => {
                         allowSorting={false}
                         allowEditing={false}
                         cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
+                        headerCellRender={renderActionHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                 </TreeList>

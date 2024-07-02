@@ -1,12 +1,16 @@
 const INITIAL_STATE = {
+    goodsReceipt: [],
+    purchaseOrder: [],
     vendorQuotation: [],
     purchaseRequest: [],
+    purchaseInvoice: [],
     requestForQuotation: [],
-	goodReceiptAction: { node: null, type: "CREATE" },
-	purchaseOrderAction: { node: null, type: "CREATE" },
-	purchaseRequestAction: { node: null, type: "CREATE" },
-	vendorQuotationAction: { node: null, type: "CREATE" },
-	requestForQuotationAction: { node: null, type: "CREATE" }
+    goodReceiptAction: { node: null, type: "CREATE" },
+    purchaseOrderAction: { node: null, type: "CREATE" },
+    purchaseRequestAction: { node: null, type: "CREATE" },
+    purchaseInvoiceAction: { node: null, type: "CREATE" },
+    vendorQuotationAction: { node: null, type: "CREATE" },
+    requestForQuotationAction: { node: null, type: "CREATE" },
 }
 
 const PurchaseReducer = (state = INITIAL_STATE, action) => {
@@ -15,6 +19,12 @@ const PurchaseReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 purchaseRequest: action.payload.data.result
+            }
+        }
+        case "GET_PURCHASE_ORDER": {
+            return {
+                ...state,
+                purchaseOrder: action.payload.data.result
             }
         }
         case "GET_REQUEST_FOR_QUOTATION": {
@@ -27,6 +37,18 @@ const PurchaseReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 vendorQuotation: action.payload.data.result
+            }
+        }
+        case "GET_GOODS_RECEIPT": {
+            return {
+                ...state,
+                goodsReceipt: action.payload.data.result
+            }
+        }
+        case "GET_PURCHASE_INVOICE": {
+            return {
+                ...state,
+                purchaseInvoice: action.payload.data.result
             }
         }
         case "PURCHASE_REQUEST_ACTION_TYPE": {
@@ -59,8 +81,14 @@ const PurchaseReducer = (state = INITIAL_STATE, action) => {
                 goodReceiptAction: action.payload
             }
         }
-		default: return state
-	}
+        case "PURCHASE_INVOICE_ACTION_TYPE": {
+            return {
+                ...state,
+                purchaseInvoiceAction: action.payload
+            }
+        }
+        default: return state
+    }
 }
 
 export default PurchaseReducer

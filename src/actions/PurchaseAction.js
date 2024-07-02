@@ -214,3 +214,10 @@ export const goodReceiptActionType = (obj) => {
         payload: obj
     }
 }
+
+export const purchaseInvoiceActionType = (obj) => {
+    return {
+        type: "PURCHASE_INVOICE_ACTION_TYPE",
+        payload: obj
+    }
+}

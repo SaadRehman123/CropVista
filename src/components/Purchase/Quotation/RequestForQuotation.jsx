@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from 'react'
+import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -11,7 +11,7 @@ import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { toggleDeletePopup } from '../../../actions/ViewActions'
-import { requestForQuotationActionType } from '../../../actions/PurchaseAction'
+import { getRequestForQuotation, requestForQuotationActionType } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
 
@@ -23,6 +23,15 @@ const RequestForQuotation = () => {
     const dispatch = useDispatch()
 
     const treeListRef = useRef()
+
+    useEffect(() => {
+        dispatch(getRequestForQuotation(0))
+    }, [])
+
+    const handleOnClick = () => {
+        navigate('/app/Create_Request_For_Quotation')
+        dispatch(requestForQuotationActionType({ node: null, type: "CREATE" }))
+    }
 
     const handleOnEditClick = (e) => {
         dispatch(requestForQuotationActionType({ node: e, type: "UPDATE" }))
@@ -100,7 +109,7 @@ const RequestForQuotation = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Request For Quotation History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Request_For_Quotation')}>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
                         Create Request For Quotation
                     </Button>

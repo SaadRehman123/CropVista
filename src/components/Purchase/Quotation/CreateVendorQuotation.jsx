@@ -13,16 +13,18 @@ import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-lis
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { addVendorQuotation } from '../../../actions/PurchaseAction'
+import { addVendorQuotation, getVendorQuotation, updateVendorQuotation } from '../../../actions/PurchaseAction'
 
 const CreateVendorQuotation = () => {
 
     const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
+    const vendorQuotation = useSelector(state => state.purchase.vendorQuotation)
     const requestForQuotation = useSelector(state => state.purchase.requestForQuotation)
     const vendorQuotationAction = useSelector(state => state.purchase.vendorQuotationAction)
 
     const [treeListData, setTreeListData] = useState([])
+    const [rfqDataSource, setRfqDataSource] = useState([])
     const [vendorDataSource, setVendorDataSource] = useState([])
 
     const [invalid, setInvalid] = useState({ vendorId: false, rfq_Id: false })
@@ -41,18 +43,39 @@ const CreateVendorQuotation = () => {
 
     useEffect(() => {
         if (vendorQuotationAction.type === "CREATE") {
+            const updatedRFQ = requestForQuotation.map(rfq => {
+                const rfqVendors = rfq.childrenVendors.filter(rfqVendor => {
+                    const isVendorInQuotation = vendorQuotation.some(vq => 
+                        vq.rfq_Id === rfq.rfq_Id && vq.vendorId === rfqVendor.vendorId
+                    )
+                    return !isVendorInQuotation
+                })
+
+                return {
+                    ...rfq,
+                    childrenVendors: rfqVendors
+                }
+            }).filter(rfq => rfq.childrenVendors.length > 0)
+
+            setRfqDataSource(updatedRFQ)
+        }
+    }, [vendorDataSource])
+
+    useEffect(() => {
+        if (vendorQuotationAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now(), vendorQuotationStatus: "Pending" }))            
         }
         else if (vendorQuotationAction.type === "UPDATE") {
             setFormData({
-                creationDate: "",
-                vendorId: "",
-                vendorName: "",
-                vendorAddress: "",
-                vendorNumber: "",
-                vendorQuotationStatus: "",
-                rfq_Id: ""
-            })            
+                creationDate: vendorQuotationAction.node.data.vq_CreationDate,
+                vendorId: vendorQuotationAction.node.data.vendorId,
+                vendorName: vendorQuotationAction.node.data.vendorName,
+                vendorAddress: vendorQuotationAction.node.data.vendorAddress,
+                vendorNumber: vendorQuotationAction.node.data.vendorNumber,
+                vendorQuotationStatus: vendorQuotationAction.node.data.vq_Status,
+                rfq_Id: vendorQuotationAction.node.data.rfq_Id
+            })
+            setTreeListData(vendorQuotationAction.node.data.children)
         }
     }, [])
 
@@ -66,7 +89,7 @@ const CreateVendorQuotation = () => {
                 rfq_Id: value
             }))
 
-            const RFQ = requestForQuotation.find((rfq) => rfq.rfq_Id === value)
+            const RFQ = rfqDataSource.find((rfq) => rfq.rfq_Id === value)
             if(RFQ){
                 const uniqueItemData = RFQ.childrenItems.reduce((acc, current) => {
                     if (!acc.some(item => item.rfq_ItemId === current.rfq_ItemId)) {
@@ -210,11 +233,22 @@ const CreateVendorQuotation = () => {
                         vendorAddress: "",
                         vendorNumber: ""
                     }))
+                    dispatch(getVendorQuotation(0))
                     setVendorDataSource(updatedVendorDataSource)
+                    notify("Vendor Quotation Created Successfully")
+                }
+            })
+        }
+        else if(vendorQuotationAction.type === "UPDATE"){
+            dispatch(updateVendorQuotation(vendorQuotation, vendorQuotationAction.node.data.vq_Id)).then((res) => {
+                if(res.payload.data.success){
+                    notify("Vendor Quotation Updated Successfully")
                 }
             })
         }
     }
+
+    console.log(vendorDataSource);
 
     const renderContent = () => {
         return(
@@ -246,43 +280,54 @@ const CreateVendorQuotation = () => {
 
                                 <FormGroupItem>
                                     <FormLabel>Vendor Id</FormLabel>
-                                    <SelectBox
-                                        elementAttr={{
-                                            class: "form-selectbox"
-                                        }}
-                                        searchTimeout={200}
-                                        accessKey={'vendorId'}
-                                        searchEnabled={true}
-                                        displayExpr={'vendorId'}
-                                        searchMode={'contains'}
-                                        searchExpr={'vendorName'}
-                                        dataSource={vendorDataSource.map((item) => {
-                                            return {
-                                                vendorId: item.vendorId,
-                                                vendorName: item.vendorName
-                                            }
-                                        })}
-                                        value={formData.vendorId}
-                                        openOnFieldClick={true}
-                                        acceptCustomValue={true}
-                                        disabled={vendorDataSource.length === 0 ? true : false}
-                                        onFocusIn={handleOnFocusIn}
-                                        onFocusOut={handleOnFocusOut}
-                                        itemRender={(e) => {
-                                            return (
-                                                <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                                                    <span>{e.vendorId}</span>
-                                                    <span style={{ marginLeft: "auto", }}>
-                                                        {e.vendorName}
-                                                    </span>
-                                                </div>
-                                            )
-                                        }}
-                                        placeholder={"Select Vendor"}
-                                        dropDownOptions={{ maxHeight: 300 }}
-                                        onValueChanged={(e) => onValueChanged(e, 'vendorId')}
-                                        validationStatus={invalid.vendorId === false ? "valid" : "invalid"}
-                                    />
+                                    {vendorQuotationAction.type !== "UPDATE" ?
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            accessKey={'vendorId'}
+                                            searchEnabled={true}
+                                            displayExpr={'vendorId'}
+                                            searchMode={'contains'}
+                                            searchExpr={'vendorName'}
+                                            dataSource={vendorDataSource.map((item) => {
+                                                return {
+                                                    vendorId: item.vendorId,
+                                                    vendorName: item.vendorName
+                                                }
+                                            })}
+                                            value={formData.vendorId}
+                                            openOnFieldClick={true}
+                                            acceptCustomValue={true}
+                                            disabled={vendorDataSource.length === 0 ? true : false}
+                                            onFocusIn={handleOnFocusIn}
+                                            onFocusOut={handleOnFocusOut}
+                                            itemRender={(e) => {
+                                                return (
+                                                    <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
+                                                        <span>{e.vendorId}</span>
+                                                        <span style={{ marginLeft: "auto", }}>
+                                                            {e.vendorName}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            }}
+                                            placeholder={"Select Vendor"}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            onValueChanged={(e) => onValueChanged(e, 'vendorId')}
+                                            validationStatus={invalid.vendorId === false ? "valid" : "invalid"}
+                                        />
+                                        :
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'vendorId'}
+                                            value={formData.vendorId}
+                                        />
+                                    }
                                 </FormGroupItem>
 
                                 <FormGroupItem>
@@ -314,26 +359,37 @@ const CreateVendorQuotation = () => {
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Request For Quotation</FormLabel>
-                                    <SelectBox
-                                        elementAttr={{
-                                            class: "form-selectbox"
-                                        }}
-                                        searchTimeout={200}
-                                        searchEnabled={true}
-                                        searchMode={'contains'}
-                                        accessKey={'rfq_Id'}
-                                        dataSource={requestForQuotation.map((item) => {
-                                            return item.rfq_Id
-                                        })}
-                                        value={formData.rfq_Id}
-                                        openOnFieldClick={true}
-                                        onFocusIn={handleOnFocusIn}
-                                        onFocusOut={handleOnFocusOut}
-                                        placeholder={"Select Request For Quotation"}
-                                        dropDownOptions={{ maxHeight: 300 }}
-                                        onValueChanged={(e) => onValueChanged(e, 'rfq_Id')}
-                                        validationStatus={invalid.rfq_Id === false ? "valid" : "invalid"}
-                                    />
+                                    {vendorQuotationAction.type !== "UPDATE" ? 
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            searchEnabled={true}
+                                            searchMode={'contains'}
+                                            accessKey={'rfq_Id'}
+                                            dataSource={rfqDataSource.map((item) => {
+                                                return item.rfq_Id
+                                            })}
+                                            value={formData.rfq_Id}
+                                            openOnFieldClick={true}
+                                            onFocusIn={handleOnFocusIn}
+                                            onFocusOut={handleOnFocusOut}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            placeholder={"Select Request For Quotation"}
+                                            onValueChanged={(e) => onValueChanged(e, 'rfq_Id')}
+                                            validationStatus={invalid.rfq_Id === false ? "valid" : "invalid"}
+                                        /> 
+                                        :
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'rfq_Id'}
+                                            value={formData.rfq_Id}
+                                        />
+                                    }
                                 </FormGroupItem>
 
                                 <FormGroupItem>

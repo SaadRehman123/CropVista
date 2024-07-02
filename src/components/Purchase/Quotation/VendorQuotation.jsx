@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from 'react'
+import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -11,7 +11,7 @@ import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { toggleDeletePopup } from '../../../actions/ViewActions'
-import { vendorQuotationActionType } from '../../../actions/PurchaseAction'
+import { getVendorQuotation, vendorQuotationActionType } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
 
@@ -23,6 +23,15 @@ const VendorQuotation = () => {
     const dispatch = useDispatch()
 
     const treeListRef = useRef()
+    
+    useEffect(() => {
+        dispatch(getVendorQuotation(0))
+    }, [])
+
+    const handleOnClick = () => {
+        navigate('/app/Create_Vendor_Quotation')
+        dispatch(vendorQuotationActionType({ node: null, type: "CREATE" }))
+    }
 
     const handleOnEditClick = (e) => {
         dispatch(vendorQuotationActionType({ node: e, type: "UPDATE" }))
@@ -101,7 +110,7 @@ const VendorQuotation = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Vendor Quotation History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Vendor_Quotation')}>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
                         Create Vendor Quotation
                     </Button>
@@ -119,7 +128,7 @@ const VendorQuotation = () => {
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     dataSource={vendorQuotation}
-                    keyExpr={"rfq_Id"}
+                    keyExpr={"vq_Id"}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}

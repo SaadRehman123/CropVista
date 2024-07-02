@@ -155,6 +155,31 @@ export const updateRequestForQuotation = (obj, id) => {
     }
 }
 
+export const getVendorQuotation = (id) => {
+    const result = axios({
+        method: 'GET',
+        url: `rest/vendorQuotation/getVQ/${id}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_VENDOR_QUOTATION',
+        payload: result
+    }
+}
+
+export const addVendorQuotation = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/vendorQuotation/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_VENDOR_QUOTATION',
+        payload: result
+    }
+}
+
 export const purchaseRequestActionType = (obj) => {
     return {
         type: "PURCHASE_REQUEST_ACTION_TYPE",

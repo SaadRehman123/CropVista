@@ -272,6 +272,8 @@ const CreateRequestForQuotation = () => {
                                 dispatch(getPurchaseRequest(0))
                             }
                         })
+
+                        dispatch(getRequestForQuotation(0))
                     }
 
                     setFormData({

@@ -139,6 +139,7 @@ const CreatePurchaseRequest = () => {
                         purchaseReqStatus: "Pending"
                     })
                     setTreeListData([])
+                    dispatch(getPurchaseRequest(0))
                     notify("Purhase Request Created Successfully", "info", 2000)
                 }
             })

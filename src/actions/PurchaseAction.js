@@ -180,6 +180,19 @@ export const addVendorQuotation = (obj) => {
     }
 }
 
+export const updateVendorQuotation = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/vendorQuotation/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_VENDOR_QUOTATION',
+        payload: result
+    }
+}
+
 export const purchaseRequestActionType = (obj) => {
     return {
         type: "PURCHASE_REQUEST_ACTION_TYPE",

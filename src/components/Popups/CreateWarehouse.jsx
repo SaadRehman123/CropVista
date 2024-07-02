@@ -166,14 +166,14 @@ const CreateWarehouse = () => {
                         />
                     </FormGroupItem>
                     
-                    <div style={{ display: 'flex', justifyContent: "space-between", marginTop: 5, marginBottom: 5 }}>                 
+                    <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>                 
                         <FormGroupItem>
                             <FormLabel>Location</FormLabel>
                             <TextBox
                                 elementAttr={{
                                     class: "form-areabox"
                                 }}
-                                width={225}
+                                width={402}
                                 accessKey={'location'}
                                 value={formData.location}
                                 onFocusIn={handleOnFocusIn}
@@ -184,7 +184,7 @@ const CreateWarehouse = () => {
                             />
                         </FormGroupItem>
                         
-                        <FormGroupItem style={{ marginRight: 160 }}>
+                        <FormGroupItem style={{ marginLeft: 20 }}>
                             <FormLabel>Active</FormLabel>
                             <CheckBox
                                 style={{

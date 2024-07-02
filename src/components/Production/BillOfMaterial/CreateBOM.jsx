@@ -33,6 +33,9 @@ const CreateBOM = () => {
     const [invalid, setInvalid] = useState({ itemId: false, warehouseId: false, productDescription: false, quantity: false, productionStdCost: false })
     const [formData, setFormData] = useState({ itemId: "", warehouseId: "", productDescription: "", quantity: "", productionStdCost: "" })
 
+    const itemResourceTreeRef = useRef(null)
+    const dispatch = useDispatch()
+
     const itemResourceDatasource = new DataSource({
         store: {
             data: assignClientId(treeListData),
@@ -40,9 +43,6 @@ const CreateBOM = () => {
             key: 'clientId',
         }
     })
-
-    const itemResourceTreeRef = useRef(null)
-    const dispatch = useDispatch()
 
     useEffect(() => {
         setItemResourceTreeRef(itemResourceTreeRef)
@@ -440,7 +440,6 @@ const CreateBOM = () => {
     }
 
     //Treelist Rendering
-
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
             if (e.column.dataField === "itemquantity" || e.column.dataField === "unitPrice" || e.column.dataField === "total") {
@@ -775,9 +774,13 @@ const CreateBOM = () => {
     const renderTreelist = () => {
         return (
             <Fragment>
-                <div style={{ display: "flex", flexFlow: "row-reverse" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Header>
+                        <HeaderSpan>Route Stages</HeaderSpan>
+                    </Header>
                     <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
                 </div>
+
                 <TreeList
                     elementAttr={{
                         id: "create-bom-treelist",

@@ -1,67 +1,39 @@
-import React, { Fragment, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { Fragment, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Button } from 'reactstrap'
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { TreeList } from 'devextreme-react'
+import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { bomActionType, getBom } from '../../../actions/BomActions'
-import { setBomRef, toggleDeletePopup } from '../../../actions/ViewActions'
+import { toggleDeletePopup } from '../../../actions/ViewActions'
+import { requestForQuotationActionType } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
 
-const BillOfMaterial = () => {
+const RequestForQuotation = () => {
 
-    const bomDatasource = useSelector(state => state.bom.Bom)
-    
+    const requestForQuotation = useSelector(state => state.purchase.requestForQuotation)
+
     const navigate = useNavigate()
-    const treeListRef = useRef(null)
-
     const dispatch = useDispatch()
 
-    useEffect(() => {
-        dispatch(getBom(0))
-        dispatch(bomActionType({ node: null, type: "CREATE" }))
-    }, [])
-
-    useEffect(() => {
-        dispatch(setBomRef(treeListRef))
-    }, [])
+    const treeListRef = useRef()
 
     const handleOnEditClick = (e) => {
-        dispatch(bomActionType({ node: e, type: "UPDATE" }))
-        navigate('/app/Create_Bom')
+        dispatch(requestForQuotationActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Request_For_Quotation')
     }
 
-    const renderBomIdColumn = (e) => {
+    const renderRequestForQuotationIdColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.bid}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderProductDescriptionColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.productDescription}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderQuantityColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.quantity}
+                    {e.data.rfq_Id}
                 </CellContent>
             </CellContainer>
         )
@@ -71,7 +43,37 @@ const BillOfMaterial = () => {
         return (
             <CellContainer>
                 <CellContent>
-                    {moment(e.data.creationDate).format("DD/MM/YYYY")}
+                    {moment(e.data.rfq_CreationDate).format("DD/MM/YYYY")}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderRequiredByColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {moment(e.data.rfq_RequiredBy).format("DD/MM/YYYY")}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderPurchaseRequestIdColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.pr_Id}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderStatusColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.rfq_Status}
                 </CellContent>
             </CellContainer>
         )
@@ -81,14 +83,14 @@ const BillOfMaterial = () => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Bom'
+                    title='Edit Request For Quotation'
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)} />
 
                 <button
-                    title='Delete Bom'
+                    title='Cancel Request For Quotation'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"BOM" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"REQUEST_FOR_QUOTATION" }))} />
             </ActionCellContainer>
         )
     }
@@ -97,71 +99,81 @@ const BillOfMaterial = () => {
         return (
             <Fragment>
                 <Header>
-                    <HeaderSpan>Bill of Material History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/create_bom')}>
+                    <HeaderSpan>Request For Quotation History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Request_For_Quotation')}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Bill of Material
+                        Create Request For Quotation
                     </Button>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "bom-treelist",
+                        id: "request-for-quotation-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"bid"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={bomDatasource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Bill of Material'}
+                    dataSource={requestForQuotation}
+                    keyExpr={"rfq_Id"}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
-                    columnResizingMode={"nextColumn"}>
+                    columnResizingMode={"nextColumn"}
+                    noDataText={'No Request For Quotation'}>
 
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"BOM-Id"}
-                        dataField={"BID"}
+                        caption={"RFQ-Id"}
+                        dataField={"rfq_Id"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderBomIdColumn}
+                        cellRender={renderRequestForQuotationIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Product Description"}
-                        dataField={"productDescription"}
+                        caption={"Creation Date"}
+                        dataField={"rfq_CreationDate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderProductDescriptionColumn} 
+                        cellRender={renderCreationDateColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
                         
                     <Column
-                        caption={"Quantity"}
-                        dataField={"quantity"}
+                        caption={"Required By"}
+                        dataField={"rfq_RequiredBy"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderQuantityColumn} 
+                        cellRender={renderRequiredByColumn} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+                        
+                    <Column
+                        caption={"PR-Id"}
+                        dataField={"pr_Id"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderPurchaseRequestIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
-                        caption={"Creation Date"}
-                        dataField={"creationDate"}
+                        caption={"Status"}
+                        dataField={"rfq_Status"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderCreationDateColumn} 
+                        cellRender={renderStatusColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -201,25 +213,11 @@ const BillOfMaterial = () => {
     )
 }
 
-export default BillOfMaterial
+export default RequestForQuotation
 
 const ActionCellContainer = styled.div`
     display: flex;
     font-size: 16px;
     align-items: center;
     justify-content: space-evenly;
-`
-
-const Header = styled.div`
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-`
-
-const HeaderSpan = styled.span`
-    color: #495057;
-    font-size: 16px;
-    font-weight: 500;
-    font-family: 'RobotoFallback';
 `

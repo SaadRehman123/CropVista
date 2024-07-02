@@ -49,7 +49,8 @@ const CreateItem = () => {
     }, [createItemPopup.type])
 
     const onValueChanged = (e, name) => {
-        const value = e.value
+        let value = e.value
+        if (value === null) value = ""
 
         if (name === "itemType") {
             setItemType(value)
@@ -263,8 +264,8 @@ const CreateItem = () => {
                             searchExpr={'season'}
                             searchMode={'contains'}
                             dataSource={["Kharif", "Rabi"]}
-                            readOnly={createItemPopup.type !== "CREATE" ? true : false}
                             disabled={itemType === "Finish Good" ? false : true}
+                            readOnly={createItemPopup.type !== "CREATE" ? true : false}
                             value={formData.season}
                             openOnFieldClick={true}
                             onFocusIn={handleOnFocusIn}
@@ -316,19 +317,25 @@ const CreateItem = () => {
                         </FormGroupItem>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>
+                    <div style={{ display: 'flex', marginTop: 5, marginBottom: 5 }}>
                         <FormGroupItem>
                             <FormLabel>UoM</FormLabel>
-                            <TextBox
+                            <SelectBox
                                 elementAttr={{
-                                    class: "form-textbox"
+                                    class: "form-selectbox"
                                 }}
-                                width={225}
+                                width={400}
+                                searchTimeout={200}
                                 accessKey={'UOM'}
-                                placeholder={"Enter UoM"}
+                                searchEnabled={true}
+                                searchMode={'contains'}
+                                dataSource={["Kg", "Each", "Piece", "Gram" ]}
                                 value={formData.UOM}
+                                openOnFieldClick={true}
                                 onFocusIn={handleOnFocusIn}
                                 onFocusOut={handleOnFocusOut}
+                                placeholder={"Select UoM"}
+                                dropDownOptions={{ maxHeight: 300 }}
                                 onValueChanged={(e) => onValueChanged(e, 'UOM')}
                                 validationStatus={invalid.UOM === false ? "valid" : "invalid"}
                             />

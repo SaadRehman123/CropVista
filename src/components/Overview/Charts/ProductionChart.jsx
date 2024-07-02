@@ -1,34 +1,34 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+
 import PieChart, { Legend, Series, Tooltip, Label, Connector, Export, Size } from 'devextreme-react/pie-chart'
 
-const ProductionChart = () => {
+const ProductionChart = ({ selectedYear }) => {
 
-    const dataSource = [
-        {
-            crop: 'Cotton',
-            val: 1000,
-        },
-        {
-            crop: 'Sweet Potato',
-            val: 3000,
-        },
-        {
-            crop: 'Wheat',
-            val: 6000,
-        },
-        {
-            crop: 'Corn',
-            val: 8000,
-        },
-        {
-            crop: 'Rice',
-            val: 5000,
-        },
-        {
-            crop: 'Mustard Seed',
-            val: 2000,
-        }
-    ]
+    const stockEntries = useSelector(state => state.stock.stockEntries)
+
+    const [dataSource, setDataSource] = useState()
+
+    useEffect(() => {
+        const filteredData = stockEntries.filter(stock => {
+            const stockEntryYear = new Date(stock.stockEntryDate).getFullYear()
+            return stockEntryYear === selectedYear && stock.stockEntryTo === "Inventory"
+        })
+
+        const formattedData = filteredData.reduce((acc, stock) => {
+            const existingCrop = acc.find(item => item.crop === stock.stockEntryName)
+            if (existingCrop) {
+                existingCrop.val += stock.stockEntryQuantity
+            }
+            else {
+                acc.push({ crop: stock.stockEntryName, val: stock.stockEntryQuantity })
+            }
+            return acc
+        }, [])
+
+        setDataSource(formattedData)
+    }, [selectedYear])
+
 
     const customizeTooltip = (arg) => {
         return {

@@ -16,7 +16,7 @@ const CreateVendor = () => {
 
     const vendorMasterAction = useSelector(state => state.vendor.vendorMasterAction)
 
-    const [formData, setFormData]= useState({ vendorName:"", vendorGroup:"", vendorType:"", isDisabled: false, vendorAddress:"", vendorNumber:"", vendorEmail: "" })
+    const [formData, setFormData] = useState({ vendorName:"", vendorGroup:"", vendorType:"", isDisabled: false, vendorAddress:"", vendorNumber:"", vendorEmail: "" })
     const [invalid, setInvalid] = useState({ vendorName: false, vendorGroup: false, vendorType: false, vendorAddress: false, vendorNumber: false })
 
     const dispatch = useDispatch()
@@ -89,6 +89,16 @@ const CreateVendor = () => {
                 if(data.success){
                     notify("Vendor Created Successfully", "info", 2000)
                     dispatch(getVendorMaster())
+                    
+                    setFormData({ 
+                        vendorName:"", 
+                        vendorGroup:"", 
+                        vendorType:"",
+                        isDisabled: false,
+                        vendorAddress:"",
+                        vendorNumber:"",
+                        vendorEmail: ""
+                    })
                 }
                 else {
                     notify(data.message, "info", 2000)

@@ -1,34 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+
 import { Chart, CommonSeriesSettings, Export, SeriesTemplate, Size, Title } from 'devextreme-react/chart'
 
 const BarChart = () => {
 
-    const dataSource = [
-        {
-            crop: 'Cotton',
-            acre: 3,
-        },
-        {
-            crop: 'Sweet Potato',
-            acre: 2,
-        },
-        {
-            crop: 'Wheat',
-            acre: 3,
-        },
-        {
-            crop: 'Corn',
-            acre: 4,
-        },
-        {
-            crop: 'Rice',
-            acre: 6,
-        },
-        {
-            crop: 'Mustard Seed',
-            acre: 11,
-        }
-    ]
+    const plannedCrops = useSelector(state => state.crops.plannedCrops)
+    
+    const [dataSource, setDataSource] = useState()
+
+    useEffect(() => {
+        const filteredData = plannedCrops.filter(item => item.status !== "Closed" && item.status !== "Cancelled")
+        const cropMap = filteredData.reduce((acc, item) => {
+            if (acc[item.crop]) {
+                acc[item.crop] += item.acre
+            } else {
+                acc[item.crop] = item.acre
+            }
+            return acc
+        }, {})
+
+        const newDataSource = Object.keys(cropMap).map(crop => ({
+            crop,
+            acre: cropMap[crop],
+        }))
+
+        setDataSource(newDataSource)
+    }, [])
 
     return (
         <Chart

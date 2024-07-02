@@ -75,6 +75,7 @@ const DeletePopup = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
+        
         if(deletePopup.type === "CROP_PLAN") {
             const instance = cropPlanRef.current.instance
             const selectedRow = instance.getSelectedRowsData()

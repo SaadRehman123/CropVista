@@ -13,16 +13,19 @@ const Inventory = () => {
 
     const handleOnCardClick = (id) => {
         if (id === 1) {
-            navigate('/app/warehouse')
+            navigate('/app/Warehouse')
         }
         else if (id === 2) {
-            navigate('/app/resource')
+            navigate('/app/Resources')
         }
         else if (id === 3) {
             navigate('/app/Item_Master')
         }
         else if (id === 4) {
             navigate('/app/Stock_Entries')
+        }
+        else if (id === 5) {
+            navigate('/app/Inventory_Status')
         }
     }
 
@@ -62,4 +65,5 @@ const card = [
     { id: 2, name: "Resource", text: "Efficiently manage your resources with real-time data. Add, update, and delete resources seamlessly to ensure smooth operations and optimal utilization"},
     { id: 3, name: "Item Master", text: "Maintain a comprehensive database of all items with detailed information to streamline procurement, production, and inventory management"},
     { id: 4, name: "Stock Entries", text: "Record and track stock entries to ensure accurate inventory levels and efficient warehouse management"},
+    { id: 5, name: "Inventory Status", text: "Monitor and analyze real-time inventory status to make informed decisions and maintain optimal stock levels throughout operations"}
 ]

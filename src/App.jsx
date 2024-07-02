@@ -17,9 +17,11 @@ import { getWarehouse } from './actions/WarehouseAction'
 import { getPlannedCrops } from './actions/CropsActions'
 import { getInventory } from './actions/InventoryAction'
 import { renderLoadingView } from './actions/ViewActions'
+import { getVendorMaster } from './actions/VendorActions'
 import { getStockEntries } from './actions/StockEntriesAction'
 import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
+import { getPurchaseRequest, getRequestForQuotation, getVendorQuotation } from './actions/PurchaseAction'
 
 import './App.css'
 
@@ -43,7 +45,11 @@ const App = () => {
 		dispatch(getItemMaster()).catch((error) => console.error(error))
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
 		dispatch(getStockEntries()).catch((error) => console.error(error))
+		dispatch(getVendorMaster()).catch((error) => console.error(error))
 		dispatch(getProductionOrder(0)).catch((error) => console.error(error))
+		dispatch(getPurchaseRequest(0)).catch((error) => console.error(error))
+		dispatch(getVendorQuotation(0)).catch((error) => console.error(error))
+		dispatch(getRequestForQuotation(0)).catch((error) => console.error(error))
         setUpApplication()
     }, [login])
 
@@ -59,7 +65,7 @@ const App = () => {
 					if(response.payload.data.success && response.payload.data.result !== null){
 						setAppReady(true)
 						dispatch(renderLoadingView(false))
-						navigate("/app/dashboard")
+						navigate("/app/Dashboard")
 					}
 				}).catch((error) => {
 					console.error(error)

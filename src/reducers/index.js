@@ -8,6 +8,7 @@ import PopupReducer from "./PopupReducer"
 import CropsReducer from "./CropsReducer"
 import SeasonsReducer from "./SeasonsReducer"
 import ResourceReducer from "./ResourceReducer"
+import PurchaseReducer from "./PurchaseReducer"
 import WarehouseReducer from "./WarehouseReducer"
 import InventoryReducer from "./InventoryReducer"
 import ProductionReducer from "./ProductionReducer"
@@ -23,6 +24,7 @@ const rootReducers = combineReducers({
     crops: CropsReducer,
     seasons: SeasonsReducer,
     resource: ResourceReducer,
+    purchase: PurchaseReducer,
     stock: StockEntriesReducer,
     warehouse: WarehouseReducer,
     vendor: VendorMasterReducer,

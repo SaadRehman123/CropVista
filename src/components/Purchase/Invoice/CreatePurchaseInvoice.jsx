@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable jsx-a11y/no-access-key */
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import FormBackground from '../../SupportComponents/FormBackground'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
@@ -190,8 +188,8 @@ const CreatePurchaseInvoice = () => {
                                     <FormLabel>Paid</FormLabel>
                                     <CheckBox
                                         style={{ marginBottom: 7 }}
-                                        value={formData.active}
-                                        onValueChanged={(e) => onValueChanged(e, 'active')}
+                                        value={formData.paid}
+                                        onValueChanged={(e) => onValueChanged(e, 'paid')}
                                     />
                                 </FormGroupItem>
                             </div>

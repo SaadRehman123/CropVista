@@ -26,6 +26,11 @@ const PurchaseInvoice = () => {
         dispatch(purchaseInvoiceActionType({ node: e, type: "UPDATE" }))
         navigate('/app/Create_Purchase_Invoice')
     }
+    
+    const handleOnCreate = (e) => {
+        dispatch(purchaseInvoiceActionType({ node: null, type: "CREATE" }))
+        navigate('/app/Create_Purchase_Invoice')
+    }
 
     const renderGoodsReceiptId = (e) => {
         return (
@@ -88,7 +93,7 @@ const PurchaseInvoice = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Purchase Invoice History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => navigate('/app/Create_Purchase_Invoice')}>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreate()}>
                         <i style={{ marginRight: 10 }} className='fal fa-plus' />
                         Create Purchase Invoice
                     </Button>

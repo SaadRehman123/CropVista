@@ -1,9 +1,10 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import moment from 'moment'
+import notify from 'devextreme/ui/notify'
 import DataSource from 'devextreme/data/data_source'
 import FormBackground from '../../SupportComponents/FormBackground'
-import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
 import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
@@ -11,20 +12,22 @@ import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-lis
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-
-import styled from 'styled-components'
+import { addPurchaseOrder, getPurchaseOrder, getPurchaseRequest, updatePurchaseRequest } from '../../../actions/PurchaseAction'
 
 const CreatePurchaseOrder = () => {
 
     const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
+    const purchaseRequest = useSelector(state => state.purchase.purchaseRequest)
+    const vendorQuotation = useSelector(state => state.purchase.vendorQuotation)
+    const requestForQuotation = useSelector(state => state.purchase.requestForQuotation)
     const purchaseOrderAction = useSelector(state => state.purchase.purchaseOrderAction)
-    
-    const [deletedRows, setDeletedRows] = useState([])
-    const [treeListData, setTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ requiredBy: false, vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", purchaseOrderStatus: "" })
+    const [treeListData, setTreeListData] = useState([])
+    const [vendorDataSource, setVendorDataSource] = useState([])
+
+    const [invalid, setInvalid] = useState({ requiredBy: false, vendorId: false, pr_Id: false })
+    const [formData, setFormData] = useState({ creationDate: "", requiredBy: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", purchaseOrderStatus: "", pr_Id: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
@@ -39,18 +42,20 @@ const CreatePurchaseOrder = () => {
 
     useEffect(() => {
         if (purchaseOrderAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), purchaseOrderStatus: "Pending" }))            
         }
         else if (purchaseOrderAction.type === "UPDATE") {
             setFormData({
-                creationDate: "",
-                requiredBy: "",
-                vendorId: "",
-                vendorName: "",
-                vendorAddress: "",
-                vendorNumber: "",
-                purchaseOrderStatus: ""
-            })            
+                pr_Id: purchaseOrderAction.node.data.pr_Id,
+                creationDate: purchaseOrderAction.node.data.creationDate,
+                requiredBy: purchaseOrderAction.node.data.requiredBy,
+                vendorId: purchaseOrderAction.node.data.vendorId,
+                vendorName: purchaseOrderAction.node.data.vendorName,
+                vendorAddress: purchaseOrderAction.node.data.vendorAddress,
+                vendorNumber: purchaseOrderAction.node.data.vendorNumber,
+                purchaseOrderStatus: purchaseOrderAction.node.data.purchaseOrderStatus
+            })
+            setTreeListData(purchaseOrderAction.node.data.children)
         }
     }, [])
 
@@ -68,17 +73,30 @@ const CreatePurchaseOrder = () => {
                     vendorAddress: vendor.vendorAddress,
                     vendorNumber: vendor.vendorNumber
                 }))
+
+                const items = value.children.map(item => {
+                    delete item.vq_Id
+                    delete item.vq_ItemId
+
+                    return {
+                        ...item,
+                        pro_Id: "",
+                        pro_ItemId: ""
+                    }
+                })
+
+                setTreeListData(items)
             }
         }
-        else {
-            setFormData((prevState) => ({ ...prevState, [name]: value }))
-        }
+        else if(name === "pr_Id"){
+            const id = requestForQuotation.find(item => item.pr_Id === value)
+            const date = purchaseRequest.find(item => item.purchaseRequestId === value)
 
-        if (name === "requiredBy") {
-            setInvalid((prevInvalid) => ({
-                ...prevInvalid,
-                requiredBy: value === "" || !value ? true : false
-            }))
+            if(id){
+                setFormData((prevState) => ({ ...prevState, [name]: value, requiredBy: date ? date.pR_RequiredBy : "" }))
+                const arr = vendorQuotation.filter((item) => item.rfq_Id === id.rfq_Id)
+                setVendorDataSource(arr)
+            }
         }
     }
 
@@ -100,53 +118,69 @@ const CreatePurchaseOrder = () => {
                 [name]: formData[name].trim() === "" ? true : false
             }))
         }
-    }
-
-    const handleOnAddRow = () => {
-        const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
-        const newRow = getPurchaseOrderObj(newClientID)
-        setTreeListData([...treeListData, newRow])
-    }
-
-    const handleOnRowRemove = (e) => {
-        const deletedRow = treeListData.find(item => item.clientId === e.row.key)
-        setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
-
-        const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
-        setTreeListData(updatedData)
-        
-        purchaseOrderDataSource.store().remove(e.row.key).then(() => {
-            purchaseOrderDataSource.reload()
-        })
-    }
-
-    const handleOnItemValueChanged = (e) => {
-        let value = e.value
-
-        if(value === null){
-            value = ""
-        }
-
-        const instance = treelistRef.current.instance
-        const selectRow = instance.getSelectedRowsData()[0]
-
-        if (selectRow) {
-            
-            const selectedItem = itemMaster.find((item) => item.itemId === value)
-
-            if (selectedItem) {
-                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, rate: selectedItem.sellingRate }
-    
-                purchaseOrderDataSource.store().update(selectRow.clientId, updatedData).then(() => {
-                    purchaseOrderDataSource.reload()
-                })
-            }
+        else if(name === "pr_Id") {
+            setInvalid((prevInvalid) => ({
+                ...prevInvalid,
+                [name]: formData[name].trim() === "" ? true : false
+            }))
         }
     }
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
     
+        if (formData.requiredBy === "" || formData.pr_Id === "" || formData.vendorId === "") {
+            return notify("Form fields cannot be empty", "error", 2000)
+        }
+
+        if (invalid.requiredBy === true || invalid.vendorId === true || invalid.pr_Id === true) {
+            return notify("Please correct the invalid fields", "error", 2000)
+        }
+
+        const purchaseOrder = {
+            pro_Id: "",
+            creationDate : moment(formData.creationDate).format('YYYY-MM-DD'),
+            requiredBy : moment(formData.requiredBy).format('YYYY-MM-DD'),
+            pr_Id : formData.pr_Id,
+            vendorId : formData.vendorId,
+            vendorName : formData.vendorName,
+            vendorAddress : formData.vendorAddress,
+            vendorNumber : formData.vendorNumber,
+            purchaseOrderStatus : "Created",
+            total : calculateTotal(),
+            children: [...treeListData]
+        }
+
+        if (purchaseOrderAction.type === "CREATE") {
+            dispatch(addPurchaseOrder(purchaseOrder)).then((res) => {
+                const response = res.payload.data
+                if(response.success){
+
+                    const pr = purchaseRequest.find(item => item.purchaseRequestId === formData.pr_Id)
+                    if(pr){
+                        dispatch(updatePurchaseRequest({ ...pr, pR_Status: "Ordered" }, pr.purchaseRequestId)).then((resX) => {
+                            if(resX.payload.data.success){
+                                dispatch(getPurchaseRequest(0))
+                            }
+                        })
+                    }
+
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        pr_Id: "",
+                        requiredBy: "",
+                        vendorId: "",
+                        vendorName: "",
+                        vendorAddress: "",
+                        vendorNumber: ""
+                    }))
+                    setTreeListData([])
+                    setVendorDataSource([])
+                    dispatch(getPurchaseOrder(0))
+                    notify("Purchase Order Created Successfully")
+                }
+            })
+        }
     }
 
     const renderContent = () => {
@@ -174,76 +208,10 @@ const CreatePurchaseOrder = () => {
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
                                         value={formData.creationDate}
+                                        validationStatus={"valid"}
                                     />
                                 </FormGroupItem>
 
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Id</FormLabel>
-                                    <SelectBox
-                                        elementAttr={{
-                                            class: "form-selectbox"
-                                        }}
-                                        searchTimeout={200}
-                                        accessKey={'vendorId'}
-                                        searchEnabled={true}
-                                        displayExpr={'vendorId'}
-                                        searchMode={'contains'}
-                                        searchExpr={'vendorName'}
-                                        dataSource={vendorMaster.filter((vendor) => vendor.isDisabled === false).map((item) => {
-                                            return {
-                                                vendorId: item.vendorId,
-                                                vendorName: item.vendorName
-                                            }
-                                        })}
-                                        value={formData.vendorId}
-                                        openOnFieldClick={true}
-                                        acceptCustomValue={true}
-                                        onFocusIn={handleOnFocusIn}
-                                        onFocusOut={handleOnFocusOut}
-                                        itemRender={(e) => {
-                                            return (
-                                                <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                                                    <span>{e.vendorId}</span>
-                                                    <span style={{ marginLeft: "auto", }}>
-                                                        {e.vendorName}
-                                                    </span>
-                                                </div>
-                                            )
-                                        }}
-                                        placeholder={"Select Vendor"}
-                                        dropDownOptions={{ maxHeight: 300 }}
-                                        onValueChanged={(e) => onValueChanged(e, 'vendorId')}
-                                        validationStatus={invalid.vendorId === false ? "valid" : "invalid"}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Address</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorAddress'}
-                                        placeholder={"Enter Address"}
-                                        value={formData.vendorAddress}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Status</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'purchaseOrderStatus'}
-                                        value={formData.purchaseOrderStatus}
-                                        placeholder={'Status'}
-                                    />
-                                </FormGroupItem>
-                            </div>
-                            <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Required By</FormLabel>
                                     <DateBox
@@ -255,11 +223,11 @@ const CreatePurchaseOrder = () => {
                                         accessKey={'requiredBy'}
                                         openOnFieldClick={true}
                                         value={formData.requiredBy}
+                                        readOnly={true}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
                                         validationMessagePosition={"bottom"}
-                                        onValueChanged={(e) => onValueChanged(e, 'requiredBy')}
-                                        validationStatus={invalid.requiredBy === false ? "valid" : "invalid"}
+                                        validationStatus={"valid"}
                                     />
                                 </FormGroupItem>
 
@@ -277,6 +245,111 @@ const CreatePurchaseOrder = () => {
                                 </FormGroupItem>
 
                                 <FormGroupItem>
+                                    <FormLabel>Vendor Address</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'vendorAddress'}
+                                        placeholder={"Enter Address"}
+                                        value={formData.vendorAddress}
+                                    />
+                                </FormGroupItem>
+                            </div>
+                            
+                            <div style={{width: 500, margin: "0 20px"}}>
+                                <FormGroupItem>
+                                    <FormLabel>Purchase Request</FormLabel>
+                                    {purchaseOrderAction.type !== "UPDATE" ? 
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            searchEnabled={true}
+                                            searchMode={'contains'}
+                                            accessKey={'pr_Id'}
+                                            dataSource={purchaseRequest.filter((purchase) => purchase.pR_Status === "RFQ Created").map((item) => {
+                                                return item.purchaseRequestId
+                                            })}
+                                            disabled={purchaseRequest.filter((purchase) => purchase.pR_Status === "RFQ Created").length === 0 ? true : false}
+                                            value={formData.pr_Id}
+                                            openOnFieldClick={true}
+                                            onFocusIn={handleOnFocusIn}
+                                            onFocusOut={handleOnFocusOut}
+                                            placeholder={"Select Purchase Request"}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            onValueChanged={(e) => onValueChanged(e, 'pr_Id')}
+                                            validationStatus={invalid.pr_Id === false ? "valid" : "invalid"}
+                                        />
+                                        : 
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'pr_Id'}
+                                            placeholder='Select PR-Id'
+                                            value={formData.pr_Id}
+                                        />
+                                    }
+                                </FormGroupItem>
+
+                                <FormGroupItem>
+                                    <FormLabel>Vendor Id</FormLabel>
+                                    {purchaseOrderAction.type !== "UPDATE" ? 
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            accessKey={'vendorId'}
+                                            searchEnabled={true}
+                                            displayExpr={'vendorId'}
+                                            searchMode={'contains'}
+                                            searchExpr={'vendorName'}
+                                            disabled={vendorDataSource.length === 0 ? true : false}
+                                            dataSource={vendorDataSource.map((item) => {
+                                                return {
+                                                    vendorId: item.vendorId,
+                                                    vendorName: item.vendorName,
+                                                    children: item.children
+                                                }
+                                            })}
+                                            value={formData.vendorId}
+                                            openOnFieldClick={true}
+                                            acceptCustomValue={true}
+                                            onFocusIn={handleOnFocusIn}
+                                            onFocusOut={handleOnFocusOut}
+                                            itemRender={(e) => {
+                                                return (
+                                                    <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
+                                                        <span>{e.vendorId}</span>
+                                                        <span style={{ marginLeft: "auto", }}>
+                                                            {e.vendorName}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            }}
+                                            placeholder={"Select Vendor"}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            onValueChanged={(e) => onValueChanged(e, 'vendorId')}
+                                            validationStatus={invalid.vendorId === false ? "valid" : "invalid"}
+                                        />
+                                        :
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'vendorId'}
+                                            value={formData.vendorId}
+                                        />
+                                    }
+                                </FormGroupItem>
+
+                                <FormGroupItem>
                                     <FormLabel>Vendor Contact</FormLabel>
                                     <TextBox
                                         elementAttr={{
@@ -289,11 +362,26 @@ const CreatePurchaseOrder = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 45 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {purchaseOrderAction.type === "UPDATE" ? "Update" : "Save"} Purchase Order
-                                    </Button>
-                                </FormButtonContainer>
+                                <FormGroupItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'purchaseOrderStatus'}
+                                        value={formData.purchaseOrderStatus}
+                                        placeholder={'Status'}
+                                    />
+                                </FormGroupItem>
+
+                                {purchaseOrderAction.type !== "UPDATE" && (
+                                    <FormButtonContainer style={{ marginTop: 30 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            Save Purchase Order
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
                             </div>
                         </div>
                     </FormGroupContainer>
@@ -348,10 +436,6 @@ const CreatePurchaseOrder = () => {
         }
     }
 
-    const renderActionHeaderCell = (e) => {
-        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
-    }
-
     const renderHeaderCell = (e) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 8 }}>
@@ -397,27 +481,6 @@ const CreatePurchaseOrder = () => {
         const selectedIds = treeListData.map(item => item.itemId)
         return itemMaster.filter(item => item.itemType === "Raw Material" && item.disable === false && !selectedIds.includes(item.itemId))
     }
-    
-    const renderItemIdCell = (e) => {
-        const filteredDataSource = filterItems()
-
-        return (
-            <SelectBoxTreelist
-                event={e}
-                valueExpr={"itemId"}
-                searchExpr={"itemName"}
-                itemRender={(e) => renderItems(e)}
-                renderType={"itemId"}
-                displayExpr={"itemId"}
-                dataSource={filteredDataSource}
-                placeholder={"Choose Item"}
-                noDataText={"Item Not Present"}
-                handleOnValueChanged={handleOnItemValueChanged}
-                renderContent={() => renderItemContent(e)}
-                disabled={false}
-            />
-        )
-    }
 
     const renderQuantityColumn = ({ data }) => {
         return (
@@ -460,17 +523,6 @@ const CreatePurchaseOrder = () => {
         )
     }
 
-    const renderActionColumn = (e) => {
-        return (
-            <ActionCellContainer>
-                <button
-                    title='Delete Item'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => handleOnRowRemove(e)} />
-            </ActionCellContainer>
-        )
-    }
-
     const renderTreelist = () => {
         return (
             <Fragment>
@@ -478,7 +530,6 @@ const CreatePurchaseOrder = () => {
                     <Header>
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
-                    <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
                 </div>
 
                 <TreeList
@@ -517,9 +568,8 @@ const CreatePurchaseOrder = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
-                        cellRender={renderItemIdCell}
-                        editCellRender={renderItemIdCell}
+                        allowEditing={false}
+                        cellRender={renderItemContent}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -540,7 +590,7 @@ const CreatePurchaseOrder = () => {
                         dataField={"itemQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={false}
                         editorOptions={"dxNumberBox"}
                         cellRender={renderQuantityColumn}
                         headerCellRender={renderHeaderCell}
@@ -579,19 +629,6 @@ const CreatePurchaseOrder = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
-                    <Column
-                        width={75}
-                        minWidth={75}
-                        caption={"Actions"}
-                        dataField={"actions"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        allowEditing={false}
-                        cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
-                        cssClass={"project-treelist-column"}
-                    />
                 </TreeList>
                 {renderTotal()}
                 {renderTotalQuantity()}
@@ -605,45 +642,3 @@ const CreatePurchaseOrder = () => {
 }
 
 export default CreatePurchaseOrder
-
-const getPurchaseOrderObj = (clientId) => {
-    return {
-        itemId: "",
-        itemName: "",
-        itemQuantity: 1,
-        uom: "",
-        rate: "",
-        amount: "",
-        clientId: clientId
-    }
-}
-
-const ActionCellContainer = styled.div`
-    display: flex;
-    font-size: 16px;
-    align-items: center;
-    justify-content: space-evenly;
-`
-
-const AddButton = styled.button`
-    font-size: 13px;
-        
-    color: #4285f4b5;
-    background-color: #FFFFFF;
-
-    border: 1px solid #eeeeee; 
-    cursor: pointer;
-
-    width: auto;
-    height: 30px;
-    margin: 10px;
-    border-radius: 5px;
-
-    transition: 0.2s background-color, color;
-    &:hover,
-    &:focus,
-    &:focus-within {
-        background-color: #4285f4b5;
-        color: #FFFFFF;
-    }
-`

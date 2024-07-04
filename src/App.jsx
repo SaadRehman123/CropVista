@@ -21,7 +21,7 @@ import { getVendorMaster } from './actions/VendorActions'
 import { getStockEntries } from './actions/StockEntriesAction'
 import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
-import { getPurchaseRequest, getRequestForQuotation, getVendorQuotation } from './actions/PurchaseAction'
+import { getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation } from './actions/PurchaseAction'
 
 import './App.css'
 
@@ -46,6 +46,7 @@ const App = () => {
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
 		dispatch(getStockEntries()).catch((error) => console.error(error))
 		dispatch(getVendorMaster()).catch((error) => console.error(error))
+		dispatch(getPurchaseOrder(0)).catch((error) => console.error(error))
 		dispatch(getProductionOrder(0)).catch((error) => console.error(error))
 		dispatch(getPurchaseRequest(0)).catch((error) => console.error(error))
 		dispatch(getVendorQuotation(0)).catch((error) => console.error(error))

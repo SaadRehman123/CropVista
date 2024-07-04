@@ -163,30 +163,6 @@ const CreateVendorQuotation = () => {
         }
     }
 
-    const handleOnItemValueChanged = (e) => {
-        let value = e.value
-
-        if(value === null){
-            value = ""
-        }
-
-        const instance = treelistRef.current.instance
-        const selectRow = instance.getSelectedRowsData()[0]
-
-        if (selectRow) {
-            
-            const selectedItem = itemMaster.find((item) => item.itemId === value)
-
-            if (selectedItem) {
-                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, rate: selectedItem.sellingRate }
-    
-                vendorQuotationDataSource.store().update(selectRow.clientId, updatedData).then(() => {
-                    vendorQuotationDataSource.reload()
-                })
-            }
-        }
-    }
-
     const handleOnSubmit = (e) => {
         e.preventDefault()
     
@@ -248,8 +224,6 @@ const CreateVendorQuotation = () => {
         }
     }
 
-    console.log(vendorDataSource);
-
     const renderContent = () => {
         return(
             <Fragment>
@@ -274,6 +248,7 @@ const CreateVendorQuotation = () => {
                                         accessKey={'creationDate'}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
+                                        validationStatus={"valid"}
                                         value={formData.creationDate}
                                     />
                                 </FormGroupItem>
@@ -519,32 +494,6 @@ const CreateVendorQuotation = () => {
         )
     }
 
-    const filterItems = () => {
-        const selectedIds = treeListData.map(item => item.itemId)
-        return itemMaster.filter(item => item.itemType === "Raw Material" && item.disable === false && !selectedIds.includes(item.itemId))
-    }
-    
-    const renderItemIdCell = (e) => {
-        const filteredDataSource = filterItems()
-
-        return (
-            <SelectBoxTreelist
-                event={e}
-                valueExpr={"itemId"}
-                searchExpr={"itemName"}
-                itemRender={(e) => renderItems(e)}
-                renderType={"itemId"}
-                displayExpr={"itemId"}
-                dataSource={filteredDataSource}
-                placeholder={"Choose Item"}
-                noDataText={"Item Not Present"}
-                handleOnValueChanged={handleOnItemValueChanged}
-                renderContent={() => renderItemContent(e)}
-                disabled={false}
-            />
-        )
-    }
-
     const renderQuantityColumn = ({ data }) => {
         return (
             <CellContainer>
@@ -631,9 +580,8 @@ const CreateVendorQuotation = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
-                        cellRender={renderItemIdCell}
-                        editCellRender={renderItemIdCell}
+                        allowEditing={false}
+                        editCellRender={renderItemContent}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />

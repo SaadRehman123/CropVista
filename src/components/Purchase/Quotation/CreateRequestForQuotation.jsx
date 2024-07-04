@@ -115,7 +115,6 @@ const CreateRequestForQuotation = () => {
     
     const handleOnItemRowRemove = (e) => {
         const deletedRow = itemTreeListData.find(item => item.clientId === e.row.key)
-        console.log(deletedRow);
         if(deletedRow.rfq_itemId !== ""){
             setItemDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
         }
@@ -364,6 +363,7 @@ const CreateRequestForQuotation = () => {
                                         readOnly={true}
                                         value={formData.creationDate}
                                         placeholder={"DD/MM/YYYY"}
+                                        validationStatus={"valid"}
                                         displayFormat={"dd/MM/yyyy"}
                                     />
                                 </FormGroupItem>

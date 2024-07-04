@@ -225,7 +225,7 @@ const CreateGoodReceipt = () => {
 
     const calculateTotal = () => {
         return treeListData.reduce((sum, item) => {
-            const total = item.acceptedQuantity * item.rate
+            const total = item.quantity * item.rate
             return sum + total
         }, 0)
     }
@@ -249,7 +249,7 @@ const CreateGoodReceipt = () => {
 
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (!data.acceptedQuantity) data.acceptedQuantity = 0
+        if (!data.quantity) data.quantity = 0
         if (!data.rate) data.rate = 0
 
         //For Now
@@ -260,7 +260,7 @@ const CreateGoodReceipt = () => {
 
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
-            if (e.column.dataField === "acceptedQuantity") {
+            if (e.column.dataField === "quantity") {
                 if (e.value < 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
@@ -298,11 +298,11 @@ const CreateGoodReceipt = () => {
         )
     }
 
-    const renderAcceptedQuantityColumn = ({ data }) => {
+    const renderQuantityColumn = ({ data }) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {data.acceptedQuantity}
+                    {data.quantity}
                 </CellContent>
             </CellContainer>
         )
@@ -319,7 +319,7 @@ const CreateGoodReceipt = () => {
     }
 
     const renderAmountCell = ({ data }) => {
-        const value = data.acceptedQuantity * data.rate
+        const value = data.quantity * data.rate
         return (
             <CellContainer>
                 <CellContent>
@@ -393,13 +393,13 @@ const CreateGoodReceipt = () => {
                     />
                         
                     <Column
-                        caption={"Accepted Quantity"}
-                        dataField={"acceptedQuantity"}
+                        caption={"Quantity"}
+                        dataField={"quantity"}
                         alignment={"left"}
                         allowSorting={false}
                         allowEditing={true}
                         editorOptions={"dxNumberBox"}
-                        cellRender={renderAcceptedQuantityColumn}
+                        cellRender={renderQuantityColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

@@ -193,6 +193,31 @@ export const updateVendorQuotation = (obj, id) => {
     }
 }
 
+export const getPurchaseOrder = (id) => {
+    const result = axios({
+        method: 'GET',
+        url: `rest/purchaseOrder/getPurchaseOrder/${id}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_PURCHASE_ORDER',
+        payload: result
+    }
+}
+
+export const addPurchaseOrder = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/purchaseOrder/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_PURCHASE_ORDER',
+        payload: result
+    }
+}
+
 export const purchaseRequestActionType = (obj) => {
     return {
         type: "PURCHASE_REQUEST_ACTION_TYPE",

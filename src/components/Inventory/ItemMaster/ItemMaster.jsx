@@ -155,7 +155,7 @@ const ItemMaster = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Item ID"}
+                        caption={"Item-Id"}
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}

@@ -74,8 +74,6 @@ const CreateVendorQuotation = () => {
                 rfq_Id: vendorQuotationAction.node.data.rfq_Id
             })
 
-            console.log(vendorQuotationAction.node.data.children);
-
             setTreeListData(vendorQuotationAction.node.data.children)
         }
     }, [])
@@ -608,7 +606,7 @@ const CreateVendorQuotation = () => {
                         dataField={"itemQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={false}
                         editorOptions={"dxNumberBox"}
                         cellRender={renderQuantityColumn}
                         headerCellRender={renderHeaderCell}

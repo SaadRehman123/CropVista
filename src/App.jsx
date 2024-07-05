@@ -21,7 +21,7 @@ import { getVendorMaster } from './actions/VendorActions'
 import { getStockEntries } from './actions/StockEntriesAction'
 import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
-import { getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation } from './actions/PurchaseAction'
+import { getGoodReceipt, getPurchaseInvoice, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation } from './actions/PurchaseAction'
 
 import './App.css'
 
@@ -51,6 +51,7 @@ const App = () => {
 		dispatch(getProductionOrder(0)).catch((error) => console.error(error))
 		dispatch(getPurchaseRequest(0)).catch((error) => console.error(error))
 		dispatch(getVendorQuotation(0)).catch((error) => console.error(error))
+		dispatch(getPurchaseInvoice(0)).catch((error) => console.error(error))
 		dispatch(getRequestForQuotation(0)).catch((error) => console.error(error))
         setUpApplication()
     }, [login])

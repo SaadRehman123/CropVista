@@ -5,7 +5,6 @@ import moment from 'moment'
 import notify from 'devextreme/ui/notify'
 import DataSource from 'devextreme/data/data_source'
 import FormBackground from '../../SupportComponents/FormBackground'
-import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
 import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
@@ -17,7 +16,6 @@ import { addVendorQuotation, getVendorQuotation, updateVendorQuotation } from '.
 
 const CreateVendorQuotation = () => {
 
-    const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
     const vendorQuotation = useSelector(state => state.purchase.vendorQuotation)
     const requestForQuotation = useSelector(state => state.purchase.requestForQuotation)
@@ -75,6 +73,9 @@ const CreateVendorQuotation = () => {
                 vendorQuotationStatus: vendorQuotationAction.node.data.vq_Status,
                 rfq_Id: vendorQuotationAction.node.data.rfq_Id
             })
+
+            console.log(vendorQuotationAction.node.data.children);
+
             setTreeListData(vendorQuotationAction.node.data.children)
         }
     }, [])
@@ -94,9 +95,6 @@ const CreateVendorQuotation = () => {
                 const uniqueItemData = RFQ.childrenItems.reduce((acc, current) => {
                     if (!acc.some(item => item.rfq_ItemId === current.rfq_ItemId)) {
                         let newItem = { ...current }
-                        
-                        delete newItem.rfq_Id
-                        delete newItem.rfq_ItemId
                 
                         acc.push({
                             ...newItem,
@@ -115,6 +113,7 @@ const CreateVendorQuotation = () => {
                     }
                     return acc
                 }, [])
+
 
                 setTreeListData([...uniqueItemData])
                 setVendorDataSource([...uniqueVendorData])
@@ -209,6 +208,13 @@ const CreateVendorQuotation = () => {
                         vendorAddress: "",
                         vendorNumber: ""
                     }))
+                    setTreeListData(
+                        response.result.children.map((item) => {
+                            item.rate = 0
+
+                            return item
+                        })
+                    )
                     dispatch(getVendorQuotation(0))
                     setVendorDataSource(updatedVendorDataSource)
                     notify("Vendor Quotation Created Successfully")

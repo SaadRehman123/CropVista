@@ -196,10 +196,15 @@ const CreatePlan = () => {
 
         const dataSource = crops.filter(item => {
             const cropPlans = plannedCrops.filter(cropItem => cropItem.itemId === item.cropId)
-            const hasClosedOrCancelled = cropPlans.some(cropItem => ["Closed", "Cancelled"].includes(cropItem.status))
-            const hasExcludedStatuses = cropPlans.some(cropItem => ["Pending", "Planned", "Release", "Completed"].includes(cropItem.status))
-        
-            return hasClosedOrCancelled && !hasExcludedStatuses
+            if(cropPlans.length === 0){
+                return cropPlans
+            }
+            else {
+                const hasClosedOrCancelled = cropPlans.some(cropItem => ["Closed", "Cancelled"].includes(cropItem.status))
+                const hasExcludedStatuses = cropPlans.some(cropItem => ["Pending", "Planned", "Release", "Completed"].includes(cropItem.status))
+            
+                return hasClosedOrCancelled && !hasExcludedStatuses
+            }
         }).map(item => item.name)
         
         return (

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Button } from 'reactstrap'
+import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
@@ -80,10 +80,11 @@ const RequestForQuotation = () => {
 
     const renderStatusColumn = (e) => {
         return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.rfq_Status}
-                </CellContent>
+            <CellContainer style={{ alignItems: 'center' }}>
+                <Badge className={"status-badge"} color={setColor(e)}>
+                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
+                    <span>{e.data.rfq_Status}</span>
+                </Badge>
             </CellContainer>
         )
     }
@@ -178,6 +179,8 @@ const RequestForQuotation = () => {
                     />
 
                     <Column
+                        width={110}
+                        minWidth={110}
                         caption={"Status"}
                         dataField={"rfq_Status"}
                         alignment={"left"}
@@ -230,3 +233,16 @@ const ActionCellContainer = styled.div`
     align-items: center;
     justify-content: space-evenly;
 `
+
+const setColor = (e) => {
+    let color
+
+    if(e.data.rfq_Status === "Created"){
+        color = 'success'
+    }
+    else if(e.data.rfq_Status === "Cancelled"){
+        color = 'danger'
+    }
+
+    return color
+}

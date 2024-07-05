@@ -6,7 +6,7 @@ import moment from 'moment'
 import styled from 'styled-components'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Button } from 'reactstrap'
+import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
@@ -79,10 +79,11 @@ const GoodReceipt = () => {
     
     const renderStatusColumn = (e) => {
         return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.gr_Status}
-                </CellContent>
+            <CellContainer style={{ alignItems: 'center' }}>
+                <Badge className={"status-badge"} color={setColor(e)}>
+                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
+                    <span>{e.data.gr_Status}</span>
+                </Badge>
             </CellContainer>
         )
     }
@@ -177,6 +178,8 @@ const GoodReceipt = () => {
                     />
                         
                     <Column
+                        width={115}
+                        minWidth={115}
                         caption={"Status"}
                         dataField={"gr_Status"}
                         alignment={"left"}
@@ -229,3 +232,22 @@ const ActionCellContainer = styled.div`
     align-items: center;
     justify-content: space-evenly;
 `
+
+const setColor = (e) => {
+    let color
+
+    if(e.data.gr_Status === "Created"){
+        color = 'info'
+    }
+    else if(e.data.gr_Status === "Un-Paid"){
+        color = 'warning'
+    }
+    else if(e.data.gr_Status === "Paid"){
+        color = 'success'
+    }
+    else if(e.data.gr_Status === "Cancelled"){
+        color = 'danger'
+    }
+
+    return color
+}

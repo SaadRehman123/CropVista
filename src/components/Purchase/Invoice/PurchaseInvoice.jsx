@@ -5,18 +5,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Button } from 'reactstrap'
+import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { toggleDeletePopup } from '../../../actions/ViewActions'
-import { getPurchaseInvoice, purchaseInvoiceActionType } from '../../../actions/PurchaseAction'
+import { getGoodReceipt, getPurchaseInvoice, purchaseInvoiceActionType, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
 
 const PurchaseInvoice = () => {
 
+    const goodReceipt = useSelector((state) => state.purchase.goodReceipt)
     const purchaseInvoice = useSelector(state => state.purchase.purchaseInvoice)
 
     const navigate = useNavigate()
@@ -26,6 +27,34 @@ const PurchaseInvoice = () => {
 
     useEffect(() => {
         dispatch(getPurchaseInvoice(0))
+    }, [])
+
+    useEffect(() => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const pastDueDateInvoices = purchaseInvoice.filter(item => {
+            const dueDate = new Date(item.dueDate)
+            dueDate.setHours(0, 0, 0, 0)
+            return dueDate < today
+        }).filter((pi) => pi.pi_Status === "Un-Paid")
+        
+        if(pastDueDateInvoices.length !== 0){
+            pastDueDateInvoices.forEach((item) => {
+                item.pi_Status = "Over-Due"
+                dispatch(updatePurchaseInvoice(item, item.pi_Id)).then((res) => {
+                    if(res.payload.data.success){
+                        const gr = goodReceipt.find(item => item.gr_Id === res.payload.data.result.gr_Id)
+                        dispatch(updateGoodReceipt({ ...gr, gr_Status: "Over-Due" }, gr.gr_Id)).then((resX) => {
+                            if(resX.payload.data.success){
+                                dispatch(getGoodReceipt(0))
+                            }
+                        })
+                    }
+                })
+            })
+        }
+        
     }, [])
 
     const handleOnEditClick = (e) => {
@@ -80,10 +109,11 @@ const PurchaseInvoice = () => {
 
     const renderStatusColumn = (e) => {
         return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.pi_Status}
-                </CellContent>
+            <CellContainer style={{ alignItems: 'center' }}>
+                <Badge className={"status-badge"} color={setColor(e)}>
+                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
+                    <span>{e.data.pi_Status}</span>
+                </Badge>
             </CellContainer>
         )
     }
@@ -178,6 +208,8 @@ const PurchaseInvoice = () => {
                     />
 
                     <Column
+                        width={115}
+                        minWidth={115}
                         caption={"Status"}
                         dataField={"pi_Status"}
                         alignment={"left"}
@@ -230,3 +262,22 @@ const ActionCellContainer = styled.div`
     align-items: center;
     justify-content: space-evenly;
 `
+
+const setColor = (e) => {
+    let color
+
+    if(e.data.pi_Status === "Un-Paid"){
+        color = 'warning'
+    }
+    else if(e.data.pi_Status === "Paid"){
+        color = 'success'
+    }
+    else if(e.data.pi_Status === "Over-Due"){
+        color = 'danger'
+    }
+    else if(e.data.pi_Status === "Cancelled"){
+        color = 'danger'
+    }
+
+    return color
+}

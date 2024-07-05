@@ -9,9 +9,9 @@ import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 import ProductionOrderReport from '../../Reports/ProductionOrderReport'
 
-import { Button } from 'reactstrap'
+import { Badge, Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { getBom } from '../../../actions/BomActions'
 import { getPlannedCrops } from '../../../actions/CropsActions'
@@ -131,10 +131,11 @@ const ProductionOrder = () => {
 
     const renderStatusColumn = (e) => {
         return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.status}
-                </CellContent>
+            <CellContainer style={{ alignItems: 'center' }}>
+                <Badge className={"status-badge"} color={setColor(e)}>
+                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
+                    <span>{e.data.status}</span>
+                </Badge>
             </CellContainer>
         )
     }
@@ -268,6 +269,8 @@ const ProductionOrder = () => {
                     />
 
                     <Column
+                        width={110}
+                        minWidth={110}
                         caption={"Status"}
                         dataField={"status"}
                         alignment={"left"}
@@ -307,16 +310,21 @@ const ActionCellContainer = styled.div`
     justify-content: space-evenly;
 `
 
-const Header = styled.div`
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-`
+const setColor = (e) => {
+    let color
 
-const HeaderSpan = styled.span`
-    color: #495057;
-    font-size: 16px;
-    font-weight: 500;
-    font-family: 'RobotoFallback';
-`
+    if(e.data.status === "Pending"){
+        color = 'warning'
+    }
+    else if(e.data.status === "Release"){
+        color = 'info'
+    }
+    else if(e.data.status === "Completed"){
+        color = 'success'
+    }
+    else if(e.data.status === "Closed"){
+        color = 'danger'
+    }
+
+    return color
+}

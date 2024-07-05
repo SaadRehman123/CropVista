@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Button } from 'reactstrap'
+import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
@@ -65,10 +65,11 @@ const PurchaseRequest = () => {
 
     const renderStatusColumn = (e) => {
         return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.pR_Status}
-                </CellContent>
+             <CellContainer style={{ alignItems: 'center' }}>
+                <Badge className={"status-badge"} color={setColor(e)}>
+                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
+                    <span>{e.data.pR_Status}</span>
+                </Badge>
             </CellContainer>
         )
     }
@@ -156,6 +157,8 @@ const PurchaseRequest = () => {
                     />
 
                     <Column
+                        width={110}
+                        minWidth={110}
                         caption={"Status"}
                         dataField={"PR_Status"}
                         alignment={"left"}
@@ -208,3 +211,22 @@ const ActionCellContainer = styled.div`
     align-items: center;
     justify-content: space-evenly;
 `
+
+const setColor = (e) => {
+    let color
+
+    if(e.data.pR_Status === "Created"){
+        color = 'secondary'
+    }
+    else if(e.data.pR_Status === "RFQ Created"){
+        color = 'info'
+    }
+    else if(e.data.pR_Status === "Ordered"){
+        color = 'success'
+    }
+    else if(e.data.pR_Status === "Cancelled"){
+        color = 'danger'
+    }
+
+    return color
+}

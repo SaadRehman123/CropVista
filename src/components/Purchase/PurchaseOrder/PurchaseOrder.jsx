@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Button } from 'reactstrap'
+import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
@@ -80,10 +80,11 @@ const PurchaseOrder = () => {
     
     const renderStatusColumn = (e) => {
         return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.purchaseOrderStatus}
-                </CellContent>
+            <CellContainer style={{ alignItems: 'center' }}>
+                <Badge className={"status-badge"} color={setColor(e)}>
+                    <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
+                    <span>{e.data.purchaseOrderStatus}</span>
+                </Badge>
             </CellContainer>
         )
     }
@@ -178,6 +179,8 @@ const PurchaseOrder = () => {
                     />
                         
                     <Column
+                        width={120}
+                        minWidth={120}
                         caption={"Status"}
                         dataField={"purchaseOrderStatus"}
                         alignment={"left"}
@@ -230,3 +233,19 @@ const ActionCellContainer = styled.div`
     align-items: center;
     justify-content: space-evenly;
 `
+
+const setColor = (e) => {
+    let color
+
+    if(e.data.purchaseOrderStatus === "Created"){
+        color = 'success'
+    }
+    else if(e.data.purchaseOrderStatus === "GR Created"){
+        color = 'info'
+    }
+    else if(e.data.purchaseOrderStatus === "Cancelled"){
+        color = 'danger'
+    }
+
+    return color
+}

@@ -10,25 +10,30 @@ import { FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } fro
 import { addCrops } from '../../actions/CropsActions'
 import { toggleCreateItemPopup } from '../../actions/PopupActions'
 import { addItemMaster, getItemMaster, updateItemMaster } from '../../actions/ItemActions'
+import { addInventory, getInventory, updateInventory } from '../../actions/InventoryAction'
 
 const CreateItem = () => {
 
     const itemMaster = useSelector(state => state.item.itemMaster)
+    const warehouses = useSelector(state => state.warehouse.warehouses)
     const itemMasterRef = useSelector(state => state.view.itemMasterRef)
+    const inventory = useSelector(state => state.inventory.inventoryStatus)
     const createItemPopup = useSelector(state => state.popup.toggleCreateItemPopup)
 
     const [itemType, setItemType] = useState("")
-    const [formData, setFormData]= useState({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "" })
-    const [invalid, setInvalid] = useState({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false })
-
+    const [formData, setFormData]= useState({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "", warehouseId: "" })
+    const [invalid, setInvalid] = useState({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false, warehouseId: false })
+    
+    const [warehouseDateSource, setWarehouseDateSource]= useState([])
+    
     const dispatch = useDispatch()
 
     const toggle = () => {
         dispatch(toggleCreateItemPopup({ open: false, type: "" }))
 
         setItemType("")
-        setFormData({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "" })
-        setInvalid({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false })
+        setFormData({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "", warehouseId: "" })
+        setInvalid({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false, warehouseId: false })
     }
 
     useEffect(() => {
@@ -43,7 +48,8 @@ const CreateItem = () => {
                 valuationRate: selectedRow[0].valuationRate,
                 active: selectedRow[0].disable,
                 UOM: selectedRow[0].uom,
-                season: selectedRow[0].season
+                season: selectedRow[0].season,
+                warehouseId: selectedRow[0].warehouseId
             })
         }
     }, [createItemPopup.type])
@@ -53,19 +59,42 @@ const CreateItem = () => {
         if (value === null) value = ""
 
         if (name === "itemType") {
+            const warehouse = warehouses.filter((item) => item.wrType === value && item.active === true)
+            
+            if(warehouse.length !== 0) {
+                setWarehouseDateSource(warehouse)
+            }
+            
             setItemType(value)
 
-            if (value === "Raw Material") {
+            if (value === "Raw Material" && createItemPopup.type === "CREATE") {
                 setFormData((prevState) => ({
                     ...prevState,
                     [name]: value,
+                    warehouseId: "" ,
                     season: ""
                 }))
-                return
+            }
+            else if(value === "Finish Good" && createItemPopup.type === "CREATE") {
+                setFormData((prevState) => ({
+                    ...prevState,
+                    [name]: value,
+                    warehouseId: ""
+                }))
             }
         }
+        else {
+            setFormData((prevState) => ({ ...prevState, [name]: value }))
+        }
+    }
 
-        setFormData((prevState) => ({ ...prevState, [name]: value }))
+    const onWarehouseChange = (e) => {
+        let value = e.value
+        if (value === null) value = ""
+        
+        if(value && typeof value === "object"){
+            setFormData((prevState) => ({ ...prevState, warehouseId: value.wrId }))
+        }
     }
 
     const handleOnFocusIn = (e) => {
@@ -155,7 +184,8 @@ const CreateItem = () => {
             valuationRate: formData.valuationRate,
             disable: formData.active,
             UOM: formData.UOM,
-            season: formData.season
+            season: formData.season,
+            warehouseId: formData.warehouseId
         }
 
         if (createItemPopup.type === "CREATE") {
@@ -173,8 +203,18 @@ const CreateItem = () => {
                         dispatch(addCrops(crop))
                     }
 
+                    const inventoryItem = {
+                        "inventoryId": "",
+                        "inventoryItem": data.result.itemName,
+                        "inventoryQuantity": 0,
+                        "inventoryWarehouse": data.result.warehouseId
+                    }
+
+                    dispatch(addInventory(inventoryItem))
+
                     instance.getDataSource().store().insert(data.result).then(() => instance.refresh())                    
                     dispatch(getItemMaster())
+                    setWarehouseDateSource([])
                     notify("Item Created Successfully", "info", 2000)
                     toggle()
                 }
@@ -189,6 +229,21 @@ const CreateItem = () => {
                     const data = res.payload.data
                     if(data.success){
                         instance.getDataSource().store().update(data.result.itemId, data.result).then(() => instance.refresh())
+                        
+                        if(inventory.some((item) => item.inventoryItem === data.result.itemName)){
+                            const item = inventory.find((item) => item.inventoryItem === data.result.itemName)
+                            if(item){
+                                dispatch(updateInventory(item.inventoryId, {
+                                    ...item,
+                                    inventoryWarehouse: data.result.warehouseId
+                                })).then((done) => {
+                                    if(done.payload.data.success){
+                                        dispatch(getInventory())
+                                    }
+                                })
+                            }
+                        }
+                        
                         notify("Item Updated Successfully", "info", 2000)
                         dispatch(getItemMaster())
                     }
@@ -205,6 +260,17 @@ const CreateItem = () => {
     const renderHeader = () => {
         if (createItemPopup.type === "CREATE") return "Create Item"
         else if (createItemPopup.type === "UPDATE") return "Update Item"
+    }
+
+    const renderItems = (e) => {
+        return (
+            <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
+                <span>{e.wrId}</span>
+                <span style={{ marginLeft: "auto", }}>
+                    {e.name}
+                </span>
+            </div>
+        )
     }
 
     const renderBody = () => {
@@ -276,6 +342,40 @@ const CreateItem = () => {
                             validationStatus={invalid.season === false || itemType === "Raw Material" ? "valid" : "invalid"}
                         />
                     </FormGroupItem>
+
+                    <FormGroupItem>
+                        <FormLabel>Warehouse</FormLabel>
+                        <SelectBox
+                            elementAttr={{
+                                class: "form-selectbox"
+                            }}
+                            searchTimeout={200}
+                            accessKey={'warehouseId'}
+                            searchEnabled={true}
+                            displayExpr={'wrId'}
+                            searchMode={'contains'}
+                            searchExpr={'name'}
+                            disabled={warehouseDateSource.length === 0 ? true : false}
+                            dataSource={warehouseDateSource.map(item => {
+                                return {
+                                    wrId: item.wrId,
+                                    name: item.name,
+                                    wrType: item.wrType,
+                                    active: item.active
+                                }
+                            })}
+                            value={formData.warehouseId}
+                            openOnFieldClick={true}
+                            acceptCustomValue={true}
+                            onFocusIn={handleOnFocusIn}
+                            onFocusOut={handleOnFocusOut}
+                            placeholder={"Select Warehouse"}
+                            dropDownOptions={{ maxHeight: 300 }}
+                            itemRender={(e) => renderItems(e)}
+                            onValueChanged={(e) => onWarehouseChange(e)}
+                            validationStatus={invalid.warehouseId === false ? "valid" : "invalid"}
+                        />
+                    </FormGroupItem>
                     
                     <div style={{ display: 'flex', justifyContent: "space-between", marginTop: 5, marginBottom: 5 }}>
                         <FormGroupItem>
@@ -340,7 +440,7 @@ const CreateItem = () => {
                                 validationStatus={invalid.UOM === false ? "valid" : "invalid"}
                             />
                         </FormGroupItem>
-
+                        
                         <FormGroupItem style={{ marginTop: 8, marginLeft: 15 }}>
                             <FormLabel>Disable</FormLabel>  
                             <CheckBox

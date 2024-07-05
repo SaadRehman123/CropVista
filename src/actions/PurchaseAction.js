@@ -193,6 +193,69 @@ export const updateVendorQuotation = (obj, id) => {
     }
 }
 
+export const getPurchaseOrder = (id) => {
+    const result = axios({
+        method: 'GET',
+        url: `rest/purchaseOrder/getPurchaseOrder/${id}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_PURCHASE_ORDER',
+        payload: result
+    }
+}
+
+export const addPurchaseOrder = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/purchaseOrder/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_PURCHASE_ORDER',
+        payload: result
+    }
+}
+
+export const updatePurchaseOrder = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/purchaseOrder/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_PURCHASE_ORDER',
+        payload: result
+    }
+}
+
+export const getGoodReceipt = (id) => {
+    const result = axios({
+        method: 'GET',
+        url: `rest/goodReceipt/getGoodReceipt/${id}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_GOOD_RECEIPT',
+        payload: result
+    }
+}
+
+export const addGoodReceipt = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/goodReceipt/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_GOOD_RECEIPT',
+        payload: result
+    }
+}
+
 export const purchaseRequestActionType = (obj) => {
     return {
         type: "PURCHASE_REQUEST_ACTION_TYPE",

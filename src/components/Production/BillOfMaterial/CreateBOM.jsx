@@ -24,9 +24,7 @@ const CreateBOM = () => {
     const bomAction = useSelector(state => state.bom.bomAction)
     const itemMaster = useSelector(state => state.item.itemMaster)
     const resources = useSelector(state => state.resource.resources)
-    const warehouses = useSelector(state => state.warehouse.warehouses)
 
-    const [type, setType] = useState("")
     const [deletedRows, setDeletedRows] = useState([])
     const [treeListData, setTreeListData] = useState([])
     const [itemDataSource, setItemDataSource] = useState({ type: "", dataSource: null })
@@ -95,16 +93,6 @@ const CreateBOM = () => {
                 </div>
             )
         }
-        else if (type === "warehouse") {
-            return (
-                <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                    <span>{e.wrId}</span>
-                    <span style={{ marginLeft: "auto", }}>
-                        {e.name}
-                    </span>
-                </div>
-            )
-        }
     }
 
     const handleOnRowRemove = (e) => {
@@ -121,9 +109,7 @@ const CreateBOM = () => {
 
     const onValueChanged = (e, name) => {
         let value = null
-    
-        if (name === "warehouse") value = e.value.wrId
-        else value = e.value
+        value = e.value
 
         if (name === "itemId") {
             let val = ""
@@ -132,7 +118,9 @@ const CreateBOM = () => {
 
             const selectedItem = itemMaster.find((item) => item.itemId === val)
             const productName = selectedItem ? selectedItem.itemName : ""
-            setFormData(prevState => ({ ...prevState, [name]: value, productDescription: productName }))
+            const warehouseId = selectedItem ? selectedItem.warehouseId : ""
+
+            setFormData(prevState => ({ ...prevState, [name]: value, productDescription: productName, warehouseId: warehouseId }))
         }
         else {
             setFormData(prevState => ({ ...prevState, [name]: value }))
@@ -368,27 +356,14 @@ const CreateBOM = () => {
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Warehouse</FormLabel>
-                                    <SelectBox
+                                    <TextBox
                                         elementAttr={{
-                                            class: "form-selectbox"
+                                            class: "form-textbox"
                                         }}
-                                        searchTimeout={200}
-                                        searchExpr={'name'}
-                                        searchEnabled={true}
-                                        displayExpr={'wrId'}
-                                        searchMode={'contains'}
-                                        dataSource={warehouses.filter((warehouse) => warehouse.wrType === "Finish Good" && warehouse.active === true)}
-                                        openOnFieldClick={true}
-                                        acceptCustomValue={true}
+                                        readOnly={true}
                                         accessKey={'warehouseId'}
-                                        onFocusIn={handleOnFocusIn}
+                                        placeholder='Select Warehouse'
                                         value={formData.warehouseId}
-                                        onFocusOut={handleOnFocusOut}
-                                        placeholder={"Select Warehouse"}
-                                        dropDownOptions={{ maxHeight: 300 }}
-                                        itemRender={(e) => renderItems(e, "warehouse")}
-                                        onValueChanged={(e) => onValueChanged(e, 'warehouseId')}
-                                        validationStatus={invalid.warehouseId === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
 
@@ -516,13 +491,12 @@ const CreateBOM = () => {
                 dataSource: resources
             })
         }
-
-        setType(value)
     }
 
     const handleOnItemValueChanged = (e) => {
         let uom
         let itemName
+        let warehouseId
 
         const value = e.value
         const instance = itemResourceTreeRef.current.instance
@@ -540,30 +514,12 @@ const CreateBOM = () => {
                 const item = itemMaster.find((item) => item.itemId === value)
                 if (item) {
                     itemName = item.itemName
-                    uom = item.uom                    
+                    uom = item.uom
+                    warehouseId = item.warehouseId                 
                 }
             }
 
-            const updatedData = { ...selectRow, id: value, name: itemName, uom: uom }
-
-            itemResourceDatasource.store().update(selectRow.clientId, updatedData).then(() => {
-                itemResourceDatasource.reload()
-            })
-        }
-    }
-
-    const handleOnWarehouseValueChanged = (e) => {
-        let value = e.value
-
-        if(value === null){
-            value = ""
-        }
-
-        const instance = itemResourceTreeRef.current.instance
-        const selectRow = instance.getSelectedRowsData()[0]
-
-        if (selectRow) {
-            const updatedData = { ...selectRow, warehouseId: value }
+            const updatedData = { ...selectRow, id: value, name: itemName, uom: uom, warehouseId: warehouseId }
 
             itemResourceDatasource.store().update(selectRow.clientId, updatedData).then(() => {
                 itemResourceDatasource.reload()
@@ -600,16 +556,6 @@ const CreateBOM = () => {
             <CellContainer>
                 <CellContent>
                     {e.data.id}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderWarehouseContent = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.warehouseId}
                 </CellContent>
             </CellContainer>
         )
@@ -706,20 +652,11 @@ const CreateBOM = () => {
 
     const renderWarehouseCell = (e) => {
         return (
-            <SelectBoxTreelist
-                event={e}
-                valueExpr={"wrId"}
-                searchExpr={"name"}
-                itemRender={(e) => renderItems(e, "warehouse")}
-                renderType={"wrId"}
-                displayExpr={"wrId"}
-                dataSource={warehouses.filter((warehouse) => warehouse.wrType === "Raw Material" && warehouse.active === true)}
-                placeholder={"Choose Type"}
-                noDataText={"Type Not Present"}
-                handleOnValueChanged={handleOnWarehouseValueChanged}
-                renderContent={() => renderWarehouseContent(e)}
-                disabled={type === "Resource" ? true : false}
-            />
+            <CellContainer>
+                <CellContent>
+                    {e.data.warehouseId}
+                </CellContent>
+            </CellContainer>
         )
     }
 
@@ -886,8 +823,8 @@ const CreateBOM = () => {
                         dataField={"warehouseId"}
                         alignment={"left"}
                         allowSorting={false}
+                        allowEditing={false}
                         cellRender={renderWarehouseCell} 
-                        editCellRender={renderWarehouseCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

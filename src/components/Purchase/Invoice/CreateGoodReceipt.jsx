@@ -1,6 +1,8 @@
 import React, { Fragment, useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
+import moment from "moment"
+import notify from "devextreme/ui/notify"
 import DataSource from "devextreme/data/data_source"
 import FormBackground from "../../SupportComponents/FormBackground"
 
@@ -9,17 +11,20 @@ import { DateBox, SelectBox, TextBox, TreeList } from "devextreme-react"
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from "../../SupportComponents/StyledComponents"
 
+import { updateInventory } from "../../../actions/InventoryAction"
 import { assignClientId } from "../../../utilities/CommonUtilities"
+import { addGoodReceipt, getGoodReceipt, getPurchaseOrder, updatePurchaseOrder } from "../../../actions/PurchaseAction"
 
 const CreateGoodReceipt = () => {
 
-    const vendorMaster = useSelector(state => state.vendor.vendorMaster)
+    const inventory = useSelector(state => state.inventory.inventoryStatus)
+    const purchaseOrder = useSelector(state => state.purchase.purchaseOrder)
     const goodReceiptAction = useSelector(state => state.purchase.goodReceiptAction)
 
     const [treeListData, setTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ vendorId: false })
-    const [formData, setFormData] = useState({ creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", goodReceiptStatus: "" })
+    const [invalid, setInvalid] = useState({ pro_Id: false })
+    const [formData, setFormData] = useState({ pro_Id: "", creationDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", goodReceiptStatus: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
@@ -34,17 +39,19 @@ const CreateGoodReceipt = () => {
 
     useEffect(() => {
         if (goodReceiptAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now() }))            
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), goodReceiptStatus: "Pending" }))            
         }
         else if (goodReceiptAction.type === "UPDATE") {
             setFormData({
-                creationDate: "",
-                vendorId: "",
-                vendorName: "",
-                vendorAddress: "",
-                vendorNumber: "",
-                goodReceiptStatus: ""
-            })            
+                pro_Id: goodReceiptAction.node.data.pro_Id,
+                creationDate: goodReceiptAction.node.data.creationDate,
+                vendorId: goodReceiptAction.node.data.vendorId,
+                vendorName: goodReceiptAction.node.data.vendorName,
+                vendorAddress: goodReceiptAction.node.data.vendorAddress,
+                vendorNumber: goodReceiptAction.node.data.vendorNumber,
+                goodReceiptStatus: goodReceiptAction.node.data.gr_Status
+            })
+            setTreeListData(goodReceiptAction.node.data.children) 
         }
     }, [])
 
@@ -52,15 +59,25 @@ const CreateGoodReceipt = () => {
         let value = e.value
         if (value === null) value = ""
 
-        const vendor = vendorMaster.find((vendor) => vendor.vendorId === value.vendorId) 
-        if(vendor){
+        if(value && typeof value === 'object'){
             setFormData((prevState) => ({ 
                 ...prevState,
-                vendorId: vendor.vendorId,
-                vendorName: vendor.vendorName,
-                vendorAddress: vendor.vendorAddress,
-                vendorNumber: vendor.vendorNumber
+                pro_Id: value.pro_Id,
+                vendorId: value.vendorId,
+                vendorName: value.vendorName,
+                vendorAddress: value.vendorAddress,
+                vendorNumber: value.vendorNumber
             }))
+
+            const items = value.children.map(item => {
+                return {
+                    ...item,
+                    gr_Id: "",
+                    gr_ItemId: ""
+                }
+            })
+
+            setTreeListData(items)
         }
     }
 
@@ -76,7 +93,7 @@ const CreateGoodReceipt = () => {
         const name = e.event.target.accessKey
         if (formData[name] === null) formData[name] = ""
         
-        if(name === "vendorId"){
+        if(name === "pro_Id"){
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 [name]: formData[name].trim() === "" ? true : false
@@ -87,6 +104,66 @@ const CreateGoodReceipt = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
     
+        if (formData.pro_Id === "") {
+            return notify("Form fields cannot be empty", "error", 2000)
+        }
+
+        if (invalid.pro_Id === true) {
+            return notify("Please correct the invalid fields", "error", 2000)
+        }
+
+        const goodReceipt = {
+            gr_Id: "",
+            pro_Id : formData.pro_Id,
+            vendorId : formData.vendorId,
+            vendorName : formData.vendorName,
+            vendorAddress : formData.vendorAddress,
+            vendorNumber : formData.vendorNumber,
+            creationDate : moment(formData.creationDate).format('YYYY-MM-DD'),
+            total : calculateTotal(),
+            gr_Status : "Created",
+            children: [...treeListData]
+        }
+
+        if (goodReceiptAction.type === "CREATE") {
+            dispatch(addGoodReceipt(goodReceipt)).then((res) => {
+                const response = res.payload.data
+                if(response.success){
+                    const pro = purchaseOrder.find(item => item.pro_Id === formData.pro_Id)
+                    if(pro){
+                        dispatch(updatePurchaseOrder({ ...pro, purchaseOrderStatus: "GR Created" }, pro.pro_Id)).then((resX) => {
+                            if(resX.payload.data.success){
+                                dispatch(getPurchaseOrder(0))
+                            }
+                        })
+                    }
+
+                    response.result.children.forEach((child) => {
+                        if(inventory.some((item) => item.inventoryItem === child.itemName)){
+                            const item = inventory.find((item) => item.inventoryItem === child.itemName)
+                            if(item){
+                                dispatch(updateInventory(item.inventoryId, {
+                                    ...item,
+                                    inventoryQuantity: item.inventoryQuantity + child.itemQuantity
+                                }))
+                            }
+                        }
+                    })
+
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        pro_Id: "",
+                        vendorId: "",
+                        vendorName: "",
+                        vendorAddress: "",
+                        vendorNumber: ""
+                    }))
+                    setTreeListData([])
+                    dispatch(getGoodReceipt(0))
+                    notify("Good Receipt Created Successfully")
+                }
+            })
+        }
     }
 
     const renderContent = () => {
@@ -101,42 +178,33 @@ const CreateGoodReceipt = () => {
                         <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>
                             <div style={{width: 500, margin: "0 20px 20px 20px"}}>
                                 <FormGroupItem>
-                                    <FormLabel>Vendor Id</FormLabel>
-                                    <SelectBox
+                                    <FormLabel>Creation Date</FormLabel>
+                                    <DateBox
                                         elementAttr={{
-                                            class: "form-selectbox"
+                                            class: "form-datebox",
                                         }}
-                                        searchTimeout={200}
-                                        accessKey={'vendorId'}
-                                        searchEnabled={true}
-                                        displayExpr={'vendorId'}
-                                        searchMode={'contains'}
-                                        searchExpr={'vendorName'}
-                                        dataSource={vendorMaster.filter((vendor) => vendor.isDisabled === false).map((item) => {
-                                            return {
-                                                vendorId: item.vendorId,
-                                                vendorName: item.vendorName
-                                            }
-                                        })}
-                                        value={formData.vendorId}
+                                        type={"date"}
+                                        readOnly={true}
+                                        min={new Date()}
                                         openOnFieldClick={true}
-                                        acceptCustomValue={true}
-                                        onFocusIn={handleOnFocusIn}
-                                        onFocusOut={handleOnFocusOut}
-                                        itemRender={(e) => {
-                                            return (
-                                                <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                                                    <span>{e.vendorId}</span>
-                                                    <span style={{ marginLeft: "auto", }}>
-                                                        {e.vendorName}
-                                                    </span>
-                                                </div>
-                                            )
+                                        accessKey={'creationDate'}
+                                        placeholder={"DD/MM/YYYY"}
+                                        displayFormat={"dd/MM/yyyy"}
+                                        value={formData.creationDate}
+                                        validationStatus={"valid"}
+                                    />
+                                </FormGroupItem>
+
+                                <FormGroupItem>
+                                    <FormLabel>Vendor Id</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
                                         }}
-                                        placeholder={"Select Vendor"}
-                                        dropDownOptions={{ maxHeight: 300 }}
-                                        onValueChanged={(e) => onValueChanged(e, 'vendorId')}
-                                        validationStatus={invalid.vendorId === false ? "valid" : "invalid"}
+                                        readOnly={true}
+                                        accessKey={'vendorId'}
+                                        placeholder={"Enter Address"}
+                                        value={formData.vendorId}
                                     />
                                 </FormGroupItem>
 
@@ -154,23 +222,74 @@ const CreateGoodReceipt = () => {
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Creation Date</FormLabel>
-                                    <DateBox
+                                    <FormLabel>Status</FormLabel>
+                                    <TextBox
                                         elementAttr={{
-                                            class: "form-datebox",
+                                            class: "form-textbox"
                                         }}
-                                        type={"date"}
                                         readOnly={true}
-                                        min={new Date()}
-                                        openOnFieldClick={true}
-                                        accessKey={'creationDate'}
-                                        placeholder={"DD/MM/YYYY"}
-                                        displayFormat={"dd/MM/yyyy"}
-                                        value={formData.creationDate}
+                                        accessKey={'goodReceiptStatus'}
+                                        value={formData.goodReceiptStatus}
+                                        placeholder={'Status'}
                                     />
                                 </FormGroupItem>
                             </div>
                             <div style={{width: 500, margin: "0 20px"}}>
+                                <FormGroupItem>
+                                    <FormLabel>Purchase Order</FormLabel>
+                                    {goodReceiptAction.type !== "UPDATE" ?
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            accessKey={'pro_Id'}
+                                            searchEnabled={true}
+                                            displayExpr={'pro_Id'}
+                                            searchMode={'contains'}
+                                            searchExpr={'vendorName'}
+                                            dataSource={purchaseOrder.filter((PO) => PO.purchaseOrderStatus === "Created").map(item => {
+                                                return {
+                                                    pro_Id: item.pro_Id,
+                                                    vendorId: item.vendorId,
+                                                    vendorName: item.vendorName,
+                                                    vendorAddress: item.vendorAddress,
+                                                    vendorNumber: item.vendorNumber,
+                                                    children: item.children
+                                                }
+                                            })}
+                                            value={formData.pro_Id}
+                                            openOnFieldClick={true}
+                                            acceptCustomValue={true}
+                                            onFocusIn={handleOnFocusIn}
+                                            onFocusOut={handleOnFocusOut}
+                                            itemRender={(e) => {
+                                                return (
+                                                    <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
+                                                        <span>{e.pro_Id}</span>
+                                                        <span style={{ marginLeft: "auto", }}>
+                                                            {e.vendorName}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            }}
+                                            placeholder={"Select Purchase Order"}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            onValueChanged={(e) => onValueChanged(e)}
+                                            validationStatus={invalid.pro_Id === false ? "valid" : "invalid"}
+                                        />
+                                        :
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'pro_Id'}
+                                            value={formData.pro_Id}
+                                        />
+                                    }
+                                </FormGroupItem>
+
                                 <FormGroupItem>
                                     <FormLabel>Vendor Name</FormLabel>
                                     <TextBox
@@ -196,25 +315,13 @@ const CreateGoodReceipt = () => {
                                         value={formData.vendorNumber}
                                     />
                                 </FormGroupItem>
-                                
-                                <FormGroupItem>
-                                    <FormLabel>Status</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'goodReceiptStatus'}
-                                        value={formData.goodReceiptStatus}
-                                        placeholder={'Status'}
-                                    />
-                                </FormGroupItem>
-
-                                <FormButtonContainer style={{ marginTop: 30 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {goodReceiptAction.type === "UPDATE" ? "Update" : "Save"} Good Receipt
-                                    </Button>
-                                </FormButtonContainer>
+                                {goodReceiptAction.type === "CREATE" && (
+                                    <FormButtonContainer style={{ marginTop: 45 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            Save Good Receipt
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
                             </div>
                         </div>
                     </FormGroupContainer>
@@ -225,7 +332,7 @@ const CreateGoodReceipt = () => {
 
     const calculateTotal = () => {
         return treeListData.reduce((sum, item) => {
-            const total = item.acceptedQuantity * item.rate
+            const total = item.itemQuantity * item.rate
             return sum + total
         }, 0)
     }
@@ -249,7 +356,7 @@ const CreateGoodReceipt = () => {
 
     const handleOnSaved = (e) => {
         const data = e.changes[0].data
-        if (!data.acceptedQuantity) data.acceptedQuantity = 0
+        if (!data.itemQuantity) data.itemQuantity = 0
         if (!data.rate) data.rate = 0
 
         //For Now
@@ -260,7 +367,7 @@ const CreateGoodReceipt = () => {
 
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
-            if (e.column.dataField === "acceptedQuantity") {
+            if (e.column.dataField === "itemQuantity") {
                 if (e.value < 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
@@ -298,11 +405,21 @@ const CreateGoodReceipt = () => {
         )
     }
 
-    const renderAcceptedQuantityColumn = ({ data }) => {
+    const renderQuantityColumn = ({ data }) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {data.acceptedQuantity}
+                    {data.itemQuantity}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderUomCell = ({ data }) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {data.uom}
                 </CellContent>
             </CellContainer>
         )
@@ -319,7 +436,7 @@ const CreateGoodReceipt = () => {
     }
 
     const renderAmountCell = ({ data }) => {
-        const value = data.acceptedQuantity * data.rate
+        const value = data.itemQuantity * data.rate
         return (
             <CellContainer>
                 <CellContent>
@@ -374,9 +491,8 @@ const CreateGoodReceipt = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={false}
                         cellRender={renderItemIdCell}
-                        editCellRender={renderItemIdCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -393,13 +509,24 @@ const CreateGoodReceipt = () => {
                     />
                         
                     <Column
-                        caption={"Accepted Quantity"}
-                        dataField={"acceptedQuantity"}
+                        caption={"Quantity"}
+                        dataField={"itemQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={false}
                         editorOptions={"dxNumberBox"}
-                        cellRender={renderAcceptedQuantityColumn}
+                        cellRender={renderQuantityColumn}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+                    
+                    <Column
+                        caption={"UoM"}
+                        dataField={"uom"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowEditing={false}
+                        cellRender={renderUomCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

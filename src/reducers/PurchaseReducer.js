@@ -1,4 +1,6 @@
 const INITIAL_STATE = {
+    goodReceipt: [],
+    purchaseOrder: [],
     vendorQuotation: [],
     purchaseRequest: [],
     requestForQuotation: [],
@@ -27,6 +29,18 @@ const PurchaseReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 vendorQuotation: action.payload.data.result
+            }
+        }
+        case "GET_PURCHASE_ORDER": {
+            return {
+                ...state,
+                purchaseOrder: action.payload.data.result
+            }
+        }
+        case "GET_GOOD_RECEIPT": {
+            return {
+                ...state,
+                goodReceipt: action.payload.data.result
             }
         }
         case "PURCHASE_REQUEST_ACTION_TYPE": {

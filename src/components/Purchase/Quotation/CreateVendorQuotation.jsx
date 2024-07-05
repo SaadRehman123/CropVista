@@ -5,7 +5,6 @@ import moment from 'moment'
 import notify from 'devextreme/ui/notify'
 import DataSource from 'devextreme/data/data_source'
 import FormBackground from '../../SupportComponents/FormBackground'
-import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
 import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
@@ -17,7 +16,6 @@ import { addVendorQuotation, getVendorQuotation, updateVendorQuotation } from '.
 
 const CreateVendorQuotation = () => {
 
-    const itemMaster = useSelector(state => state.item.itemMaster)
     const vendorMaster = useSelector(state => state.vendor.vendorMaster)
     const vendorQuotation = useSelector(state => state.purchase.vendorQuotation)
     const requestForQuotation = useSelector(state => state.purchase.requestForQuotation)
@@ -75,6 +73,9 @@ const CreateVendorQuotation = () => {
                 vendorQuotationStatus: vendorQuotationAction.node.data.vq_Status,
                 rfq_Id: vendorQuotationAction.node.data.rfq_Id
             })
+
+            console.log(vendorQuotationAction.node.data.children);
+
             setTreeListData(vendorQuotationAction.node.data.children)
         }
     }, [])
@@ -94,9 +95,6 @@ const CreateVendorQuotation = () => {
                 const uniqueItemData = RFQ.childrenItems.reduce((acc, current) => {
                     if (!acc.some(item => item.rfq_ItemId === current.rfq_ItemId)) {
                         let newItem = { ...current }
-                        
-                        delete newItem.rfq_Id
-                        delete newItem.rfq_ItemId
                 
                         acc.push({
                             ...newItem,
@@ -115,6 +113,7 @@ const CreateVendorQuotation = () => {
                     }
                     return acc
                 }, [])
+
 
                 setTreeListData([...uniqueItemData])
                 setVendorDataSource([...uniqueVendorData])
@@ -160,30 +159,6 @@ const CreateVendorQuotation = () => {
                 ...prevInvalid,
                 [name]: formData[name].trim() === "" ? true : false
             }))
-        }
-    }
-
-    const handleOnItemValueChanged = (e) => {
-        let value = e.value
-
-        if(value === null){
-            value = ""
-        }
-
-        const instance = treelistRef.current.instance
-        const selectRow = instance.getSelectedRowsData()[0]
-
-        if (selectRow) {
-            
-            const selectedItem = itemMaster.find((item) => item.itemId === value)
-
-            if (selectedItem) {
-                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom, rate: selectedItem.sellingRate }
-    
-                vendorQuotationDataSource.store().update(selectRow.clientId, updatedData).then(() => {
-                    vendorQuotationDataSource.reload()
-                })
-            }
         }
     }
 
@@ -233,6 +208,13 @@ const CreateVendorQuotation = () => {
                         vendorAddress: "",
                         vendorNumber: ""
                     }))
+                    setTreeListData(
+                        response.result.children.map((item) => {
+                            item.rate = 0
+
+                            return item
+                        })
+                    )
                     dispatch(getVendorQuotation(0))
                     setVendorDataSource(updatedVendorDataSource)
                     notify("Vendor Quotation Created Successfully")
@@ -247,8 +229,6 @@ const CreateVendorQuotation = () => {
             })
         }
     }
-
-    console.log(vendorDataSource);
 
     const renderContent = () => {
         return(
@@ -274,6 +254,7 @@ const CreateVendorQuotation = () => {
                                         accessKey={'creationDate'}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
+                                        validationStatus={"valid"}
                                         value={formData.creationDate}
                                     />
                                 </FormGroupItem>
@@ -519,32 +500,6 @@ const CreateVendorQuotation = () => {
         )
     }
 
-    const filterItems = () => {
-        const selectedIds = treeListData.map(item => item.itemId)
-        return itemMaster.filter(item => item.itemType === "Raw Material" && item.disable === false && !selectedIds.includes(item.itemId))
-    }
-    
-    const renderItemIdCell = (e) => {
-        const filteredDataSource = filterItems()
-
-        return (
-            <SelectBoxTreelist
-                event={e}
-                valueExpr={"itemId"}
-                searchExpr={"itemName"}
-                itemRender={(e) => renderItems(e)}
-                renderType={"itemId"}
-                displayExpr={"itemId"}
-                dataSource={filteredDataSource}
-                placeholder={"Choose Item"}
-                noDataText={"Item Not Present"}
-                handleOnValueChanged={handleOnItemValueChanged}
-                renderContent={() => renderItemContent(e)}
-                disabled={false}
-            />
-        )
-    }
-
     const renderQuantityColumn = ({ data }) => {
         return (
             <CellContainer>
@@ -631,9 +586,8 @@ const CreateVendorQuotation = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
-                        cellRender={renderItemIdCell}
-                        editCellRender={renderItemIdCell}
+                        allowEditing={false}
+                        editCellRender={renderItemContent}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />

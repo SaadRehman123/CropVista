@@ -11,7 +11,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { toggleDeletePopup } from '../../../actions/ViewActions'
+import { setGoodReceiptRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getGoodReceipt, goodReceiptActionType } from '../../../actions/PurchaseAction'
 
 const GoodReceipt = () => {
@@ -22,6 +22,10 @@ const GoodReceipt = () => {
     const dispatch = useDispatch()
 
     const treeListRef = useRef()
+
+    useEffect(() => {
+        dispatch(setGoodReceiptRef(treeListRef))
+    }, [])
 
     useEffect(() => {
         dispatch(getGoodReceipt(0))
@@ -96,10 +100,12 @@ const GoodReceipt = () => {
                     className='fal fa-eye treelist-edit-button'
                     onClick={() => handleOnViewClick(e)} />
 
-                <button
-                    title='Cancel Good Receipt'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"GOOD_RECEIPT" }))} />
+                {e.data.gr_Status === "Created" && (
+                    <button
+                        title='Cancel Good Receipt'
+                        className='fal fa-trash treelist-delete-button'
+                        onClick={() => dispatch(toggleDeletePopup({ active: true, type:"GOOD_RECEIPT" }))} />
+                )}
             </ActionCellContainer>
         )
     }

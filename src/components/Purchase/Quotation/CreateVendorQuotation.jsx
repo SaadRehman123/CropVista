@@ -63,7 +63,7 @@ const CreateVendorQuotation = () => {
         if (vendorQuotationAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now(), vendorQuotationStatus: "Pending" }))            
         }
-        else if (vendorQuotationAction.type === "UPDATE") {
+        else if (vendorQuotationAction.type === "UPDATE" || vendorQuotationAction.type === "VIEW") {
             setFormData({
                 creationDate: vendorQuotationAction.node.data.vq_CreationDate,
                 vendorId: vendorQuotationAction.node.data.vendorId,
@@ -259,7 +259,7 @@ const CreateVendorQuotation = () => {
 
                                 <FormGroupItem>
                                     <FormLabel>Vendor Id</FormLabel>
-                                    {vendorQuotationAction.type !== "UPDATE" ?
+                                    {vendorQuotationAction.type === "CREATE" ?
                                         <SelectBox
                                             elementAttr={{
                                                 class: "form-selectbox"
@@ -338,7 +338,7 @@ const CreateVendorQuotation = () => {
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Request For Quotation</FormLabel>
-                                    {vendorQuotationAction.type !== "UPDATE" ? 
+                                    {vendorQuotationAction.type === "CREATE" ? 
                                         <SelectBox
                                             elementAttr={{
                                                 class: "form-selectbox"
@@ -347,7 +347,7 @@ const CreateVendorQuotation = () => {
                                             searchEnabled={true}
                                             searchMode={'contains'}
                                             accessKey={'rfq_Id'}
-                                            dataSource={rfqDataSource.map((item) => {
+                                            dataSource={rfqDataSource.filter(rfq => rfq.rfq_Status === "Created").map((item) => {
                                                 return item.rfq_Id
                                             })}
                                             value={formData.rfq_Id}
@@ -397,11 +397,13 @@ const CreateVendorQuotation = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 45 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {vendorQuotationAction.type === "UPDATE" ? "Update" : "Save"} Vendor Quotation
-                                    </Button>
-                                </FormButtonContainer>
+                                {vendorQuotationAction.type !== "VIEW" && (
+                                    <FormButtonContainer style={{ marginTop: 45 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            {vendorQuotationAction.type === "UPDATE" ? "Update" : "Save"} Vendor Quotation
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
                             </div>
                         </div>
                     </FormGroupContainer>
@@ -628,8 +630,8 @@ const CreateVendorQuotation = () => {
                         caption={"Rate"}
                         dataField={"rate"}
                         alignment={"left"}
-                        allowEditing={true}
                         allowSorting={false}
+                        allowEditing={vendorQuotationAction.type !== "VIEW" ? true : false}
                         cellRender={renderRateCell} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}

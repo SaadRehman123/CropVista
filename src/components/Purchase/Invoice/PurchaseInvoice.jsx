@@ -10,7 +10,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { toggleDeletePopup } from '../../../actions/ViewActions'
+import { setPurchaseInvoiceRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getGoodReceipt, getPurchaseInvoice, purchaseInvoiceActionType, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
@@ -24,6 +24,10 @@ const PurchaseInvoice = () => {
     const dispatch = useDispatch()
 
     const treeListRef = useRef()
+
+    useEffect(() => {
+        dispatch(setPurchaseInvoiceRef(treeListRef))
+    }, [])
 
     useEffect(() => {
         dispatch(getPurchaseInvoice(0))
@@ -125,11 +129,6 @@ const PurchaseInvoice = () => {
                     title='Edit Purchase Invoice'
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)} />
-
-                <button
-                    title='Cancel Purchase Invoice'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type: "PURCHASE_INVOICE" }))} />
             </ActionCellContainer>
         )
     }

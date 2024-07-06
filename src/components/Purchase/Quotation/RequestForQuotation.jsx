@@ -10,7 +10,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { toggleDeletePopup } from '../../../actions/ViewActions'
+import { setRequestForQuotationRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getRequestForQuotation, requestForQuotationActionType } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
@@ -25,6 +25,10 @@ const RequestForQuotation = () => {
     const treeListRef = useRef()
 
     useEffect(() => {
+        dispatch(setRequestForQuotationRef(treeListRef))
+    }, [])
+
+    useEffect(() => {
         dispatch(getRequestForQuotation(0))
     }, [])
 
@@ -35,6 +39,11 @@ const RequestForQuotation = () => {
 
     const handleOnEditClick = (e) => {
         dispatch(requestForQuotationActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Request_For_Quotation')
+    }
+
+    const handleOnViewClick = (e) => {
+        dispatch(requestForQuotationActionType({ node: e, type: "VIEW" }))
         navigate('/app/Create_Request_For_Quotation')
     }
 
@@ -92,15 +101,26 @@ const RequestForQuotation = () => {
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
-                <button
-                    title='Edit Request For Quotation'
-                    className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick(e)} />
+                {e.data.rfq_Status === "Created" && (
+                    <>
+                        <button
+                            title='Edit Request For Quotation'
+                            className='fal fa-pen treelist-edit-button'
+                            onClick={() => handleOnEditClick(e)} />
 
-                <button
-                    title='Cancel Request For Quotation'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"REQUEST_FOR_QUOTATION" }))} />
+                        <button
+                            title='Cancel Request For Quotation'
+                            className='fal fa-trash treelist-delete-button'
+                            onClick={() => dispatch(toggleDeletePopup({ active: true, type:"REQUEST_FOR_QUOTATION" }))} />
+                    </>
+                )}
+
+                {e.data.rfq_Status !== "Created" && (
+                    <button
+                        title='View Request For Quotation'
+                        className='fal fa-eye treelist-edit-button'
+                        onClick={() => handleOnViewClick(e)} />
+                )}
             </ActionCellContainer>
         )
     }

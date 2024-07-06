@@ -10,7 +10,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { toggleDeletePopup } from '../../../actions/ViewActions'
+import { setVendorQuotationRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getVendorQuotation, vendorQuotationActionType } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
@@ -25,6 +25,10 @@ const VendorQuotation = () => {
     const treeListRef = useRef()
     
     useEffect(() => {
+        dispatch(setVendorQuotationRef(treeListRef))
+    }, [])
+    
+    useEffect(() => {
         dispatch(getVendorQuotation(0))
     }, [])
 
@@ -35,6 +39,11 @@ const VendorQuotation = () => {
 
     const handleOnEditClick = (e) => {
         dispatch(vendorQuotationActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Vendor_Quotation')
+    }
+
+    const handleOnViewClick = (e) => {
+        dispatch(vendorQuotationActionType({ node: e, type: "VIEW" }))
         navigate('/app/Create_Vendor_Quotation')
     }
 
@@ -93,15 +102,26 @@ const VendorQuotation = () => {
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
-                <button
-                    title='Edit Vendor Quotation'
-                    className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick(e)} />
+                {e.data.vq_Status === "Created" && (
+                    <>
+                        <button
+                            title='Edit Vendor Quotation'
+                            className='fal fa-pen treelist-edit-button'
+                            onClick={() => handleOnEditClick(e)} />
 
-                <button
-                    title='Cancel Vendor Quotation'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"REQUEST_FOR_QUOTATION" }))} />
+                        <button
+                            title='Delete Vendor Quotation'
+                            className='fal fa-trash treelist-delete-button'
+                            onClick={() => dispatch(toggleDeletePopup({ active: true, type:"VENDOR_QUOTATION" }))} />
+                    </>
+                )}
+
+                {e.data.vq_Status !== "Created" && (
+                    <button
+                        title='View Vendor Quotation'
+                        className='fal fa-eye treelist-edit-button'
+                        onClick={() => handleOnViewClick(e)} />
+                )}
             </ActionCellContainer>
         )
     }
@@ -240,6 +260,9 @@ const setColor = (e) => {
 
     if(e.data.vq_Status === "Created"){
         color = 'success'
+    }
+    else if(e.data.vq_Status === "Booked"){
+        color = 'info'
     }
     else if(e.data.vq_Status === "Cancelled"){
         color = 'danger'

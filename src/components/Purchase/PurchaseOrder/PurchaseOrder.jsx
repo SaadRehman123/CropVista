@@ -10,7 +10,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { toggleDeletePopup } from '../../../actions/ViewActions'
+import { setPurchaseOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getPurchaseOrder, purchaseOrderActionType } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
@@ -23,6 +23,10 @@ const PurchaseOrder = () => {
     const dispatch = useDispatch()
 
     const treeListRef = useRef()
+
+    useEffect(() => {
+        dispatch(setPurchaseOrderRef(treeListRef))
+    }, [])
 
     useEffect(() => {
         dispatch(getPurchaseOrder(0))
@@ -97,10 +101,12 @@ const PurchaseOrder = () => {
                     className='fal fa-eye treelist-edit-button'
                     onClick={() => handleOnViewClick(e)} />
 
-                <button
-                    title='Cancel Purchase Order'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PURCHASE_ORDER" }))} />
+                {e.data.purchaseOrderStatus === "Created" && (
+                    <button
+                        title='Cancel Purchase Order'
+                        className='fal fa-trash treelist-delete-button'
+                        onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PURCHASE_ORDER" }))} />
+                )}
             </ActionCellContainer>
         )
     }

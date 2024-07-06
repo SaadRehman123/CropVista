@@ -10,7 +10,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { toggleDeletePopup } from '../../../actions/ViewActions'
+import { setPurchaseRequestRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getPurchaseRequest, purchaseRequestActionType } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
@@ -25,11 +25,25 @@ const PurchaseRequest = () => {
     const treeListRef = useRef()
 
     useEffect(() => {
+        dispatch(setPurchaseRequestRef(treeListRef))
+    }, [])
+
+    useEffect(() => {
         dispatch(getPurchaseRequest(0))
     }, [])
 
+    const handleOnClick = () => {
+        navigate('/app/Create_Purchase_Request')
+        dispatch(purchaseRequestActionType({ node: null, type: "CREATE" }))
+    }
+
     const handleOnEditClick = (e) => {
         dispatch(purchaseRequestActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Purchase_Request')
+    }
+
+    const handleOnViewClick = (e) => {
+        dispatch(purchaseRequestActionType({ node: e, type: "VIEW" }))
         navigate('/app/Create_Purchase_Request')
     }
 
@@ -77,15 +91,26 @@ const PurchaseRequest = () => {
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
-                <button
-                    title='Edit Purchase Request'
-                    className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick(e)} />
+                {e.data.pR_Status === "Created" && (
+                    <>
+                        <button
+                            title='Edit Purchase Request'
+                            className='fal fa-pen treelist-edit-button'
+                            onClick={() => handleOnEditClick(e)} />
 
-                <button
-                    title='Cancel Purchase Request'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PURCHASE_REQUEST" }))} />
+                        <button
+                            title='Cancel Purchase Request'
+                            className='fal fa-trash treelist-delete-button'
+                            onClick={() => dispatch(toggleDeletePopup({ active: true, type:"PURCHASE_REQUEST" }))} />
+                    </>
+                )}
+
+                {e.data.pR_Status !== "Created" && (
+                    <button
+                        title='View Purchase Request'
+                        className='fal fa-eye treelist-edit-button'
+                        onClick={() => handleOnViewClick(e)} />
+                )}
             </ActionCellContainer>
         )
     }
@@ -95,10 +120,7 @@ const PurchaseRequest = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Purchase Request History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => {
-                        navigate('/app/Create_Purchase_Request')
-                        dispatch(purchaseRequestActionType({ node: null, type: "CREATE" }))
-                    }}>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
                         Create Purchase Request
                     </Button>
@@ -157,8 +179,8 @@ const PurchaseRequest = () => {
                     />
 
                     <Column
-                        width={110}
-                        minWidth={110}
+                        width={123}
+                        minWidth={123}
                         caption={"Status"}
                         dataField={"PR_Status"}
                         alignment={"left"}

@@ -7,9 +7,15 @@ const INITIAL_STATE = {
 	resourceRef: null,
 	warehouseRef: null,
 	itemMasterRef: null,
+	goodReceiptRef: null,
 	itemResourceRef: null,
 	vendorMasterRef: null,
+	purchaseOrderRef: null,
+	vendorQuotationRef: null,
 	productionOrderRef: null,
+	purchaseRequestRef: null,
+	purchaseInvoiceRef: null,
+	requestForQuotationRef: null,
 	setProductionOrderItemResourceRef: null,
 	setNavToolbarTitle: 'Dashboard',
     deletePopup: { active: false, type: "" },
@@ -99,6 +105,42 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
 			return {
 				...state,
 				vendorMasterRef: action.payload
+			}
+		}
+		case "SET_PURCHASE_REQUEST_REF": {
+			return {
+				...state,
+				purchaseRequestRef: action.payload
+			}
+		}
+		case "SET_REQUEST_FOR_QUOTATION_REF": {
+			return {
+				...state,
+				requestForQuotationRef: action.payload
+			}
+		}
+		case "SET_VENDOR_QUOTATION_REF": {
+			return {
+				...state,
+				vendorQuotationRef: action.payload
+			}
+		}
+		case "SET_PURCHASE_ORDER_REF": {
+			return {
+				...state,
+				purchaseOrderRef: action.payload
+			}
+		}
+		case "SET_GOOD_RECEIPT_REF": {
+			return {
+				...state,
+				goodReceiptRef: action.payload
+			}
+		}
+		case "SET_PURCHASE_INVOICE_REF": {
+			return {
+				...state,
+				purchaseInvoiceRef: action.payload
 			}
 		}
 		default: return state

@@ -12,7 +12,7 @@ import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-lis
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { addPurchaseOrder, getPurchaseOrder, getPurchaseRequest, updatePurchaseRequest } from '../../../actions/PurchaseAction'
+import { addPurchaseOrder, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../../actions/PurchaseAction'
 
 const CreatePurchaseOrder = () => {
 
@@ -75,9 +75,6 @@ const CreatePurchaseOrder = () => {
                 }))
 
                 const items = value.children.map(item => {
-                    delete item.vq_Id
-                    delete item.vq_ItemId
-
                     return {
                         ...item,
                         pro_Id: "",
@@ -164,6 +161,24 @@ const CreatePurchaseOrder = () => {
                             }
                         })
                     }
+                    
+                    const rfq = requestForQuotation.find(item => item.pr_Id === formData.pr_Id)
+                    const vq = vendorQuotation.filter(item => item.rfq_Id === rfq.rfq_Id)
+
+                    if(vq){
+                        vq.forEach((item) => {
+                            if(item.vendorId === formData.vendorId){
+                                dispatch(updateVendorQuotation( { ...item, vq_Status: "Booked" } , item.vq_Id))
+                            }
+                            else {
+                                dispatch(updateVendorQuotation( { ...item, vq_Status: "Closed" } , item.vq_Id))
+                            }
+                        })    
+                    }
+
+                    if(rfq) {
+                        dispatch(updateRequestForQuotation({ ...rfq, rfq_Status: "Closed" }, rfq.rfq_Id))
+                    }
 
                     setFormData((prevState) => ({
                         ...prevState,
@@ -174,9 +189,12 @@ const CreatePurchaseOrder = () => {
                         vendorAddress: "",
                         vendorNumber: ""
                     }))
+
                     setTreeListData([])
                     setVendorDataSource([])
                     dispatch(getPurchaseOrder(0))
+                    dispatch(getVendorQuotation(0))
+                    dispatch(getRequestForQuotation(0))
                     notify("Purchase Order Created Successfully")
                 }
             })

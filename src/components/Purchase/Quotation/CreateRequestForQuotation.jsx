@@ -62,7 +62,7 @@ const CreateRequestForQuotation = () => {
         if (requestForQuotationAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now(), requestForQuotationStatus: "Pending" }))            
         }
-        else if (requestForQuotationAction.type === "UPDATE") {
+        else if (requestForQuotationAction.type === "UPDATE"  || requestForQuotationAction.type === "VIEW") {
             setFormData({
                 creationDate: requestForQuotationAction.node.data.rfq_CreationDate,
                 requiredBy: requestForQuotationAction.node.data.rfq_RequiredBy,
@@ -385,7 +385,7 @@ const CreateRequestForQuotation = () => {
                             <div style={{width: 500, margin: "0 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Purchase Request</FormLabel>
-                                    {requestForQuotationAction.type !== "UPDATE" ? 
+                                    {requestForQuotationAction.type === "CREATE" ? 
                                         <SelectBox
                                             elementAttr={{
                                                 class: "form-selectbox"
@@ -428,6 +428,7 @@ const CreateRequestForQuotation = () => {
                                         accessKey={'requiredBy'}
                                         openOnFieldClick={true}
                                         value={formData.requiredBy}
+                                        readOnly={requestForQuotationAction.type === "VIEW" ? true : false}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
                                         validationMessagePosition={"bottom"}
@@ -436,11 +437,13 @@ const CreateRequestForQuotation = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 30 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {requestForQuotationAction.type === "UPDATE" ? "Update" : "Save"} Request For Quotation
-                                    </Button>
-                                </FormButtonContainer>
+                                {requestForQuotationAction.type !== "VIEW" && (
+                                    <FormButtonContainer style={{ marginTop: 30 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            {requestForQuotationAction.type === "UPDATE" ? "Update" : "Save"} Request For Quotation
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
                             </div>
                         </div>
                     </FormGroupContainer>
@@ -574,9 +577,11 @@ const CreateRequestForQuotation = () => {
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
 
-                    <AddButton onClick={() => handleOnItemAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
-                        Add Row
-                    </AddButton>
+                    {requestForQuotationAction.type !== "VIEW" && (
+                        <AddButton onClick={() => handleOnItemAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
+                            Add Row
+                        </AddButton>
+                    )}
                 </div>
 
                 <TreeList
@@ -615,7 +620,7 @@ const CreateRequestForQuotation = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={requestForQuotationAction.type !== "VIEW" ? true : false}
                         cellRender={renderItemIdCell}
                         editCellRender={renderItemIdCell}
                         headerCellRender={renderHeaderCell}
@@ -638,7 +643,7 @@ const CreateRequestForQuotation = () => {
                         dataField={"itemQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={requestForQuotationAction.type === "VIEW" ? false : true}
                         editorOptions={"dxNumberBox"}
                         cellRender={renderQuantityColumn}
                         headerCellRender={renderHeaderCell}
@@ -656,18 +661,20 @@ const CreateRequestForQuotation = () => {
                         cssClass={"project-treelist-item-column"}
                     />
 
-                    <Column
-                        width={75}
-                        minWidth={75}
-                        caption={"Actions"}
-                        dataField={"actions"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        allowEditing={false}
-                        cellRender={renderItemActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
-                        cssClass={"project-treelist-column"}
-                    />
+                    {requestForQuotationAction.type !== "VIEW" && (
+                        <Column
+                            width={75}
+                            minWidth={75}
+                            caption={"Actions"}
+                            dataField={"actions"}
+                            alignment={"center"}
+                            allowSorting={false}
+                            allowEditing={false}
+                            cellRender={renderItemActionColumn}
+                            headerCellRender={renderActionHeaderCell} 
+                            cssClass={"project-treelist-column"}
+                        />
+                    )}
                 </TreeList>
             </Fragment>
         )
@@ -705,7 +712,7 @@ const CreateRequestForQuotation = () => {
                 noDataText={"Item Not Present"}
                 handleOnValueChanged={handleOnVendorValueChanged}
                 renderContent={() => renderVendorContent(e)}
-                disabled={false}
+                disabled={requestForQuotationAction.type === "VIEW" ? true : false}
             />
         )
     }
@@ -758,10 +765,11 @@ const CreateRequestForQuotation = () => {
                     <Header>
                         <HeaderSpan>Vendors</HeaderSpan>
                     </Header>
-
-                    <AddButton onClick={() => handleOnVendorAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
-                        Add Row
-                    </AddButton>
+                    {requestForQuotationAction.type !== "VIEW" && (
+                        <AddButton onClick={() => handleOnVendorAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />
+                            Add Row
+                        </AddButton>
+                    )}
                 </div>
                 <TreeList
                     elementAttr={{
@@ -797,7 +805,7 @@ const CreateRequestForQuotation = () => {
                         dataField={"vendorId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={requestForQuotationAction.type !== "VIEW" ? true : false}
                         cellRender={renderVendorIdCell}
                         editCellRender={renderVendorIdCell}
                         headerCellRender={renderHeaderCell}
@@ -826,18 +834,20 @@ const CreateRequestForQuotation = () => {
                         cssClass={"project-treelist-item-column"}
                     />
 
-                    <Column
-                        width={75}
-                        minWidth={75}
-                        caption={"Actions"}
-                        dataField={"actions"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        allowEditing={false}
-                        cellRender={renderVendorActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
-                        cssClass={"project-treelist-column"}
-                    />
+                    {requestForQuotationAction.type !== "VIEW" && (
+                        <Column
+                            width={75}
+                            minWidth={75}
+                            caption={"Actions"}
+                            dataField={"actions"}
+                            alignment={"center"}
+                            allowSorting={false}
+                            allowEditing={false}
+                            cellRender={renderVendorActionColumn}
+                            headerCellRender={renderActionHeaderCell} 
+                            cssClass={"project-treelist-column"}
+                        />
+                    )}
                 </TreeList>
             </Fragment>
         )

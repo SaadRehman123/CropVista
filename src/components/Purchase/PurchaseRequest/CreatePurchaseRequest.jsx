@@ -43,7 +43,7 @@ const CreatePurchaseRequest = () => {
         if (purchaseRequestAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now(), purchaseReqStatus: "Pending" }))            
         }
-        else if (purchaseRequestAction.type === "UPDATE") {
+        else if (purchaseRequestAction.type === "UPDATE" || purchaseRequestAction.type === "VIEW") {
             setFormData({
                 creationDate: purchaseRequestAction.node.data.pR_CreationDate,
                 requiredBy: purchaseRequestAction.node.data.pR_RequiredBy,
@@ -228,6 +228,7 @@ const CreatePurchaseRequest = () => {
                                         openOnFieldClick={true}
                                         value={formData.requiredBy}
                                         placeholder={"DD/MM/YYYY"}
+                                        readOnly={purchaseRequestAction.type === "VIEW" ? true : false}
                                         displayFormat={"dd/MM/yyyy"}
                                         validationMessagePosition={"bottom"}
                                         onValueChanged={(e) => onValueChanged(e)}
@@ -235,11 +236,14 @@ const CreatePurchaseRequest = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 45 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {purchaseRequestAction.type === "UPDATE" ? "Update" : "Save"} Purchase Request
-                                    </Button>
-                                </FormButtonContainer>
+                                {purchaseRequestAction.type !== "VIEW" && (
+                                    <FormButtonContainer style={{ marginTop: 45 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            {purchaseRequestAction.type === "UPDATE" ? "Update" : "Save"} Purchase Request
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
+                                
                             </div>
                         </div>
                     </FormGroupContainer>
@@ -372,7 +376,9 @@ const CreatePurchaseRequest = () => {
                     <Header>
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
-                    <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
+                    {purchaseRequestAction.type !== "VIEW" && (
+                        <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
+                    )}
                 </div>
 
                 <TreeList
@@ -411,7 +417,7 @@ const CreatePurchaseRequest = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={purchaseRequestAction.type === "VIEW" ? false : true}
                         cellRender={renderItemIdCell}
                         editCellRender={renderItemIdCell}
                         headerCellRender={renderHeaderCell}
@@ -434,7 +440,7 @@ const CreatePurchaseRequest = () => {
                         dataField={"itemQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={purchaseRequestAction.type === "VIEW" ? false : true}
                         editorOptions={"dxNumberBox"}
                         cellRender={renderQuantityColumn}
                         headerCellRender={renderHeaderCell}
@@ -452,18 +458,20 @@ const CreatePurchaseRequest = () => {
                         cssClass={"project-treelist-item-column"}
                     />
 
-                    <Column
-                        width={75}
-                        minWidth={75}
-                        caption={"Actions"}
-                        dataField={"actions"}
-                        alignment={"center"}
-                        allowSorting={false}
-                        allowEditing={false}
-                        cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
-                        cssClass={"project-treelist-column"}
-                    />
+                    {purchaseRequestAction.type !== "VIEW" && (
+                        <Column
+                            width={75}
+                            minWidth={75}
+                            caption={"Actions"}
+                            dataField={"actions"}
+                            alignment={"center"}
+                            allowSorting={false}
+                            allowEditing={false}
+                            cellRender={renderActionColumn}
+                            headerCellRender={renderActionHeaderCell} 
+                            cssClass={"project-treelist-column"}
+                        />
+                    )}
                 </TreeList>
             </Fragment>
         )

@@ -96,3 +96,45 @@ export const setVendorMasterRef = (value) => {
 		payload: value
 	}
 }
+
+export const setPurchaseRequestRef = (value) => {
+	return {
+		type: "SET_PURCHASE_REQUEST_REF",
+		payload: value
+	}
+}
+
+export const setRequestForQuotationRef = (value) => {
+	return {
+		type: "SET_REQUEST_FOR_QUOTATION_REF",
+		payload: value
+	}
+}
+
+export const setVendorQuotationRef = (value) => {
+	return {
+		type: "SET_VENDOR_QUOTATION_REF",
+		payload: value
+	}
+}
+
+export const setPurchaseOrderRef = (value) => {
+	return {
+		type: "SET_PURCHASE_ORDER_REF",
+		payload: value
+	}
+}
+
+export const setGoodReceiptRef = (value) => {
+	return {
+		type: "SET_GOOD_RECEIPT_REF",
+		payload: value
+	}
+}
+
+export const setPurchaseInvoiceRef = (value) => {
+	return {
+		type: "SET_PURCHASE_INVOICE_REF",
+		payload: value
+	}
+}

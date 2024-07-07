@@ -14,11 +14,11 @@ import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-reac
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { toggleCreateJobCardPopup, toggleLowSupplyPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
 import { getPlannedCrops, updateCropsPlan } from '../../../actions/CropsActions'
 import { addInventory, updateInventory } from '../../../actions/InventoryAction'
 import { addStockEntries, getStockEntries } from '../../../actions/StockEntriesAction'
+import { toggleCreateJobCardPopup, toggleLowSupplyPopup } from '../../../actions/PopupActions'
 import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages, updateProductionOrder } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'

@@ -15,7 +15,7 @@ import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActio
 import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
 
 import styled from 'styled-components'
-import { getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updateGoodReceipt, updatePurchaseOrder, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../actions/PurchaseAction'
+import { deleteVendorQuotation, getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updateGoodReceipt, updatePurchaseOrder, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../actions/PurchaseAction'
 import { getInventory, updateInventory } from '../../actions/InventoryAction'
 
 const DeletePopup = () => {
@@ -361,7 +361,29 @@ const DeletePopup = () => {
             handleOnToggle(deletePopup.type)
         }
         else if(deletePopup.type === 'VENDOR_QUOTATION'){
-            
+            const instance = vendorQuotationRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+
+            const obj = {
+                vq_Id: selectedRow[0].vq_Id,
+                rfq_Id: selectedRow[0].rfq_Id,
+                vendorId: selectedRow[0].vendorId,
+                vendorName: selectedRow[0].vendorName,
+                vendorNumber: selectedRow[0].vendorNumber,
+                vendorAddress: selectedRow[0].vendorAddress,
+                vq_Status: selectedRow[0].vq_Status,
+                vq_CreationDate: selectedRow[0].vq_CreationDate,
+                total: selectedRow[0].total,
+                children: selectedRow[0].children
+            }
+
+            dispatch(deleteVendorQuotation(obj, obj.vq_Id)).then(res => {
+                const data = res.payload.data
+                if(data.success){
+                    dispatch(getVendorQuotation(0))
+                }
+            })
+            handleOnToggle(deletePopup.type)
         }
         else if(deletePopup.type === 'PURCHASE_ORDER'){
             const instance = purchaseOrderRef.current.instance
@@ -423,18 +445,8 @@ const DeletePopup = () => {
             dispatch(updateGoodReceipt(obj, obj.gr_Id)).then((res) => {
                 if(res.payload.data.success){
                     const pro = purchaseOrder.find(item => item.pro_Id === obj.pro_Id)
-                    const rfq = requestForQuotation.find(item => item.pr_Id === pro.pr_Id)
-                    const vq = vendorQuotation.filter(item => item.rfq_Id === rfq.rfq_Id)
-                    const pr = purchaseRequest.find((item) => item.purchaseRequestId === pro.pr_Id)
-    
+                   
                     if(pro) dispatch(updatePurchaseOrder({ ...pro, purchaseOrderStatus: "Created" }, pro.pro_Id))
-                    if(pr) dispatch(updatePurchaseRequest({ ...pr, pR_Status: "RFQ Created" }, pr.purchaseRequestId))
-                    if(vq){
-                        vq.forEach((item) => {
-                            dispatch(updateVendorQuotation( { ...item, vq_Status: "Created" } , item.vq_Id))
-                        })
-                    }
-                    if(rfq) dispatch(updateRequestForQuotation({ ...rfq, rfq_Status: "Created" }, rfq.rfq_Id))
                         
                     obj.children.forEach((child) => {
                         if(inventory.some((item) => item.inventoryItem === child.itemName)){
@@ -451,9 +463,6 @@ const DeletePopup = () => {
                     dispatch(getInventory())
                     dispatch(getGoodReceipt(0))
                     dispatch(getPurchaseOrder(0))
-                    dispatch(getPurchaseRequest(0))
-                    dispatch(getVendorQuotation(0))
-                    dispatch(getRequestForQuotation(0))
                 }
             })
             handleOnToggle(deletePopup.type)

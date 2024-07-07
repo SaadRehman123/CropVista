@@ -11,9 +11,12 @@ import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-reac
 import { addStockEntries } from '../../actions/StockEntriesAction'
 import { toggleCreateJobCardPopup } from '../../actions/PopupActions'
 import { getProductionOrder, updatePoRouteStages } from '../../actions/ProductionOrderAction'
+import { Popover } from 'devextreme-react'
+import { getInventory, updateInventory } from '../../actions/InventoryAction'
 
 const CreateJobCard = (props) => {
 
+    const inventory = useSelector(state => state.inventory.inventoryStatus)
     const productionOrder = useSelector(state => state.production.productionOrder)
     const createJobCard = useSelector(state => state.popup.toggleCreateJobCardPopup)
 
@@ -22,6 +25,8 @@ const CreateJobCard = (props) => {
     const dispatch = useDispatch()
 
     const treelistRef = useRef(null)
+
+    const toggle = () => dispatch(toggleCreateJobCardPopup(false))
 
     useEffect(() => {
         const excludedStatuses = ["Closed", "Completed", "Cancelled"]
@@ -50,41 +55,83 @@ const CreateJobCard = (props) => {
         const instance = treelistRef.current.instance
         const selectedRow = instance.getSelectedRowsData().sort((a, b) => a.pO_RouteStageId - b.pO_RouteStageId)
 
-        if (selectedRow && selectedRow.length > 0) {
-            selectedRow.forEach((item) => {
-                delete item.clientId
-                item.pO_Status = "Completed"
-
-                const stockEntries = {
-                    StockEntryId: "",
-                    StockEntryName: item.pO_ItemDescription,
-                    StockEntryWarehouse: item.pO_WarehouseId,
-                    StockEntryQuantity: item.pO_Quantity,
-                    StockEntryTo: "Production",
-                    StockEntryDate: moment(Date.now()).format('YYYY-MM-DD'),
-                    productionOrderId: ""
+        let isAllowed = true
+        const unavailableItems = []
+    
+        selectedRow.forEach(row => {
+            if(row.pO_Type === "Item"){
+                const inventoryItem = inventory.find(item => item.inventoryItem === row.pO_ItemDescription && item.inventoryWarehouse === row.pO_WarehouseId)
+                if (!inventoryItem || inventoryItem.inventoryQuantity < row.pO_Quantity) {
+                    isAllowed = false
+                    unavailableItems.push(row.pO_ItemDescription)
                 }
+            }
+        })
 
-                dispatch(updatePoRouteStages(item, item.pO_RouteStageId)).then((res) => {
-                    const data = res.payload.data
-                    if (data.success) {
-                        if (item.pO_WarehouseId !== "") {
-                            dispatch(addStockEntries(stockEntries))
-                        }
-                        dispatch(getProductionOrder(0)).then((resX) => {
-                            if (resX.payload.data.success) {
-                                notify("Route Stage Completed", "info", 2000)
+        if (selectedRow && selectedRow.length > 0) {
+            if(!isAllowed){
+                return notify(`The following items are not available in inventory - ${unavailableItems.join(" || ")}`, "info", 4000);
+            }
+            else {
+                selectedRow.forEach((item) => {
+                    delete item.clientId
+                    item.pO_Status = "Completed"
+    
+                    const stockEntries = {
+                        StockEntryId: "",
+                        StockEntryName: item.pO_ItemDescription,
+                        StockEntryWarehouse: item.pO_WarehouseId,
+                        StockEntryQuantity: item.pO_Quantity,
+                        StockEntryTo: "Production",
+                        StockEntryDate: moment(Date.now()).format('YYYY-MM-DD'),
+                        productionOrderId: ""
+                    }
+    
+                    dispatch(updatePoRouteStages(item, item.pO_RouteStageId)).then((res) => {
+                        const data = res.payload.data
+                        if (data.success) {
+                            if (item.pO_WarehouseId !== "") {
+                                dispatch(addStockEntries(stockEntries))
                             }
-                        })
-                        toggle()
+
+                            if(inventory.some((inve) => inve.inventoryItem === item.pO_ItemDescription)){
+                                const itemX = inventory.find((invent) => invent.inventoryItem === item.pO_ItemDescription)
+                                if(itemX){
+                                    dispatch(updateInventory(itemX.inventoryId, {
+                                        ...itemX,
+                                        inventoryQuantity: itemX.inventoryQuantity - item.pO_Quantity
+                                    }))
+                                }
+                            }
+                        }
+                    })
+                })
+
+                dispatch(getProductionOrder(0)).then((resX) => {
+                    if (resX.payload.data.success) {
+                        dispatch(getInventory())
+                        notify("Route Stage Completed", "info", 2000)
                     }
                 })
-            })
+                toggle()
+            }
         }
     }
 
-    const toggle = () => {
-        dispatch(toggleCreateJobCardPopup(false))
+    const handleOnCellPrepared = (e) => {
+        if (e.rowType === "data" && e.column.dataField === "pO_Quantity") {
+            if(dataSource[e.rowIndex]){
+                const item = dataSource[e.rowIndex].pO_ItemDescription
+                const warehouse = dataSource[e.rowIndex].pO_WarehouseId
+                const requiredQuantity = dataSource[e.rowIndex].pO_Quantity
+
+                const inventoryItem = inventory.find(inv => inv.inventoryItem === item && inv.inventoryWarehouse === warehouse)
+
+                if (inventoryItem && inventoryItem.inventoryQuantity < requiredQuantity) {
+                    e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
+                }
+            }
+        }
     }
 
     const renderHeaderCell = (e) => {
@@ -216,7 +263,8 @@ const CreateJobCard = (props) => {
                     rowAlternationEnabled={true}
                     noDataText={'No Route Stage Pending'}
                     className={'dev-form-treelist'}
-                    columnResizingMode={"nextColumn"}>
+                    columnResizingMode={"nextColumn"}
+                    onCellPrepared={handleOnCellPrepared}>
 
                     <Selection
                         mode="multiple"
@@ -333,7 +381,7 @@ const CreateJobCard = (props) => {
                     />
                 </TreeList>
 
-                <Button size="sm" className={"form-action-button"} style={{ marginTop: 10, float: "right" }} onClick={() => handleOnClick()}>
+                <Button id={"complete"} size="sm" className={"form-action-button"} style={{ marginTop: 10, float: "right" }} onClick={() => handleOnClick()}>
                     Complete
                 </Button>
             </>

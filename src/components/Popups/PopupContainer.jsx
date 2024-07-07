@@ -6,10 +6,12 @@ import DeletePopup from './DeletePopup'
 import CreateResource from './CreateResource'
 import CreateWarehouse from './CreateWarehouse'
 import GeneralSettingPopup from './GeneralSettingPopup'
+import LowSupply from './LowSupply'
 
 const PopupContainer = () => {
     return (
         <>
+            <LowSupply />
             <CreatePlan />
             <CreateItem />
             <DeletePopup />

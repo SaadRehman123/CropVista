@@ -193,6 +193,19 @@ export const updateVendorQuotation = (obj, id) => {
     }
 }
 
+export const deleteVendorQuotation = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/vendorQuotation/delete/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'DELETE_VENDOR_QUOTATION',
+        payload: result
+    }
+}
+
 export const getPurchaseOrder = (id) => {
     const result = axios({
         method: 'GET',

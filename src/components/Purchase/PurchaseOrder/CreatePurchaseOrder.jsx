@@ -173,7 +173,7 @@ const CreatePurchaseOrder = () => {
                             else {
                                 dispatch(updateVendorQuotation( { ...item, vq_Status: "Closed" } , item.vq_Id))
                             }
-                        })    
+                        })
                     }
 
                     if(rfq) {

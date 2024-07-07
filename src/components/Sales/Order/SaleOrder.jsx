@@ -1,7 +1,8 @@
 import React, { Fragment, useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 
+import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
@@ -9,9 +10,9 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { setSaleOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getSaleOrder, saleOrderActionType } from '../../../actions/SalesActions'
-import moment from 'moment'
+import { setSaleOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
+
 import styled from 'styled-components'
 
 const SaleOrder = () => {

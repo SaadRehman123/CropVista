@@ -1,18 +1,21 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import DataSource from 'devextreme/data/data_source'
-import { assignClientId } from '../../../utilities/CommonUtilities'
-import styled from 'styled-components'
-import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
-import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
-import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
-import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { Button } from 'reactstrap'
-import FormBackground from '../../SupportComponents/FormBackground'
 import moment from 'moment'
 import notify from 'devextreme/ui/notify'
+import DataSource from 'devextreme/data/data_source'
+import FormBackground from '../../SupportComponents/FormBackground'
+import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
+
+import { Button } from 'reactstrap'
+import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
+import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
+
+import { assignClientId } from '../../../utilities/CommonUtilities'
 import { addSaleOrder, addSaleOrderItems, deleteSaleOrderItems, getSaleOrder, updateSaleOrder } from '../../../actions/SalesActions'
+
+import styled from 'styled-components'
 
 const CreateSaleOrder = () => {
 

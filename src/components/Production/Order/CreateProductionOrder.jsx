@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import moment from 'moment'
@@ -14,7 +14,7 @@ import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-reac
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { toggleCreateJobCardPopup } from '../../../actions/PopupActions'
+import { toggleCreateJobCardPopup, toggleLowSupplyPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
 import { getPlannedCrops, updateCropsPlan } from '../../../actions/CropsActions'
 import { addInventory, updateInventory } from '../../../actions/InventoryAction'
@@ -45,7 +45,7 @@ const CreateProductionOrder = () => {
 
     const itemResourceDatasource = new DataSource({
         store: {
-            data: assignClientId(treeListData),
+            data: assignClientId(treeListData.sort((a, b) => a.PO_RouteStage - b.PO_RouteStage)),
             type: 'array',
             key: 'clientId',
         }
@@ -190,6 +190,101 @@ const CreateProductionOrder = () => {
         }
         
     }, [productionOrder, selectedItem])
+
+    useEffect(() => {
+        const calculateRequiredQuantities = (treeListData) => {
+            const requiredQuantities = {}
+    
+            treeListData.forEach(item => {
+                if (!item.PO_ItemNo.startsWith("RE")) {
+                    if (!requiredQuantities[item.PO_ItemDescription]) {
+                        requiredQuantities[item.PO_ItemDescription] = {
+                            itemId: item.PO_ItemNo,
+                            requiredQuantity: 0,
+                            uom: item.PO_Uom
+                        }
+                    }
+                    requiredQuantities[item.PO_ItemDescription].requiredQuantity += item.PO_Quantity
+                }
+            })
+    
+            return requiredQuantities
+        }
+    
+        const getAvailableQuantities = (inventory) => {
+            const availableQuantities = {}
+    
+            inventory.forEach(item => {
+                availableQuantities[item.inventoryItem] = {
+                    inventoryId: item.inventoryId,
+                    availableQuantity: item.inventoryQuantity
+                }
+            })
+    
+            return availableQuantities
+        }
+    
+        const filterAvailableQuantities = (availableQuantities, requiredQuantities) => {
+            const filteredAvailableQuantities = {}
+    
+            for (const item in requiredQuantities) {
+                if (availableQuantities[item] !== undefined) {
+                    filteredAvailableQuantities[item] = availableQuantities[item]
+                }
+            }
+    
+            return filteredAvailableQuantities
+        }
+    
+        const findLowSupplyItems = (requiredQuantities, filteredAvailableQuantities) => {
+            const lowSupplyItems = []
+    
+            for (const item in requiredQuantities) {
+                const requiredQuantity = requiredQuantities[item].requiredQuantity
+                const availableQuantity = filteredAvailableQuantities[item].availableQuantity
+    
+                if (requiredQuantity > availableQuantity) {
+                    lowSupplyItems.push({
+                        itemName: item,
+                        itemId: requiredQuantities[item].itemId,
+                        itemQuantity: requiredQuantity,
+                        availableQuantity: availableQuantity,
+                        uom: requiredQuantities[item].uom,
+                        pR_itemId: "",
+                        pR_Id: ""
+                    })
+                }
+            }
+    
+            return lowSupplyItems
+        }
+    
+        const availableQuantities = getAvailableQuantities(inventory)
+        const requiredQuantities = calculateRequiredQuantities(treeListData.filter((item) => item.PO_Status === "Pending"))
+        const filteredAvailableQuantities = filterAvailableQuantities(availableQuantities, requiredQuantities)
+        const lowSupplyItems = findLowSupplyItems(requiredQuantities, filteredAvailableQuantities)
+            
+        if (lowSupplyItems.length !== 0) dispatch(toggleLowSupplyPopup({ active: true, arr: lowSupplyItems, body: (
+            <>
+                <p>The following Supplies are running low</p>
+                <h6>Avaiable Quantity</h6>
+                <ul style={{ listStyleType: 'disc', paddingLeft: 17 }}>
+                    {lowSupplyItems.map((item, index) => (
+                        <li key={index} style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>Item: {item.itemName} || Quantity: {item.availableQuantity}</li>
+                    ))}
+                </ul>
+                <hr />
+                <h6>Required Quantity</h6>
+                <ul style={{ listStyleType: 'disc', paddingLeft: 17 }}>
+                    {lowSupplyItems.map((item, index) => (
+                        <li key={index} style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>Item: {item.itemName} || Quantity: {item.itemQuantity}</li>
+                    ))}
+                </ul>
+            </>
+        )}))
+
+    }, [formData])
+    
 
     const onValueChanged = (e) => {
         const value = e.value
@@ -374,7 +469,7 @@ const CreateProductionOrder = () => {
         }
     }
 
-    const ProgressBar = () => {
+    const ProgressBar = useCallback(() => {
         const totalRows = treeListData.length
         const completedRows = treeListData.filter(item => item.PO_Status === 'Completed').length
         const progress = (completedRows / totalRows) * 100
@@ -384,7 +479,7 @@ const CreateProductionOrder = () => {
                 <Progress animated bar color="success" value={isNaN(progress) ? 0 : progress}>{`${progress.toFixed(0)}%`}</Progress>
             </Progress>
         )
-    }
+    }, [treeListData])
 
     const handleOnFocusOut = (e) => {
         const name = e.event.target.accessKey
@@ -557,7 +652,7 @@ const CreateProductionOrder = () => {
                     </div>
                 </Header>
 
-                <div style={{ margin: 10 }}><ProgressBar /></div>
+                <div style={{ margin: 10 }}>{ProgressBar()}</div>
 
                 <form onSubmit={handleOnSubmit}>
                     <FormGroupContainer>
@@ -580,6 +675,7 @@ const CreateProductionOrder = () => {
                                             dataSource={plannedCrops.filter((item) => bom.some(bomItem => bomItem.productId === item.itemId) && item.status === "Pending")}
                                             openOnFieldClick={true}
                                             value={formData.itemId}
+                                            acceptCustomValue={true}
                                             onFocusOut={handleOnFocusOut}
                                             placeholder={"Select Product No"}
                                             dropDownOptions={{ maxHeight: 300 }}

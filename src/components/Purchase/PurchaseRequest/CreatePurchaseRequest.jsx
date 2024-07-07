@@ -51,6 +51,10 @@ const CreatePurchaseRequest = () => {
             })
             setTreeListData([...purchaseRequestAction.node.data.children])
         }
+        else if(purchaseRequestAction.type === "COMP_CREATE"){
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), purchaseReqStatus: "Pending" }))            
+            setTreeListData([...purchaseRequestAction.node])
+        }
     }, [])
 
     const handleOnAddRow = () => {
@@ -129,7 +133,7 @@ const CreatePurchaseRequest = () => {
             children: [...treeListData]
         }
 
-        if (purchaseRequestAction.type === "CREATE") {
+        if (purchaseRequestAction.type === "CREATE" || purchaseRequestAction.type === "COMP_CREATE") {
             dispatch(addPurchaseRequest(purchaseRequest)).then((res) => {
                 const response = res.payload.data
                 if (response.success) {

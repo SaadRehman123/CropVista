@@ -11,7 +11,7 @@ import { DateBox, SelectBox, TextBox, TreeList } from "devextreme-react"
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from "../../SupportComponents/StyledComponents"
 
-import { updateInventory } from "../../../actions/InventoryAction"
+import { getInventory, updateInventory } from "../../../actions/InventoryAction"
 import { assignClientId } from "../../../utilities/CommonUtilities"
 import { addGoodReceipt, getGoodReceipt, getPurchaseOrder, updatePurchaseOrder } from "../../../actions/PurchaseAction"
 
@@ -159,6 +159,7 @@ const CreateGoodReceipt = () => {
                         vendorNumber: ""
                     }))
                     setTreeListData([])
+                    dispatch(getInventory())
                     dispatch(getGoodReceipt(0))
                     notify("Good Receipt Created Successfully")
                 }

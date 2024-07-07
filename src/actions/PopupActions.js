@@ -39,3 +39,10 @@ export const toggleCreateItemPopup = (obj) => {
 		payload : obj
 	}
 }
+
+export const toggleLowSupplyPopup = (obj) => {
+    return {
+		type : "TOGGLE_LOW_SUPPLY_POPUP",
+		payload : obj
+	}
+}

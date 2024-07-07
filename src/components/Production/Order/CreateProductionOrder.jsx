@@ -479,7 +479,7 @@ const CreateProductionOrder = () => {
                 <Progress animated bar color="success" value={isNaN(progress) ? 0 : progress}>{`${progress.toFixed(0)}%`}</Progress>
             </Progress>
         )
-    }, [treeListData])
+    }, [productionOrder])
 
     const handleOnFocusOut = (e) => {
         const name = e.event.target.accessKey

@@ -145,3 +145,24 @@ export const setCustomerMasterRef = (value) => {
 		payload: value
 	}
 }
+
+export const setSaleOrderRef = (value) => {
+	return {
+		type: "SET_SALE_ORDER_REF",
+		payload: value
+	}
+}
+
+export const setGoodIssueRef = (value) => {
+	return {
+		type: "SET_GOOD_ISSUE_REF",
+		payload: value
+	}
+}
+
+export const setSaleInvoiceRef = (value) => {
+	return {
+		type: "SET_SALE_INVOICE_REF",
+		payload: value
+	}
+}

@@ -207,6 +207,7 @@ const CreatePurchaseInvoice = () => {
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
                                         value={formData.creationDate}
+                                        validationStatus={'valid'}
                                     />
                                 </FormGroupItem>
 

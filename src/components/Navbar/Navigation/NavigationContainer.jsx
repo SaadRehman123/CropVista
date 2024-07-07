@@ -118,6 +118,18 @@ const NavigationContainer = () => {
             navigate('/app/Customer_Master')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        else if(obj.id === "saleOrder"){
+            navigate('/app/Sale_Order')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
+        else if(obj.id === "goodIssue"){
+            navigate('/app/Good_Issue')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
+        else if(obj.id === "saleInvoice"){
+            navigate('/app/Sale_Invoice')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
     }
 
     return (
@@ -158,5 +170,8 @@ const navigations = [
     {id: "good-receipt", name: "Good Receipt", icon: "fal fa-receipt", pad: 10, type: "purchase"},
     {id: "purchase-invoice", name: "Purchase Invoice", icon: "fal fa-file-invoice-dollar", pad: 10, type: "purchase"},
     {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-users", pad: 5, type: "purchase"},
-    {id: "customerMaster", name: "Customer Master", icon: "fal fa-users", pad: 5, type: "sales"},
+    {id: "saleOrder", name: "Sale Order", icon: "fal fa-users", pad: 5, type: "sales"},
+    {id: "goodIssue", name: "Good Issue", icon: "fal fa-users", pad: 5, type: "sales"},
+    {id: "saleInvoice", name: "Sale Invoice", icon: "fal fa-users", pad: 5, type: "sales"},
+    {id: "customerMaster", name: "Customer Master", icon: "fal fa-users", pad: 5, type: "sales"}
 ]

@@ -4,8 +4,11 @@ import { Route, Routes } from 'react-router-dom'
 import Purchase from '../components/Cards/Purchase'
 import Inventory from '../components/Cards/Inventory'
 import Production from '../components/Cards/Production'
+import GoodIssue from '../components/Sales/Issue/GoodIssue'
+import SaleOrder from '../components/Sales/Order/SaleOrder'
 import CropPlan from '../components/Production/Crops/CropPlan'
 import Resource from '../components/Inventory/Resource/Resource'
+import SalesInvoice from '../components/Sales/Invoice/SalesInvoice'
 import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import GoodReceipt from '../components/Purchase/Invoice/GoodReceipt'
 import StockEntries from '../components/Inventory/Stock/StockEntries'
@@ -31,6 +34,7 @@ import CreateVendorQuotation from '../components/Purchase/Quotation/CreateVendor
 import CreatePurchaseOrder from '../components/Purchase/PurchaseOrder/CreatePurchaseOrder'
 import CreatePurchaseRequest from '../components/Purchase/PurchaseRequest/CreatePurchaseRequest'
 import CreateRequestForQuotation from '../components/Purchase/Quotation/CreateRequestForQuotation'
+import CreateSaleOrder from '../components/Sales/Order/CreateSaleOrder'
 
 const AppRoutes = () => {
     return (
@@ -156,6 +160,22 @@ const AppRoutes = () => {
                 <Route
                     path="Customer_Master"
                     element={<CustomerMaster />}>
+                </Route>
+                <Route
+                    path="Sale_Order"
+                    element={<SaleOrder />}>
+                </Route>
+                <Route
+                    path="Create_Sale_Order"
+                    element={<CreateSaleOrder />}>
+                </Route>
+                <Route
+                    path="Good_Issue"
+                    element={<GoodIssue />}>
+                </Route>
+                <Route
+                    path="saleInvoice"
+                    element={<SalesInvoice />}>
                 </Route>
             </Routes>
         </div>

@@ -8,16 +8,17 @@ import notify from 'devextreme/ui/notify'
 
 import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteResource, getResource } from '../../actions/ResourceAction'
+import { getSaleOrder, updateSaleOrder } from '../../actions/SalesActions'
 import { updateProductionOrder } from '../../actions/ProductionOrderAction'
 import { deleteVendor, getVendorMaster } from '../../actions/VendorActions'
 import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
-import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
-import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
-
-import styled from 'styled-components'
-import { deleteVendorQuotation, getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updateGoodReceipt, updatePurchaseOrder, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../actions/PurchaseAction'
 import { getInventory, updateInventory } from '../../actions/InventoryAction'
 import { deleteCustomer, getCustomerMaster } from '../../actions/CustomerActions'
+import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
+import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
+import { deleteVendorQuotation, getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updateGoodReceipt, updatePurchaseOrder, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../actions/PurchaseAction'
+
+import styled from 'styled-components'
 
 const DeletePopup = () => {
     
@@ -27,6 +28,7 @@ const DeletePopup = () => {
     const deletePopup = useSelector((state) => state.view.deletePopup)
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
     const warehouseRef = useSelector((state) => state.view.warehouseRef)
+    const saleOrderRef = useSelector((state) => state.view.saleOrderRef)
     const inventory = useSelector(state => state.inventory.inventoryStatus)
     const purchaseOrder = useSelector(state => state.purchase.purchaseOrder)
     const goodReceiptRef = useSelector((state) => state.view.goodReceiptRef)
@@ -82,6 +84,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'GOOD_RECEIPT') {
             return 'Cancel Good Receipt'
         }
+        else if (deletePopup.type === 'SALE_ORDER') {
+            return 'Cancel Sale Order'
+        }
     }, [deletePopup])
 
     const renderText = () => {
@@ -120,6 +125,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'GOOD_RECEIPT') {
             return 'Are you sure you want to cancel Good Receipt?'
+        }
+        else if (deletePopup.type === 'SALE_ORDER') {
+            return 'Are you sure you want to cancel Sale Order?'
         }
     }
 
@@ -492,6 +500,30 @@ const DeletePopup = () => {
                     dispatch(getInventory())
                     dispatch(getGoodReceipt(0))
                     dispatch(getPurchaseOrder(0))
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === 'SALE_ORDER'){
+            const instance = saleOrderRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+        
+            const obj = {
+                saleOrder_Id: selectedRow[0].saleOrder_Id, 
+                creationDate: selectedRow[0].creationDate, 
+                deliveryDate: selectedRow[0].deliveryDate, 
+                customerId: selectedRow[0].customerId, 
+                customerName: selectedRow[0].customerName, 
+                customerAddress: selectedRow[0].customerAddress, 
+                customerNumber: selectedRow[0].customerNumber, 
+                total: selectedRow[0].total, 
+                so_Status: "Cancelled",
+                children: selectedRow[0].children, 
+            }
+
+            dispatch(updateSaleOrder(obj, obj.saleOrder_Id)).then((res) => {
+                if(res.payload.data.success){
+                    dispatch(getSaleOrder(0))
                 }
             })
             handleOnToggle(deletePopup.type)

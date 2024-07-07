@@ -1,7 +1,10 @@
 const INITIAL_STATE = {
 	saleOrder : [],
 	goodIssue : [],
-	saleInvoice : []
+	saleInvoice : [],
+    saleOrderAction: { node: null, type: "CREATE" },
+    goodIssueAction: { node: null, type: "CREATE" },
+    saleInvoiceAction: { node: null, type: "CREATE" }
 }
 
 const SalesReducer = (state = INITIAL_STATE, action) => {
@@ -22,6 +25,24 @@ const SalesReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 saleInvoice: action.payload.data.result
+            }
+        }
+        case "SALE_ORDER_ACTION_TYPE": {
+            return {
+                ...state,
+                saleOrderAction: action.payload
+            }
+        }
+        case "SALE_INVOICE_ACTION_TYPE": {
+            return {
+                ...state,
+                saleInvoiceAction: action.payload
+            }
+        }
+        case "GOOD_ISSUE_ACTION_TYPE": {
+            return {
+                ...state,
+                goodIssueAction: action.payload
             }
         }
 		default: return state

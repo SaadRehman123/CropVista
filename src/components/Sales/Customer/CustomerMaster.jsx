@@ -144,7 +144,7 @@ const CustomerMaster = () => {
 
                 <TreeList
                     elementAttr={{
-                        id: "vendor-master-treelist",
+                        id: "customer-master-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"customerId"}
@@ -155,7 +155,7 @@ const CustomerMaster = () => {
                     dataSource={customerMaster}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Vendor'}
+                    noDataText={'No customer'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>

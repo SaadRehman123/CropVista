@@ -185,7 +185,7 @@ const CreateCustomer = () => {
                                             class: "form-textbox"
                                         }}
                                         accessKey={'customerEmail'}
-                                        placeholder='Enter Vendor Email'
+                                        placeholder='Enter Customer Email'
                                         onFocusIn={handleOnFocusIn}
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.customerEmail}

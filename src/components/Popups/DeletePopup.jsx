@@ -617,6 +617,9 @@ const setComponent = (type) => {
     else if(type === "GOOD_RECEIPT"){
         return true
     }
+    else if(type === "SALE_ORDER"){
+        return true
+    }
 
     return false
 }

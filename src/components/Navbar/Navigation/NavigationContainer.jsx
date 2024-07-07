@@ -170,8 +170,8 @@ const navigations = [
     {id: "good-receipt", name: "Good Receipt", icon: "fal fa-receipt", pad: 10, type: "purchase"},
     {id: "purchase-invoice", name: "Purchase Invoice", icon: "fal fa-file-invoice-dollar", pad: 10, type: "purchase"},
     {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-users", pad: 5, type: "purchase"},
-    {id: "saleOrder", name: "Sale Order", icon: "fal fa-users", pad: 5, type: "sales"},
-    {id: "goodIssue", name: "Good Issue", icon: "fal fa-users", pad: 5, type: "sales"},
-    {id: "saleInvoice", name: "Sale Invoice", icon: "fal fa-users", pad: 5, type: "sales"},
+    {id: "saleOrder", name: "Sale Order", icon: "fal fa-file-chart-line", pad: 5, type: "sales"},
+    {id: "goodIssue", name: "Good Issue", icon: "fal fa-file-export", pad: 5, type: "sales"},
+    {id: "saleInvoice", name: "Sale Invoice", icon: "fal fa-file-alt", pad: 5, type: "sales"},
     {id: "customerMaster", name: "Customer Master", icon: "fal fa-users", pad: 5, type: "sales"}
 ]

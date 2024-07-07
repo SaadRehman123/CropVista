@@ -11,6 +11,7 @@ const INITIAL_STATE = {
 	itemResourceRef: null,
 	vendorMasterRef: null,
 	purchaseOrderRef: null,
+	customerMasterRef: null,
 	vendorQuotationRef: null,
 	productionOrderRef: null,
 	purchaseRequestRef: null,
@@ -141,6 +142,12 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
 			return {
 				...state,
 				purchaseInvoiceRef: action.payload
+			}
+		}
+		case "SET_CUSTOMER_MASTER_REF": {
+			return {
+				...state,
+				customerMasterRef: action.payload
 			}
 		}
 		default: return state

@@ -44,6 +44,9 @@ const NavigationContainer = () => {
         else if (section === "purchase"){
             navigate('/app/purchase')
         }
+        else if (section === "sales"){
+            navigate('/app/sales')
+        }
     }
 
     const handleOnClick = (obj) => {
@@ -111,6 +114,10 @@ const NavigationContainer = () => {
             navigate('/app/Purchase_Invoice')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        else if(obj.id === "customerMaster"){
+            navigate('/app/Customer_Master')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
     }
 
     return (
@@ -119,7 +126,7 @@ const NavigationContainer = () => {
             <ProductionNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
             <InventoryNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
             <PurchaseNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
-            {/* <SalesNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} /> */}
+            <SalesNavigation navigations={navigations} sectionsState={sectionsState} handleOnExpand={handleOnExpand} handleOnClick={handleOnClick} activeTab={activeTab} handleOnSectionClick={handleOnSectionClick} />
         </Container>
     )
 }
@@ -150,5 +157,6 @@ const navigations = [
     {id: "purchase-order", name: "Purchase Order", icon: "fal fa-file-contract", pad: 10, type: "purchase"},
     {id: "good-receipt", name: "Good Receipt", icon: "fal fa-receipt", pad: 10, type: "purchase"},
     {id: "purchase-invoice", name: "Purchase Invoice", icon: "fal fa-file-invoice-dollar", pad: 10, type: "purchase"},
-    {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-users", pad: 5, type: "purchase"}
+    {id: "vendorMaster", name: "Vendor Master", icon: "fal fa-users", pad: 5, type: "purchase"},
+    {id: "customerMaster", name: "Customer Master", icon: "fal fa-users", pad: 5, type: "sales"},
 ]

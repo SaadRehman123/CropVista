@@ -17,6 +17,7 @@ import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions
 import styled from 'styled-components'
 import { deleteVendorQuotation, getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updateGoodReceipt, updatePurchaseOrder, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../actions/PurchaseAction'
 import { getInventory, updateInventory } from '../../actions/InventoryAction'
+import { deleteCustomer, getCustomerMaster } from '../../actions/CustomerActions'
 
 const DeletePopup = () => {
     
@@ -33,6 +34,7 @@ const DeletePopup = () => {
     const purchaseOrderRef = useSelector((state) => state.view.purchaseOrderRef)
     const purchaseRequest = useSelector(state => state.purchase.purchaseRequest)
     const vendorQuotation = useSelector(state => state.purchase.vendorQuotation)
+    const customerMasterRef = useSelector((state) => state.view.customerMasterRef)
     const vendorQuotationRef = useSelector((state) => state.view.vendorQuotationRef)
     const productionOrderRef = useSelector((state) => state.view.productionOrderRef)
     const purchaseRequestRef = useSelector((state) => state.view.purchaseRequestRef)
@@ -61,6 +63,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'VENDOR_MASTER') {
             return 'Delete Vendor'
+        }
+        else if (deletePopup.type === 'CUSTOMER_MASTER') {
+            return 'Delete Customer'
         }
         else if (deletePopup.type === 'PURCHASE_REQUEST') {
             return 'Cancel Purchase Request'
@@ -97,6 +102,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'VENDOR_MASTER') {
             return 'Are you sure you want to delete selected Vendor?'
+        }
+        else if (deletePopup.type === 'CUSTOMER_MASTER') {
+            return 'Are you sure you want to delete selected Customer?'
         }
         else if (deletePopup.type === 'PURCHASE_REQUEST') {
             return 'Are you sure you want to cancel purchase request?'
@@ -276,6 +284,27 @@ const DeletePopup = () => {
                     }
 
                     notify("Production Order Cancelled", "info", 2000)
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "CUSTOMER_MASTER") {
+            const instance = customerMasterRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                customerId: selectedRow[0].customerId,
+                customerName: selectedRow[0].customerName, 
+                customerAddress: selectedRow[0].customerAddress,
+                customerEmail: selectedRow[0].customerEmail,
+                customerNumber: selectedRow[0].customerNumber,
+                disable: selectedRow[0].disable
+            }
+
+            dispatch(deleteCustomer(selectedRow[0].customerId, obj)).then(res => {
+                const data = res.payload.data
+                if(data.success){
+                    dispatch(getCustomerMaster())
                 }
             })
             handleOnToggle(deletePopup.type)

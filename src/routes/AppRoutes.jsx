@@ -10,6 +10,8 @@ import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import GoodReceipt from '../components/Purchase/Invoice/GoodReceipt'
 import StockEntries from '../components/Inventory/Stock/StockEntries'
 import ItemMaster from '../components/Inventory/ItemMaster/ItemMaster'
+import CreateCustomer from '../components/Sales/Customer/CreateCustomer'
+import CustomerMaster from '../components/Sales/Customer/CustomerMaster'
 import CreateBOM from '../components/Production/BillOfMaterial/CreateBOM'
 import VendorMaster from '../components/Purchase/VendorMaster/VendorMaster'
 import CreateVendor from '../components/Purchase/VendorMaster/CreateVendor'
@@ -146,6 +148,14 @@ const AppRoutes = () => {
                 <Route
                     path="Create_Purchase_Invoice"
                     element={<CreatePurchaseInvoice />}>
+                </Route>
+                <Route
+                    path="Create_Customer"
+                    element={<CreateCustomer />}>
+                </Route>
+                <Route
+                    path="Customer_Master"
+                    element={<CustomerMaster />}>
                 </Route>
             </Routes>
         </div>

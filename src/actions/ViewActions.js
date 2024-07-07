@@ -138,3 +138,10 @@ export const setPurchaseInvoiceRef = (value) => {
 		payload: value
 	}
 }
+
+export const setCustomerMasterRef = (value) => {
+	return {
+		type: "SET_CUSTOMER_MASTER_REF",
+		payload: value
+	}
+}

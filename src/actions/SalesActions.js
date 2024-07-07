@@ -65,6 +65,44 @@ export const updateSaleOrder = (obj, id) => {
     }
 }
 
+export const getGoodIssue = (id) => {
+    const result = axios({
+        method: 'GET',
+        url: `rest/goodIssue/getGoodIssue/${id}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_GOOD_ISSUE',
+        payload: result
+    }
+}
+
+export const addGoodIssue = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/goodIssue/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_GOOD_ISSUE',
+        payload: result
+    }
+}
+
+export const updateGoodIssue = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/goodIssue/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_GOOD_ISSUE',
+        payload: result
+    }
+}
+
 export const saleOrderActionType = (obj) => {
     return {
         type: "SALE_ORDER_ACTION_TYPE",

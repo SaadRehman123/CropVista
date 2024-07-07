@@ -8,7 +8,7 @@ import notify from 'devextreme/ui/notify'
 
 import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteResource, getResource } from '../../actions/ResourceAction'
-import { getSaleOrder, updateSaleOrder } from '../../actions/SalesActions'
+import { getGoodIssue, getSaleOrder, updateGoodIssue, updateSaleOrder } from '../../actions/SalesActions'
 import { updateProductionOrder } from '../../actions/ProductionOrderAction'
 import { deleteVendor, getVendorMaster } from '../../actions/VendorActions'
 import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
@@ -23,12 +23,14 @@ import styled from 'styled-components'
 const DeletePopup = () => {
     
     const bomRef = useSelector((state) => state.view.bomRef)
+    const saleOrder = useSelector(state => state.sales.saleOrder)
     const resourceRef = useSelector(state => state.view.resourceRef)
     const cropPlanRef = useSelector((state) => state.view.cropPlanRef)
     const deletePopup = useSelector((state) => state.view.deletePopup)
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
     const warehouseRef = useSelector((state) => state.view.warehouseRef)
     const saleOrderRef = useSelector((state) => state.view.saleOrderRef)
+    const goodIssueRef = useSelector((state) => state.view.goodIssueRef)
     const inventory = useSelector(state => state.inventory.inventoryStatus)
     const purchaseOrder = useSelector(state => state.purchase.purchaseOrder)
     const goodReceiptRef = useSelector((state) => state.view.goodReceiptRef)
@@ -87,6 +89,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'SALE_ORDER') {
             return 'Cancel Sale Order'
         }
+        else if (deletePopup.type === 'GOOD_ISSUE') {
+            return 'Cancel Good Issue'
+        }
     }, [deletePopup])
 
     const renderText = () => {
@@ -128,6 +133,9 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'SALE_ORDER') {
             return 'Are you sure you want to cancel Sale Order?'
+        }
+        else if (deletePopup.type === 'GOOD_ISSUE') {
+            return 'Are you sure you want to cancel Good Issue?'
         }
     }
 
@@ -528,6 +536,53 @@ const DeletePopup = () => {
             })
             handleOnToggle(deletePopup.type)
         }
+        else if(deletePopup.type === 'GOOD_ISSUE'){
+            const instance = goodIssueRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+        
+            const obj = {
+                gi_Id: selectedRow[0].gi_Id, 
+                creationDate: selectedRow[0].creationDate, 
+                saleOrder_Id: selectedRow[0].saleOrder_Id, 
+                customerId: selectedRow[0].customerId, 
+                customerName: selectedRow[0].customerName, 
+                customerAddress: selectedRow[0].customerAddress, 
+                customerNumber: selectedRow[0].customerNumber,
+                total: selectedRow[0].total, 
+                gi_Status: "Cancelled",
+                children: selectedRow[0].children,
+            }
+
+            dispatch(updateGoodIssue(obj, obj.gi_Id)).then((res) => {
+                const response = res.payload.data
+                if(response.success){
+                    const SO = saleOrder.find(item => item.saleOrder_Id === obj.saleOrder_Id)
+                    if(SO){
+                        dispatch(updateSaleOrder({ ...SO, so_Status: "Created" }, SO.saleOrder_Id)).then((resX) => {
+                            if(resX.payload.data.success){
+                                dispatch(getSaleOrder(0))
+                            }
+                        })
+                    }
+
+                    response.result.children.forEach((child) => {
+                        if(inventory.some((item) => item.inventoryItem === child.itemName)){
+                            const item = inventory.find((item) => item.inventoryItem === child.itemName)
+                            if(item){
+                                dispatch(updateInventory(item.inventoryId, {
+                                    ...item,
+                                    inventoryQuantity: item.inventoryQuantity + child.itemQuantity
+                                }))
+                            }
+                        }
+                    })
+
+                    dispatch(getInventory())
+                    dispatch(getGoodIssue(0))
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
     }
 
     return (
@@ -618,6 +673,9 @@ const setComponent = (type) => {
         return true
     }
     else if(type === "SALE_ORDER"){
+        return true
+    }
+    else if(type === "GOOD_ISSUE"){
         return true
     }
 

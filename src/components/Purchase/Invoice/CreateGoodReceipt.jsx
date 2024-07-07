@@ -11,8 +11,8 @@ import { DateBox, SelectBox, TextBox, TreeList } from "devextreme-react"
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from "../../SupportComponents/StyledComponents"
 
-import { getInventory, updateInventory } from "../../../actions/InventoryAction"
 import { assignClientId } from "../../../utilities/CommonUtilities"
+import { getInventory, updateInventory } from "../../../actions/InventoryAction"
 import { addGoodReceipt, getGoodReceipt, getPurchaseOrder, updatePurchaseOrder } from "../../../actions/PurchaseAction"
 
 const CreateGoodReceipt = () => {
@@ -204,7 +204,7 @@ const CreateGoodReceipt = () => {
                                         }}
                                         readOnly={true}
                                         accessKey={'vendorId'}
-                                        placeholder={"Enter Address"}
+                                        placeholder={"Enter Vendor"}
                                         value={formData.vendorId}
                                     />
                                 </FormGroupItem>

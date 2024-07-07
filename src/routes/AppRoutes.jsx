@@ -13,6 +13,8 @@ import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import GoodReceipt from '../components/Purchase/Invoice/GoodReceipt'
 import StockEntries from '../components/Inventory/Stock/StockEntries'
 import ItemMaster from '../components/Inventory/ItemMaster/ItemMaster'
+import CreateSaleOrder from '../components/Sales/Order/CreateSaleOrder'
+import CreateGoodIssue from '../components/Sales/Issue/CreateGoodIssue'
 import CreateCustomer from '../components/Sales/Customer/CreateCustomer'
 import CustomerMaster from '../components/Sales/Customer/CustomerMaster'
 import CreateBOM from '../components/Production/BillOfMaterial/CreateBOM'
@@ -34,7 +36,6 @@ import CreateVendorQuotation from '../components/Purchase/Quotation/CreateVendor
 import CreatePurchaseOrder from '../components/Purchase/PurchaseOrder/CreatePurchaseOrder'
 import CreatePurchaseRequest from '../components/Purchase/PurchaseRequest/CreatePurchaseRequest'
 import CreateRequestForQuotation from '../components/Purchase/Quotation/CreateRequestForQuotation'
-import CreateSaleOrder from '../components/Sales/Order/CreateSaleOrder'
 
 const AppRoutes = () => {
     return (
@@ -172,6 +173,10 @@ const AppRoutes = () => {
                 <Route
                     path="Good_Issue"
                     element={<GoodIssue />}>
+                </Route>
+                <Route
+                    path="Create_Good_Issue"
+                    element={<CreateGoodIssue />}>
                 </Route>
                 <Route
                     path="saleInvoice"

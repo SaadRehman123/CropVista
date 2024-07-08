@@ -5,8 +5,8 @@ import { Card, CardBody, CardHeader, CardText, CardTitle } from 'reactstrap'
 
 import FormBackground from '../SupportComponents/FormBackground'
 
-import styled from 'styled-components'
 import './styles.css'
+import styled from 'styled-components'
 
 const Purchase = () => {
 
@@ -14,25 +14,25 @@ const Purchase = () => {
 
     const handleOnCardClick = (id) => {
         if (id === 1) {
-            navigate('/app/Vendor_Master')
-        }
-        else if (id === 2) {
             navigate('/app/Purchase_Request')
         }
-        else if (id === 3) {
-            navigate('/app/Purchase_Order')
-        }
-        else if (id === 4) {
+        else if (id === 2) {
             navigate('/app/Request_For_Quotation')
         }
-        else if (id === 5) {
+        else if (id === 3) {
             navigate('/app/Vendor_Quotation')
         }
-        else if (id === 6) {
+        else if (id === 4) {
+            navigate('/app/Purchase_Order')
+        }
+        else if (id === 5) {
             navigate('/app/Good_Receipt')
         }
-        else if (id === 7) {
+        else if (id === 6) {
             navigate('/app/Purchase_Invoice')
+        }
+        else if (id === 7) {
+            navigate('/app/Vendor_Master')
         }
     }
 
@@ -68,11 +68,11 @@ const CardContainer = styled.div`
 `
 
 const card = [
-    { id: 1, name: "Vendor Master", text: "Create and maintain detailed records of all vendors, ensuring accurate and up-to-date information for streamlined procurement processes"},
-    { id: 2, name: "Purchase Request", text: "Initiate procurement processes by submitting purchase requests, detailing required items and quantities to facilitate efficient purchasing"},
-    { id: 3, name: "Purchase Order", text: "Formally authorize the purchase of goods or services from vendors, specifying terms, quantities, and agreed prices for seamless transaction management"},
-    { id: 4, name: "Request For Quotation", text: "Request price quotations from vendors to compare offerings and negotiate terms, ensuring competitive pricing and optimal procurement decisions"},
-    { id: 5, name: "Vendor Quotation", text: "Receive and evaluate detailed price quotations from vendors, comparing offers to make informed purchasing decisions and optimize procurement costs"},
-    { id: 6, name: "Good Receipt", text: "Record the receipt of goods from vendors into inventory, ensuring accuracy in quantity and quality to maintain efficient supply chain operations"},
-    { id: 7, name: "Purchase Invoice", text: "Receive and process invoices from vendors for goods or services purchased, ensuring timely and accurate payments while maintaining financial transparency"}
+    { id: 1, name: "Purchase Request", text: "Initiate procurement processes by submitting purchase requests, detailing required items and quantities to facilitate efficient purchasing"},
+    { id: 2, name: "Request For Quotation", text: "Request price quotations from vendors to compare offerings and negotiate terms, ensuring competitive pricing and optimal procurement decisions"},
+    { id: 3, name: "Vendor Quotation", text: "Receive and evaluate detailed price quotations from vendors, comparing offers to make informed purchasing decisions and optimize procurement costs"},
+    { id: 4, name: "Purchase Order", text: "Formally authorize the purchase of goods or services from vendors, specifying terms, quantities, and agreed prices for seamless transaction management"},
+    { id: 5, name: "Good Receipt", text: "Record the receipt of goods from vendors into inventory, ensuring accuracy in quantity and quality to maintain efficient supply chain operations"},
+    { id: 6, name: "Purchase Invoice", text: "Receive and process invoices from vendors for goods or services purchased, ensuring timely and accurate payments while maintaining financial transparency"},
+    { id: 7, name: "Vendor Master", text: "Create and maintain detailed records of all vendors, ensuring accurate and up-to-date information for streamlined procurement processes"}
 ]

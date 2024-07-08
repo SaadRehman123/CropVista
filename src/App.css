@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
+body{
+    overflow: hidden; 
+}
+
 .modal-title {
     font-size: 16px;
     color: #0A1A1E;
@@ -37,7 +41,7 @@ input::-webkit-inner-spin-button {
 }
 
 #content{
-    overflow-y: scroll !important;
+    overflow-y: hidden !important;
     overflow-x: hidden !important;
 }
 

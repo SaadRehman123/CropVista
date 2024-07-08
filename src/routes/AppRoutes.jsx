@@ -1,6 +1,7 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
+import Sales from '../components/Cards/Sales'
 import Purchase from '../components/Cards/Purchase'
 import Inventory from '../components/Cards/Inventory'
 import Production from '../components/Cards/Production'
@@ -53,6 +54,10 @@ const AppRoutes = () => {
                 <Route
                     path="purchase"
                     element={<Purchase />}>
+                </Route>
+                <Route
+                    path="sales"
+                    element={<Sales />}>
                 </Route>
                 <Route
                     index

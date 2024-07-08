@@ -36,18 +36,14 @@ const ProductionChart = ({ selectedYear }) => {
         }
     }
 
-    const pointClickHandler = (e) => {
-        toggleVisibility(e.target);
-    }
-    
     const legendClickHandler = (e) => {
-        const arg = e.target;
-        const item = e.component.getAllSeries()[0].getPointsByArg(arg)[0];
-        toggleVisibility(item);
+        const arg = e.target
+        const item = e.component.getAllSeries()[0].getPointsByArg(arg)[0]
+        toggleVisibility(item)
     }
 
     const toggleVisibility = (item) => {
-        item.isVisible() ? item.hide() : item.show();
+        item.isVisible() ? item.hide() : item.show()
     }
 
     return (
@@ -57,14 +53,13 @@ const ProductionChart = ({ selectedYear }) => {
             palette="Soft Pastel"
             title="Annual Crop Production"
             dataSource={dataSource}
-            onPointClick={pointClickHandler}
             onLegendClick={legendClickHandler}>
             <Series argumentField="crop" valueField="val">
                 <Label visible={true} customizeText={(arg) => `${arg.valueText} Kg`} >
                     <Connector visible={true} />
                 </Label>
             </Series>
-            <Size width={500} />
+            <Size width={500} height={280} />
             <Export enabled={true} fileName={"Annual Crop Production"} />
             <Legend
                 margin={0}

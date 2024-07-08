@@ -40,7 +40,7 @@ const DashboardContainer = () => {
                 </div>
 
                 <div style={{ display : "flex", alignContent: "center", justifyContent: "space-evenly" }}>
-                    <SalesChart />
+                    <SalesChart selectedYear={selectedYear} />
                     <ProductionChart selectedYear={selectedYear} />
                 </div>
             </div>

@@ -469,19 +469,17 @@ const CreateProductionOrder = () => {
         }
     }
 
-    const ProgressBar = () => {
+    const ProgressBar = useCallback(() => {
         const totalRows = treeListData.length
         const completedRows = treeListData.filter(item => item.PO_Status === 'Completed').length
         const progress = (completedRows / totalRows) * 100
-
-        console.log(progress)
 
         return (
             <Progress multi style={{ height: 25 }}>
                 <Progress animated bar color="success" value={isNaN(progress) ? 0 : progress}>{`${progress.toFixed(0)}%`}</Progress>
             </Progress>
         )
-    }
+    }, [treeListData])
 
     const handleOnFocusOut = (e) => {
         const name = e.event.target.accessKey
@@ -654,8 +652,7 @@ const CreateProductionOrder = () => {
                     </div>
                 </Header>
 
-                {/* <div style={{ margin: 10 }}>{ProgressBar()}</div> */}
-                <div style={{ margin: 10 }}><ProgressBar /></div>
+                <div style={{ margin: 10 }}>{ProgressBar()}</div>
 
                 <form onSubmit={handleOnSubmit}>
                     <FormGroupContainer>

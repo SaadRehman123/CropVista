@@ -40,15 +40,15 @@ const LogoutPopup = () => {
                     <Button size="sm" className={"logout-button"} onClick={handleOnLogout}>
                         <i style={{ marginRight: 5 }} className={"fal fa-sign-out"} /> Logout
                     </Button>
-                    <Button size="sm" className={"form-close-button"} onClick={() => toggle()}>Close</Button>
+                    <Button size="sm" className={"form-close-button"} onClick={() => toggle()}>Cancel</Button>
                 </FormButtonContainer>
             </Fragment>
         )
     }
 
     return (
-        <Modal size={"l"} centered={true} backdrop={"static"} isOpen={logoutPopup} toggle={toggle}>
-            <ModalHeader className={"popup-header"} toggle={toggle}>Logout</ModalHeader>
+        <Modal size={"l"} centered={true} backdrop={"static"} isOpen={logoutPopup}>
+            <ModalHeader className={"popup-header"}>Logout</ModalHeader>
             <ModalBody>{renderContent()}</ModalBody>
         </Modal>
     )

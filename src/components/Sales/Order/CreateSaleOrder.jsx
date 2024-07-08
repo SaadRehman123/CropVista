@@ -5,29 +5,34 @@ import moment from 'moment'
 import notify from 'devextreme/ui/notify'
 import DataSource from 'devextreme/data/data_source'
 import FormBackground from '../../SupportComponents/FormBackground'
+import SelectBoxTreelist from '../../SupportComponents/SelectBoxTreelist'
 
 import { Button } from 'reactstrap'
+import { DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CheckBox, DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { addPurchaseInvoice, getGoodReceipt, getPurchaseInvoice, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
+import { addSaleOrder, addSaleOrderItems, deleteSaleOrderItems, getSaleOrder, updateSaleOrder } from '../../../actions/SalesActions'
 
-const CreatePurchaseInvoice = () => {
+import styled from 'styled-components'
 
-    const goodReceipt = useSelector((state) => state.purchase.goodReceipt)
-    const purchaseInvoiceAction = useSelector(state => state.purchase.purchaseInvoiceAction)
+const CreateSaleOrder = () => {
 
+    const itemMaster = useSelector(state => state.item.itemMaster)
+    const saleOrderAction = useSelector(state => state.sales.saleOrderAction)
+    const customerMaster = useSelector(state => state.customer.customerMaster)
+
+    const [deletedRows, setDeletedRows] = useState([])
     const [treeListData, setTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ gr_Id: false, dueDate: false })
-    const [formData, setFormData] = useState({ gr_Id: "", creationDate: "", dueDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", pi_Status: "", paid: false })
+    const [invalid, setInvalid] = useState({ deliveryDate: false, customerId: false })
+    const [formData, setFormData] = useState({ creationDate: "", deliveryDate: "", customerId: "", customerName: "", customerAddress: "", customerNumber: "", so_Status: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
 
-    const purchaseInvoiceDataSource = new DataSource({
+    const saleOrderDataSource = new DataSource({
         store: {
             data: assignClientId(treeListData),
             type: 'array',
@@ -36,54 +41,81 @@ const CreatePurchaseInvoice = () => {
     })
 
     useEffect(() => {
-        if (purchaseInvoiceAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), pi_Status: "Un-Paid" }))
+        if (saleOrderAction.type === "CREATE") {
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), so_Status: "Pending" }))            
         }
-        else if (purchaseInvoiceAction.type === "UPDATE" || purchaseInvoiceAction.type === "VIEW") {
+        else if (saleOrderAction.type === "UPDATE" || saleOrderAction.type === "VIEW") {
             setFormData({
-                gr_Id: purchaseInvoiceAction.node.data.gr_Id, 
-                creationDate: purchaseInvoiceAction.node.data.creationDate,
-                dueDate: purchaseInvoiceAction.node.data.dueDate,
-                vendorId: purchaseInvoiceAction.node.data.vendorId,
-                vendorName: purchaseInvoiceAction.node.data.vendorName,
-                vendorAddress: purchaseInvoiceAction.node.data.vendorAddress,
-                vendorNumber: purchaseInvoiceAction.node.data.vendorNumber,
-                pi_Status: purchaseInvoiceAction.node.data.pi_Status,
-                paid: purchaseInvoiceAction.node.data.paid
+                creationDate: saleOrderAction.node.data.creationDate,
+                deliveryDate: saleOrderAction.node.data.deliveryDate,
+                customerId: saleOrderAction.node.data.customerId,
+                customerName: saleOrderAction.node.data.customerName,
+                customerAddress: saleOrderAction.node.data.customerAddress,
+                customerNumber: saleOrderAction.node.data.customerNumber,
+                so_Status: saleOrderAction.node.data.so_Status
             })
-            setTreeListData(purchaseInvoiceAction.node.data.children)
+            setTreeListData([...saleOrderAction.node.data.children])
         }
     }, [])
+
+    const handleOnAddRow = () => {
+        const newClientID = treeListData.length > 0 ? Math.max(...treeListData.map(item => item.clientId)) + 1 : 1
+        const newRow = getSaleOrderObj(newClientID)
+        setTreeListData([...treeListData, newRow])
+    }
+
+    const handleOnRowRemove = (e) => {
+        const deletedRow = treeListData.find(item => item.clientId === e.row.key)
+        setDeletedRows(prevDeletedRows => [...prevDeletedRows, deletedRow])
+
+        const updatedData = treeListData.filter(item => item.clientId !== e.row.key)
+        setTreeListData(updatedData)
+        
+        saleOrderDataSource.store().remove(e.row.key).then(() => {
+            saleOrderDataSource.reload()
+        })
+    }
+
+    const handleOnItemValueChanged = (e) => {
+        let value = e.value
+
+        if (value === null) value = ""
+
+        const instance = treelistRef.current.instance
+        const selectRow = instance.getSelectedRowsData()[0]
+
+        if (selectRow) {
+            
+            const selectedItem = itemMaster.find((item) => item.itemId === value)
+
+            if (selectedItem) {
+                const updatedData = { ...selectRow, itemId: selectedItem.itemId, itemName: selectedItem.itemName, uom: selectedItem.uom }
+    
+                saleOrderDataSource.store().update(selectRow.clientId, updatedData).then(() => {
+                    saleOrderDataSource.reload()
+                })
+            }
+        }
+    }
 
     const onValueChanged = (e, name) => {
         let value = e.value
         if (value === null) value = ""
 
-        if(name === "gr_Id" && value && typeof value === 'object'){
-            setFormData((prevState) => ({
-                ...prevState,
-                gr_Id: value.gr_Id,
-                vendorId: value.vendorId,
-                vendorName: value.vendorName,
-                vendorAddress: value.vendorAddress,
-                vendorNumber: value.vendorNumber
-            }))
-
-            const items = value.children.map((item) => {
-                item.pi_Id = ""
-                item.pi_ItemId = ""
-
-                return item
-            })
-
-            setTreeListData(items)
+        if (name === "customerId") {
+            if(value && typeof value === "object"){
+                setFormData((prevState) => ({ 
+                    ...prevState,
+                    customerId: value.customerId,
+                    customerName: value.customerName,
+                    customerAddress: value.customerAddress,
+                    customerNumber: value.customerNumber
+                }))
+            }
         }
-        else if(name === "dueDate"){
-            setFormData(prevState => ({ ...prevState, dueDate: value }))
-            setInvalid(prevState => ({ ...prevState, dueDate: value === "" || !value ? true : false }))
-        }
-        else if(name === "paid"){
-            setFormData(prevState => ({ ...prevState, paid: value, pi_Status: value ? "Paid" : "Un-Paid" }))
+        else if(name === "deliveryDate"){
+            setFormData(prevState => ({ ...prevState, deliveryDate: value }))
+            setInvalid(prevState => ({...prevState, deliveryDate: value === "" || !value ? true : false}))
         }
     }
 
@@ -98,8 +130,8 @@ const CreatePurchaseInvoice = () => {
     const handleOnFocusOut = (e) => {
         const name = e.event.target.accessKey
         if (formData[name] === null) formData[name] = ""
-
-        if (name === "gr_Id") {
+        
+        if(name === "customerId"){
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 [name]: formData[name].trim() === "" ? true : false
@@ -110,89 +142,94 @@ const CreatePurchaseInvoice = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
 
-        if (formData.gr_Id === "" || formData.dueDate === "") {
+        if (formData.deliveryDate === "" || formData.customerId === "") {
             return notify("Form fields cannot be empty", "error", 2000)
         }
 
-        if(invalid.gr_Id === true || invalid.dueDate === true){
+        if (invalid.customerId === true || invalid.deliveryDate === true){
             return notify("Please correct the invalid fields", "error", 2000)
         }
 
-        const purchaseInvoice = {
-            pi_Id: "",
-            dueDate: moment(formData.dueDate).format('YYYY-MM-DD'),
-            creationDate : moment(formData.creationDate).format('YYYY-MM-DD'),
-            gr_Id: formData.gr_Id,
-            vendorId : formData.vendorId,
-            vendorName : formData.vendorName,
-            vendorAddress : formData.vendorAddress,
-            vendorNumber : formData.vendorNumber,
-            pi_Status : formData.pi_Status,
-            paid: formData.paid,
-            total : calculateTotal(),
+        if(treeListData.length === 0){
+            return notify("Please add atleast one item for creating sale order", "error", 2000)
+        }
+
+        for (const row of treeListData) {
+            if (!row.itemId || !row.itemName || row.itemQuantity <= 0 || !row.uom || row.rate <= 0 || row.amount <= 0) {
+                return notify("Some rows have incomplete or incorrect info please fix them before saving", "error", 2000)
+            }
+        }
+
+        const saleOrder = {
+            saleOrder_Id: "",
+            creationDate: moment(formData.creationDate).format('YYYY-MM-DD'),
+            deliveryDate: moment(formData.deliveryDate).format('YYYY-MM-DD'),
+            customerId: formData.customerId,
+            customerName: formData.customerName,
+            customerAddress: formData.customerAddress,
+            customerNumber: formData.customerNumber,
+            total: calculateTotal(),
+            so_Status: "Created",
             children: [...treeListData]
         }
 
-        if(purchaseInvoiceAction.type === "CREATE"){
-            dispatch(addPurchaseInvoice(purchaseInvoice)).then((res) => {
+        if (saleOrderAction.type === "CREATE") {
+            dispatch(addSaleOrder(saleOrder)).then((res) => {
                 const response = res.payload.data
-                if(response.success){
-                    const gr = goodReceipt.find(item => item.gr_Id === formData.gr_Id)
-                    if(gr){
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: formData.pi_Status }, gr.gr_Id)).then((resX) => {
-                            if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
+                if (response.success) {
+                    setFormData({
+                        creationDate: Date.now(),
+                        deliveryDate: "",
+                        so_Status: "Pending"
+                    })
+                    setTreeListData([])
+                    dispatch(getSaleOrder(0))
+                    notify("Sale Order Created Successfully", "info", 2000)
+                }
+            })
+        }
+        else if (saleOrderAction.type === "UPDATE") {
+            dispatch(updateSaleOrder(saleOrder, saleOrderAction.node.data.saleOrder_Id)).then((resX) => {
+                const data = resX.payload.data
+                if (data.success) {
+
+                    const filteredChildren = saleOrder.children.filter(child => child.so_ItemId === "").map((item) => {
+                        return {
+                            ...item,
+                            saleOrder_Id: saleOrderAction.node.data.saleOrder_Id
+                        }
+                    })
+
+                    if (filteredChildren.length !== 0) {
+                        dispatch(addSaleOrderItems(saleOrderAction.node.data.saleOrder_Id, filteredChildren)).then((res) => {
+                            const data = res.payload.data
+                            if (data.success) {
+                                dispatch(getSaleOrder(0))
                             }
                         })
                     }
 
-                    setFormData((prevState) => ({
-                        ...prevState,
-                        gr_Id: "",
-                        dueDate: "",
-                        vendorId: "",
-                        vendorName: "",
-                        vendorNumber: "",
-                        vendorAddress: "",
-                        pi_Status: "Un-Paid",
-                        paid: false,
-                    }))
-                    setTreeListData([])
-                    dispatch(getPurchaseInvoice(0))
-                    notify("Purchase Invoice Created Successfully")
-                }
-            })
-        }
-        else if(purchaseInvoiceAction.type === "UPDATE") {
-            dispatch(updatePurchaseInvoice(purchaseInvoice, purchaseInvoiceAction.node.data.pi_Id)).then((res) => {
-                const response = res.payload.data
-                if(response.success){
-                    const gr = goodReceipt.find(item => item.gr_Id === formData.gr_Id)
-                    if(gr){
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: formData.pi_Status }, gr.gr_Id)).then((resX) => {
-                            if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
-                            }
-                        })
+                    if(deletedRows.length !== 0) {
+                        dispatch(deleteSaleOrderItems(deletedRows))
                     }
-                    dispatch(getPurchaseInvoice(0))
-                    notify("Purchase Invoice Updated Successfully")
+
+                    notify("Sale Order Updated Successfully", "info", 2000)
                 }
             })
         }
     }
 
     const renderContent = () => {
-        return (
+        return(
             <Fragment>
                 <Header>
-                    <HeaderSpan>Create Purchase Invoice</HeaderSpan>
+                    <HeaderSpan>Create Sale Order</HeaderSpan>
                 </Header>
 
                 <form onSubmit={handleOnSubmit}>
                     <FormGroupContainer>
                         <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>
-                            <div style={{ width: 500, margin: "0 20px 20px 20px" }}>
+                            <div style={{width: 500, margin: "0 20px 20px 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Creation Date</FormLabel>
                                     <DateBox
@@ -200,41 +237,30 @@ const CreatePurchaseInvoice = () => {
                                             class: "form-datebox",
                                         }}
                                         type={"date"}
-                                        readOnly={true}
-                                        min={new Date()}
-                                        openOnFieldClick={true}
                                         accessKey={'creationDate'}
+                                        openOnFieldClick={true}
+                                        readOnly={true}
+                                        value={formData.creationDate}
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
-                                        value={formData.creationDate}
-                                        validationStatus={'valid'}
                                     />
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Good Receipt</FormLabel>
-                                    {purchaseInvoiceAction.type === "CREATE" ?
+                                    <FormLabel>Customer Id</FormLabel>
+                                    {saleOrderAction.type === "CREATE" ? 
                                         <SelectBox
                                             elementAttr={{
                                                 class: "form-selectbox"
                                             }}
                                             searchTimeout={200}
-                                            accessKey={'gr_Id'}
+                                            accessKey={'customerId'}
                                             searchEnabled={true}
-                                            displayExpr={'gr_Id'}
+                                            displayExpr={'customerId'}
                                             searchMode={'contains'}
-                                            searchExpr={'vendorName'}
-                                            dataSource={goodReceipt.filter((gr) => gr.gr_Status === "Created").map(item => {
-                                                return {
-                                                    gr_Id: item.gr_Id,
-                                                    vendorId: item.vendorId,
-                                                    vendorName: item.vendorName,
-                                                    vendorAddress: item.vendorAddress,
-                                                    vendorNumber: item.vendorNumber,
-                                                    children: item.children
-                                                }
-                                            })}
-                                            value={formData.gr_Id}
+                                            searchExpr={'customerName'}
+                                            dataSource={customerMaster.filter((customer) => customer.disable === false)}
+                                            value={formData.customerId}
                                             openOnFieldClick={true}
                                             acceptCustomValue={true}
                                             onFocusIn={handleOnFocusIn}
@@ -242,17 +268,17 @@ const CreatePurchaseInvoice = () => {
                                             itemRender={(e) => {
                                                 return (
                                                     <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                                                        <span>{e.gr_Id}</span>
+                                                        <span>{e.customerId}</span>
                                                         <span style={{ marginLeft: "auto", }}>
-                                                            {e.vendorName}
+                                                            {e.customerName}
                                                         </span>
                                                     </div>
                                                 )
                                             }}
-                                            placeholder={"Select Good Receipt"}
+                                            placeholder={"Select Customer"}
                                             dropDownOptions={{ maxHeight: 300 }}
-                                            onValueChanged={(e) => onValueChanged(e, "gr_Id")}
-                                            validationStatus={invalid.gr_Id === false ? "valid" : "invalid"}
+                                            onValueChanged={(e) => onValueChanged(e, 'customerId')}
+                                            validationStatus={invalid.customerId === false ? "valid" : "invalid"}
                                         />
                                         :
                                         <TextBox
@@ -260,98 +286,25 @@ const CreatePurchaseInvoice = () => {
                                                 class: "form-textbox"
                                             }}
                                             readOnly={true}
-                                            accessKey={'gr_Id'}
-                                            value={formData.gr_Id}
+                                            accessKey={'customerId'}
+                                            value={formData.customerId}
                                         />
                                     }
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Vendor Name</FormLabel>
+                                    <FormLabel>Address</FormLabel>
                                     <TextBox
                                         elementAttr={{
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'vendorName'}
-                                        placeholder={"Enter Name"}
-                                        value={formData.vendorName}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Address</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorAddress'}
+                                        accessKey={'customerAddress'}
                                         placeholder={"Enter Address"}
-                                        value={formData.vendorAddress}
+                                        value={formData.customerAddress}
                                     />
                                 </FormGroupItem>
 
-                                <FormGroupItem>
-                                    <FormLabel>Paid</FormLabel>
-                                    <CheckBox
-                                        width={20}
-                                        value={formData.paid}
-                                        style={{ marginTop: 10 }}
-                                        onValueChanged={(e) => onValueChanged(e, 'paid')}
-                                        disabled={purchaseInvoiceAction.type === "VIEW" ? true : false}
-                                    />
-                                </FormGroupItem>
-                            </div>
-
-                            <div style={{ width: 500, margin: "0 20px" }}>
-                                <FormGroupItem>
-                                    <FormLabel>Due Date</FormLabel>
-                                    <DateBox
-                                        elementAttr={{
-                                            class: "form-datebox",
-                                        }}
-
-                                        type={"date"}
-                                        min={new Date()}
-                                        accessKey={'dueDate'}
-                                        openOnFieldClick={true}
-                                        value={formData.dueDate}
-                                        placeholder={"DD/MM/YYYY"}
-                                        displayFormat={"dd/MM/yyyy"}
-                                        validationMessagePosition={"bottom"}
-                                        onValueChanged={(e) => onValueChanged(e, "dueDate")}
-                                        validationStatus={invalid.dueDate === false ? "valid" : "invalid"}
-                                        readOnly={purchaseInvoiceAction.type === "VIEW" || formData.pi_Status === "Over-Due" ? true : false}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Id</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorId'}
-                                        placeholder={"Enter Vendor"}
-                                        value={formData.vendorId}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Contact</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorNumber'}
-                                        placeholder={"Enter Contact"}
-                                        value={formData.vendorNumber}
-                                    />
-                                </FormGroupItem>
-                               
                                 <FormGroupItem>
                                     <FormLabel>Status</FormLabel>
                                     <TextBox
@@ -359,16 +312,63 @@ const CreatePurchaseInvoice = () => {
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'pi_Status'}
-                                        value={formData.pi_Status}
+                                        accessKey={'so_Status'}
+                                        value={formData.so_Status}
                                         placeholder={'Status'}
                                     />
                                 </FormGroupItem>
+                            </div>
+                            <div style={{width: 500, margin: "0 20px"}}>
+                                <FormGroupItem>
+                                    <FormLabel>Delivery Date</FormLabel>
+                                    <DateBox
+                                        elementAttr={{
+                                            class: "form-datebox",
+                                        }}
+                                        type={"date"}
+                                        min={new Date()}
+                                        accessKey={'deliveryDate'}
+                                        openOnFieldClick={true}
+                                        value={formData.deliveryDate}
+                                        placeholder={"DD/MM/YYYY"}
+                                        readOnly={saleOrderAction.type === "VIEW" ? true : false}
+                                        displayFormat={"dd/MM/yyyy"}
+                                        validationMessagePosition={"bottom"}
+                                        onValueChanged={(e) => onValueChanged(e, "deliveryDate")}
+                                        validationStatus={invalid.deliveryDate === false ? "valid" : "invalid"}
+                                    />
+                                </FormGroupItem>
 
-                                {purchaseInvoiceAction.type !== "VIEW" && (
-                                    <FormButtonContainer style={{ marginTop: 25 }}>
+                                <FormGroupItem>
+                                    <FormLabel>Customer Name</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'customerName'}
+                                        placeholder={"Enter Name"}
+                                        value={formData.customerName}
+                                    />
+                                </FormGroupItem>
+
+                                <FormGroupItem>
+                                    <FormLabel>Contact</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'customerNumber'}
+                                        placeholder={"Enter Contact"}
+                                        value={formData.customerNumber}
+                                    />
+                                </FormGroupItem>
+
+                                {saleOrderAction.type !== "VIEW" && (
+                                    <FormButtonContainer style={{ marginTop: 45 }}>
                                         <Button size="sm" className={"form-action-button"}>
-                                            {purchaseInvoiceAction.type === "UPDATE" ? "Update" : "Save"} Purchase Invoice
+                                            {saleOrderAction.type === "UPDATE" ? "Update" : "Save"} Sale Order
                                         </Button>
                                     </FormButtonContainer>
                                 )}
@@ -386,7 +386,7 @@ const CreatePurchaseInvoice = () => {
             return sum + total
         }, 0)
     }
-
+    
     const renderTotal = () => {
         const totalSum = calculateTotal()
         return (
@@ -409,6 +409,8 @@ const CreatePurchaseInvoice = () => {
         if (!data.itemQuantity) data.itemQuantity = 0
         if (!data.rate) data.rate = 0
 
+        data.amount = data.itemQuantity * data.rate
+
         //For Now
         setTreeListData(prevData => {
             return [...prevData].sort((a, b) => a.clientId - b.clientId)
@@ -418,11 +420,15 @@ const CreatePurchaseInvoice = () => {
     const handleOnCellPrepared = (e) => {
         if (e.rowType === "data") {
             if (e.column.dataField === "itemQuantity") {
-                if (e.value < 0) {
+                if (e.value <= 0) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
                 }
             }
         }
+    }
+
+    const renderActionHeaderCell = (e) => {
+        return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
     }
 
     const renderHeaderCell = (e) => {
@@ -432,16 +438,6 @@ const CreatePurchaseInvoice = () => {
                     {e.column.caption}
                 </span>
             </div>
-        )
-    }
-
-    const renderItemIdCell = ({ data }) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {data.itemId}
-                </CellContent>
-            </CellContainer>
         )
     }
 
@@ -455,6 +451,53 @@ const CreatePurchaseInvoice = () => {
         )
     }
 
+    const renderItemContent = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.itemId}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderItems = (e) => {
+        return (
+            <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
+                <span>{e.itemId}</span>
+                <span style={{ marginLeft: "auto", }}>
+                    {e.itemName}
+                </span>
+            </div>
+        )
+    }
+
+    const filterItems = () => {
+        const selectedIds = treeListData.map(item => item.itemId)
+        return itemMaster.filter(item => item.itemType === "Finish Good" && item.disable === false && !selectedIds.includes(item.itemId))
+    }
+    
+    const renderItemIdCell = (e) => {
+        const filteredDataSource = filterItems()
+
+        return (
+            <SelectBoxTreelist
+                event={e}
+                valueExpr={"itemId"}
+                searchExpr={"itemName"}
+                itemRender={(e) => renderItems(e)}
+                renderType={"itemId"}
+                displayExpr={"itemId"}
+                dataSource={filteredDataSource}
+                placeholder={"Choose Item"}
+                noDataText={"Item Not Present"}
+                handleOnValueChanged={handleOnItemValueChanged}
+                renderContent={() => renderItemContent(e)}
+                disabled={false}
+            />
+        )
+    }
+
     const renderQuantityColumn = ({ data }) => {
         return (
             <CellContainer>
@@ -464,12 +507,12 @@ const CreatePurchaseInvoice = () => {
             </CellContainer>
         )
     }
-    
-    const renderUomCell = (e) => {
+
+    const renderUomCell = ({ data }) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.uom}
+                    {data.uom}
                 </CellContent>
             </CellContainer>
         )
@@ -495,6 +538,17 @@ const CreatePurchaseInvoice = () => {
             </CellContainer>
         )
     }
+    
+    const renderActionColumn = (e) => {
+        return (
+            <ActionCellContainer>
+                <button
+                    title='Delete Item'
+                    className='fal fa-trash treelist-delete-button'
+                    onClick={() => handleOnRowRemove(e)} />
+            </ActionCellContainer>
+        )
+    }
 
     const renderTreelist = () => {
         return (
@@ -503,11 +557,14 @@ const CreatePurchaseInvoice = () => {
                     <Header>
                         <HeaderSpan>Items</HeaderSpan>
                     </Header>
+                    {saleOrderAction.type !== "VIEW" && (
+                        <AddButton onClick={() => handleOnAddRow()}><i className='fal fa-plus' style={{ marginRight: 5 }} />Add Row</AddButton>
+                    )}
                 </div>
 
                 <TreeList
                     elementAttr={{
-                        id: "create-purchase-invoice-treelist",
+                        id: "create-sale-order-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"clientId"}
@@ -515,7 +572,7 @@ const CreatePurchaseInvoice = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={purchaseInvoiceDataSource}
+                    dataSource={saleOrderDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     noDataText={'No Data'}
@@ -523,7 +580,7 @@ const CreatePurchaseInvoice = () => {
                     columnResizingMode={"nextColumn"}
                     onSaved={handleOnSaved}
                     onCellPrepared={handleOnCellPrepared}>
-
+                    
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
@@ -532,7 +589,7 @@ const CreatePurchaseInvoice = () => {
                         mode='cell'
                         allowUpdating={true}
                         startEditAction='dblClick'
-                        selectTextOnEditStart={true}
+                        selectTextOnEditStart={true} 
                         texts={{ confirmDeleteMessage: '' }}
                     />
 
@@ -541,13 +598,13 @@ const CreatePurchaseInvoice = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={saleOrderAction.type === "VIEW" ? false : true}
                         cellRender={renderItemIdCell}
                         editCellRender={renderItemIdCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
+                    
                     <Column
                         caption={"Item Name"}
                         dataField={"itemName"}
@@ -558,13 +615,13 @@ const CreatePurchaseInvoice = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
+                        
                     <Column
                         caption={"Quantity"}
                         dataField={"itemQuantity"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={false}
+                        allowEditing={saleOrderAction.type === "VIEW" ? false : true}
                         editorOptions={"dxNumberBox"}
                         cellRender={renderQuantityColumn}
                         headerCellRender={renderHeaderCell}
@@ -575,9 +632,9 @@ const CreatePurchaseInvoice = () => {
                         caption={"UoM"}
                         dataField={"uom"}
                         alignment={"left"}
-                        allowSorting={false}
                         allowEditing={false}
-                        cellRender={renderUomCell}
+                        allowSorting={false}
+                        cellRender={renderUomCell} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -586,23 +643,38 @@ const CreatePurchaseInvoice = () => {
                         caption={"Rate"}
                         dataField={"rate"}
                         alignment={"left"}
-                        allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderRateCell}
+                        allowEditing={saleOrderAction.type !== "VIEW" ? true : false}
+                        cellRender={renderRateCell} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
+ 
                     <Column
                         caption={"Amount"}
                         dataField={"amount"}
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderAmountCell}
+                        cellRender={renderAmountCell} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
+
+                    {saleOrderAction.type !== "VIEW" && (
+                        <Column
+                            width={75}
+                            minWidth={75}
+                            caption={"Actions"}
+                            dataField={"actions"}
+                            alignment={"center"}
+                            allowSorting={false}
+                            allowEditing={false}
+                            cellRender={renderActionColumn}
+                            headerCellRender={renderActionHeaderCell} 
+                            cssClass={"project-treelist-column"}
+                        />
+                    )}
                 </TreeList>
                 {renderTotal()}
                 {renderTotalQuantity()}
@@ -615,4 +687,48 @@ const CreatePurchaseInvoice = () => {
     )
 }
 
-export default CreatePurchaseInvoice
+export default CreateSaleOrder
+
+const getSaleOrderObj = (clientId) => {
+    return {
+        so_ItemId: "",
+        itemId: "",
+        itemName: "",
+        itemQuantity: 1,
+        uom: "",
+        rate: 0,
+        amount: 0,
+        saleOrder_Id: "",
+        clientId: clientId
+    }
+}
+
+const ActionCellContainer = styled.div`
+    display: flex;
+    font-size: 16px;
+    align-items: center;
+    justify-content: space-evenly;
+`
+
+const AddButton = styled.button`
+    font-size: 13px;
+        
+    color: #4285f4b5;
+    background-color: #FFFFFF;
+
+    border: 1px solid #eeeeee; 
+    cursor: pointer;
+
+    width: auto;
+    height: 30px;
+    margin: 10px;
+    border-radius: 5px;
+
+    transition: 0.2s background-color, color;
+    &:hover,
+    &:focus,
+    &:focus-within {
+        background-color: #4285f4b5;
+        color: #FFFFFF;
+    }
+`

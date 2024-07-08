@@ -11,21 +11,26 @@ import { deleteResource, getResource } from '../../actions/ResourceAction'
 import { updateProductionOrder } from '../../actions/ProductionOrderAction'
 import { deleteVendor, getVendorMaster } from '../../actions/VendorActions'
 import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
+import { getInventory, updateInventory } from '../../actions/InventoryAction'
+import { deleteCustomer, getCustomerMaster } from '../../actions/CustomerActions'
 import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
 import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
+import { getGoodIssue, getSaleOrder, updateGoodIssue, updateSaleOrder } from '../../actions/SalesActions'
+import { deleteVendorQuotation, getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updateGoodReceipt, updatePurchaseOrder, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../actions/PurchaseAction'
 
 import styled from 'styled-components'
-import { deleteVendorQuotation, getGoodReceipt, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation, updateGoodReceipt, updatePurchaseOrder, updatePurchaseRequest, updateRequestForQuotation, updateVendorQuotation } from '../../actions/PurchaseAction'
-import { getInventory, updateInventory } from '../../actions/InventoryAction'
 
 const DeletePopup = () => {
     
     const bomRef = useSelector((state) => state.view.bomRef)
+    const saleOrder = useSelector(state => state.sales.saleOrder)
     const resourceRef = useSelector(state => state.view.resourceRef)
     const cropPlanRef = useSelector((state) => state.view.cropPlanRef)
     const deletePopup = useSelector((state) => state.view.deletePopup)
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
     const warehouseRef = useSelector((state) => state.view.warehouseRef)
+    const saleOrderRef = useSelector((state) => state.view.saleOrderRef)
+    const goodIssueRef = useSelector((state) => state.view.goodIssueRef)
     const inventory = useSelector(state => state.inventory.inventoryStatus)
     const purchaseOrder = useSelector(state => state.purchase.purchaseOrder)
     const goodReceiptRef = useSelector((state) => state.view.goodReceiptRef)
@@ -33,6 +38,7 @@ const DeletePopup = () => {
     const purchaseOrderRef = useSelector((state) => state.view.purchaseOrderRef)
     const purchaseRequest = useSelector(state => state.purchase.purchaseRequest)
     const vendorQuotation = useSelector(state => state.purchase.vendorQuotation)
+    const customerMasterRef = useSelector((state) => state.view.customerMasterRef)
     const vendorQuotationRef = useSelector((state) => state.view.vendorQuotationRef)
     const productionOrderRef = useSelector((state) => state.view.productionOrderRef)
     const purchaseRequestRef = useSelector((state) => state.view.purchaseRequestRef)
@@ -62,6 +68,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'VENDOR_MASTER') {
             return 'Delete Vendor'
         }
+        else if (deletePopup.type === 'CUSTOMER_MASTER') {
+            return 'Delete Customer'
+        }
         else if (deletePopup.type === 'PURCHASE_REQUEST') {
             return 'Cancel Purchase Request'
         }
@@ -76,6 +85,12 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'GOOD_RECEIPT') {
             return 'Cancel Good Receipt'
+        }
+        else if (deletePopup.type === 'SALE_ORDER') {
+            return 'Cancel Sale Order'
+        }
+        else if (deletePopup.type === 'GOOD_ISSUE') {
+            return 'Cancel Good Issue'
         }
     }, [deletePopup])
 
@@ -98,6 +113,9 @@ const DeletePopup = () => {
         else if (deletePopup.type === 'VENDOR_MASTER') {
             return 'Are you sure you want to delete selected Vendor?'
         }
+        else if (deletePopup.type === 'CUSTOMER_MASTER') {
+            return 'Are you sure you want to delete selected Customer?'
+        }
         else if (deletePopup.type === 'PURCHASE_REQUEST') {
             return 'Are you sure you want to cancel purchase request?'
         }
@@ -112,6 +130,12 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'GOOD_RECEIPT') {
             return 'Are you sure you want to cancel Good Receipt?'
+        }
+        else if (deletePopup.type === 'SALE_ORDER') {
+            return 'Are you sure you want to cancel Sale Order?'
+        }
+        else if (deletePopup.type === 'GOOD_ISSUE') {
+            return 'Are you sure you want to cancel Good Issue?'
         }
     }
 
@@ -276,6 +300,27 @@ const DeletePopup = () => {
                     }
 
                     notify("Production Order Cancelled", "info", 2000)
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === "CUSTOMER_MASTER") {
+            const instance = customerMasterRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+            
+            const obj = {
+                customerId: selectedRow[0].customerId,
+                customerName: selectedRow[0].customerName, 
+                customerAddress: selectedRow[0].customerAddress,
+                customerEmail: selectedRow[0].customerEmail,
+                customerNumber: selectedRow[0].customerNumber,
+                disable: selectedRow[0].disable
+            }
+
+            dispatch(deleteCustomer(selectedRow[0].customerId, obj)).then(res => {
+                const data = res.payload.data
+                if(data.success){
+                    dispatch(getCustomerMaster())
                 }
             })
             handleOnToggle(deletePopup.type)
@@ -467,6 +512,77 @@ const DeletePopup = () => {
             })
             handleOnToggle(deletePopup.type)
         }
+        else if(deletePopup.type === 'SALE_ORDER'){
+            const instance = saleOrderRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+        
+            const obj = {
+                saleOrder_Id: selectedRow[0].saleOrder_Id, 
+                creationDate: selectedRow[0].creationDate, 
+                deliveryDate: selectedRow[0].deliveryDate, 
+                customerId: selectedRow[0].customerId, 
+                customerName: selectedRow[0].customerName, 
+                customerAddress: selectedRow[0].customerAddress, 
+                customerNumber: selectedRow[0].customerNumber, 
+                total: selectedRow[0].total, 
+                so_Status: "Cancelled",
+                children: selectedRow[0].children, 
+            }
+
+            dispatch(updateSaleOrder(obj, obj.saleOrder_Id)).then((res) => {
+                if(res.payload.data.success){
+                    dispatch(getSaleOrder(0))
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
+        else if(deletePopup.type === 'GOOD_ISSUE'){
+            const instance = goodIssueRef.current.instance
+            const selectedRow = instance.getSelectedRowsData()
+        
+            const obj = {
+                gi_Id: selectedRow[0].gi_Id, 
+                creationDate: selectedRow[0].creationDate, 
+                saleOrder_Id: selectedRow[0].saleOrder_Id, 
+                customerId: selectedRow[0].customerId, 
+                customerName: selectedRow[0].customerName, 
+                customerAddress: selectedRow[0].customerAddress, 
+                customerNumber: selectedRow[0].customerNumber,
+                total: selectedRow[0].total, 
+                gi_Status: "Cancelled",
+                children: selectedRow[0].children,
+            }
+
+            dispatch(updateGoodIssue(obj, obj.gi_Id)).then((res) => {
+                const response = res.payload.data
+                if(response.success){
+                    const SO = saleOrder.find(item => item.saleOrder_Id === obj.saleOrder_Id)
+                    if(SO){
+                        dispatch(updateSaleOrder({ ...SO, so_Status: "Created" }, SO.saleOrder_Id)).then((resX) => {
+                            if(resX.payload.data.success){
+                                dispatch(getSaleOrder(0))
+                            }
+                        })
+                    }
+
+                    response.result.children.forEach((child) => {
+                        if(inventory.some((item) => item.inventoryItem === child.itemName)){
+                            const item = inventory.find((item) => item.inventoryItem === child.itemName)
+                            if(item){
+                                dispatch(updateInventory(item.inventoryId, {
+                                    ...item,
+                                    inventoryQuantity: item.inventoryQuantity + child.itemQuantity
+                                }))
+                            }
+                        }
+                    })
+
+                    dispatch(getInventory())
+                    dispatch(getGoodIssue(0))
+                }
+            })
+            handleOnToggle(deletePopup.type)
+        }
     }
 
     return (
@@ -554,6 +670,12 @@ const setComponent = (type) => {
         return true
     }
     else if(type === "GOOD_RECEIPT"){
+        return true
+    }
+    else if(type === "SALE_ORDER"){
+        return true
+    }
+    else if(type === "GOOD_ISSUE"){
         return true
     }
 

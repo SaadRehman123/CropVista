@@ -10,15 +10,15 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { setPurchaseInvoiceRef } from '../../../actions/ViewActions'
-import { getGoodReceipt, getPurchaseInvoice, purchaseInvoiceActionType, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
+import { setSaleInvoiceRef } from '../../../actions/ViewActions'
+import { getGoodIssue, getSaleInvoice, saleInvoiceActionType, updateGoodIssue, updateSaleInvoice } from '../../../actions/SalesActions'
 
 import styled from 'styled-components'
 
-const PurchaseInvoice = () => {
-
-    const goodReceipt = useSelector((state) => state.purchase.goodReceipt)
-    const purchaseInvoice = useSelector(state => state.purchase.purchaseInvoice)
+const SalesInvoice = () => {
+    
+    const goodIssue = useSelector((state) => state.sales.goodIssue)
+    const saleInvoice = useSelector(state => state.sales.saleInvoice)
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -26,32 +26,32 @@ const PurchaseInvoice = () => {
     const treeListRef = useRef()
 
     useEffect(() => {
-        dispatch(setPurchaseInvoiceRef(treeListRef))
+        dispatch(setSaleInvoiceRef(treeListRef))
     }, [])
 
     useEffect(() => {
-        dispatch(getPurchaseInvoice(0))
+        dispatch(getSaleInvoice(0))
     }, [])
 
     useEffect(() => {
         const today = new Date()
         today.setHours(0, 0, 0, 0)
 
-        const pastDueDateInvoices = purchaseInvoice.filter(item => {
+        const pastDueDateInvoices = saleInvoice.filter(item => {
             const dueDate = new Date(item.dueDate)
             dueDate.setHours(0, 0, 0, 0)
             return dueDate < today
-        }).filter((pi) => pi.pi_Status === "Un-Paid")
+        }).filter((si) => si.si_Status === "Un-Paid")
         
         if(pastDueDateInvoices.length !== 0){
             pastDueDateInvoices.forEach((item) => {
-                item.pi_Status = "Over-Due"
-                dispatch(updatePurchaseInvoice(item, item.pi_Id)).then((res) => {
+                item.si_Status = "Over-Due"
+                dispatch(updateSaleInvoice(item, item.salesInvoice_Id)).then((res) => {
                     if(res.payload.data.success){
-                        const gr = goodReceipt.find(item => item.gr_Id === res.payload.data.result.gr_Id)
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: "Over-Due" }, gr.gr_Id)).then((resX) => {
+                        const gi = goodIssue.find(item => item.gi_Id === res.payload.data.result.gi_Id)
+                        dispatch(updateGoodIssue({ ...gi, gi_Status: "Over-Due" }, gi.gi_Id)).then((resX) => {
                             if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
+                                dispatch(getGoodIssue(0))
                             }
                         })
                     }
@@ -62,55 +62,45 @@ const PurchaseInvoice = () => {
     }, [])
 
     const handleOnCreate = (e) => {
-        dispatch(purchaseInvoiceActionType({ node: null, type: "CREATE" }))
-        navigate('/app/Create_Purchase_Invoice')
+        dispatch(saleInvoiceActionType({ node: null, type: "CREATE" }))
+        navigate('/app/Create_Sale_Invoice')
+    }
+
+    const handleOnEditClick = (e) => {
+        dispatch(saleInvoiceActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Sale_Invoice')
     }
     
-    const handleOnEditClick = (e) => {
-        dispatch(purchaseInvoiceActionType({ node: e, type: "UPDATE" }))
-        navigate('/app/Create_Purchase_Invoice')
-    }
-
     const handleOnViewClick = (e) => {
-        dispatch(purchaseInvoiceActionType({ node: e, type: "VIEW" }))
-        navigate('/app/Create_Purchase_Invoice')
+        dispatch(saleInvoiceActionType({ node: e, type: "VIEW" }))
+        navigate('/app/Create_Sale_Invoice')
     }
-
-    const renderPurchaseInvoice = (e) => {
+    
+    const renderSaleInvoice = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.pi_Id}
+                    {e.data.salesInvoice_Id}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderGoodReceipt = (e) => {
+    const renderGoodIssue = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.gr_Id}
+                    {e.data.gi_Id}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderVendorName = (e) => {
+    const renderCustomerName = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.vendorName}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderVendorContact = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.vendorNumber}
+                    {e.data.customerName}
                 </CellContent>
             </CellContainer>
         )
@@ -141,21 +131,22 @@ const PurchaseInvoice = () => {
             <CellContainer style={{ alignItems: 'center' }}>
                 <Badge className={"status-badge"} color={setColor(e)}>
                     <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>{e.data.pi_Status}</span>
+                    <span>{e.data.si_Status}</span>
                 </Badge>
             </CellContainer>
         )
     }
 
+    
     const renderActionColumn = (e) => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Purchase Invoice'
+                    title='Edit Sale Invoice'
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)} />
                 <button
-                    title='View Purchase Invoice'
+                    title='View Sale Invoice'
                     className='fal fa-eye treelist-edit-button'
                     onClick={() => handleOnViewClick(e)} />
             </ActionCellContainer>
@@ -166,16 +157,16 @@ const PurchaseInvoice = () => {
         return (
             <Fragment>
                 <Header>
-                    <HeaderSpan>Purchase Invoice History</HeaderSpan>
+                    <HeaderSpan>Sale Invoice History</HeaderSpan>
                     <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreate()}>
                         <i style={{ marginRight: 10 }} className='fal fa-plus' />
-                        Create Purchase Invoice
+                        Create Sale Invoice
                     </Button>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "purchase-invoice-treelist",
+                        id: "Sale-invoice-treelist",
                         class: "project-treelist"
                     }}
                     ref={treeListRef}
@@ -184,53 +175,43 @@ const PurchaseInvoice = () => {
                     showColumnLines={true}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    dataSource={purchaseInvoice}
-                    keyExpr={"pi_Id"}
+                    dataSource={saleInvoice}
+                    keyExpr={"salesInvoice_Id"}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}
-                    noDataText={'No Purchase Invoice'}>
+                    noDataText={'No Sale Invoice'}>
 
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"PI-Id"}
-                        dataField={"pi_Id"}
+                        caption={"SI-Id"}
+                        dataField={"si_Id"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderPurchaseInvoice}
+                        cellRender={renderSaleInvoice}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"GR-Id"}
-                        dataField={"gr_Id"}
+                        caption={"GI-Id"}
+                        dataField={"gi_Id"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderGoodReceipt}
+                        cellRender={renderGoodIssue}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Vendor Name"}
-                        dataField={"vendorName"}
+                        caption={"Customer Name"}
+                        dataField={"customerName"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorName}
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"Contact"}
-                        dataField={"vendorNumber"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderVendorContact}
+                        cellRender={renderCustomerName}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -259,7 +240,7 @@ const PurchaseInvoice = () => {
                         width={115}
                         minWidth={115}
                         caption={"Status"}
-                        dataField={"pi_Status"}
+                        dataField={"gi_Status"}
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderStatusColumn}
@@ -302,7 +283,7 @@ const PurchaseInvoice = () => {
     )
 }
 
-export default PurchaseInvoice
+export default SalesInvoice
 
 const ActionCellContainer = styled.div`
     display: flex;
@@ -314,16 +295,16 @@ const ActionCellContainer = styled.div`
 const setColor = (e) => {
     let color
 
-    if(e.data.pi_Status === "Un-Paid"){
+    if(e.data.si_Status === "Un-Paid"){
         color = 'warning'
     }
-    else if(e.data.pi_Status === "Paid"){
+    else if(e.data.si_Status === "Paid"){
         color = 'success'
     }
-    else if(e.data.pi_Status === "Over-Due"){
+    else if(e.data.si_Status === "Over-Due"){
         color = 'danger'
     }
-    else if(e.data.pi_Status === "Cancelled"){
+    else if(e.data.si_Status === "Cancelled"){
         color = 'danger'
     }
 

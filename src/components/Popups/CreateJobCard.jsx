@@ -10,9 +10,8 @@ import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-reac
 
 import { addStockEntries } from '../../actions/StockEntriesAction'
 import { toggleCreateJobCardPopup } from '../../actions/PopupActions'
-import { getProductionOrder, updatePoRouteStages } from '../../actions/ProductionOrderAction'
-import { Popover } from 'devextreme-react'
 import { getInventory, updateInventory } from '../../actions/InventoryAction'
+import { getProductionOrder, updatePoRouteStages } from '../../actions/ProductionOrderAction'
 
 const CreateJobCard = (props) => {
 
@@ -70,7 +69,7 @@ const CreateJobCard = (props) => {
 
         if (selectedRow && selectedRow.length > 0) {
             if(!isAllowed){
-                return notify(`The following items are not available in inventory - ${unavailableItems.join(" || ")}`, "info", 4000);
+                return notify(`The following items are not available in inventory - ${unavailableItems.join(" || ")}`, "info", 4000)
             }
             else {
                 selectedRow.forEach((item) => {

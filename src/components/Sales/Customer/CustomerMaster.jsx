@@ -6,38 +6,38 @@ import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
 import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
+import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { setVendorMasterRef, toggleDeletePopup } from '../../../actions/ViewActions'
-import { getVendorMaster, vendorMasterActionType } from '../../../actions/VendorActions'
+import { setCustomerMasterRef, toggleDeletePopup } from '../../../actions/ViewActions'
+import { customerMasterActionType, getCustomerMaster } from '../../../actions/CustomerActions'
 
 import styled from 'styled-components'
 
-const VendorMaster = () => {
+const CustomerMaster = () => {
 
-    const venderMaster = useSelector(state => state.vendor.vendorMaster)
-
+    const customerMaster = useSelector(state => state.customer.customerMaster)
+    
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const treeListRef = useRef(null)
 
     useEffect(() => {
-        dispatch(setVendorMasterRef(treeListRef))
+        dispatch(setCustomerMasterRef(treeListRef))
     }, [])
 
     useEffect(() => {
-        dispatch(getVendorMaster())
+        dispatch(getCustomerMaster())
     }, [])
 
-    const handleOnCreateVendor = () => {
-        dispatch(vendorMasterActionType({ node: null, type: "CREATE" }))
-        navigate('/app/Create_Vendor')
+    const handleOnCreate = () => {
+        dispatch(customerMasterActionType({ node: null, type: "CREATE" }))
+        navigate('/app/Create_Customer')
     }
 
     const handleOnEditClick = (e) => {
-        dispatch(vendorMasterActionType({ node: e, type: "UPDATE" }))
-        navigate('/app/Create_Vendor')
+        dispatch(customerMasterActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Customer')
     }
 
     const renderActionHeaderCell = (e) => {
@@ -54,82 +54,62 @@ const VendorMaster = () => {
         )
     }
 
-    const renderVenderIdColumn = (e) => {
+    const renderCustomerIdColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.vendorId}
+                    {e.data.customerId}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderVendorNameColumn = (e) => {
+    const renderCustomerNameColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.vendorName}
+                    {e.data.customerName}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderVendorGroupColumn = (e) => {
+    const renderCustomerContactColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.vendorGroup}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderVendorTypeColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.vendorType}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderVendorAddressColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.vendorAddress}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderVendorContactColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.vendorNumber}
+                    {e.data.customerNumber}
                 </CellContent>
             </CellContainer>
         )
     }
     
-    const renderVendorEmailColumn = (e) => {
+    const renderCustomerAddressColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.vendorEmail}
+                    {e.data.customerAddress}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+    
+    const renderCustomerEmailColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.customerEmail}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderVendorDisableColumn = (e) => {
+    const renderCustomerDisableColumn = (e) => {
         return (
             <CellContainer style={{ alignItems: 'center' }}>
-                <Badge className={"active-badge"} color={!e.data.isDisabled ? "success" : "secondary"}>
+                <Badge className={"active-badge"} color={!e.data.disable ? "success" : "secondary"}>
                     <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>{!e.data.isDisabled ? "Active" : "Disabled"}</span>
+                    <span>{!e.data.disable ? "Active" : "Disabled"}</span>
                 </Badge>
             </CellContainer>
         )
@@ -139,14 +119,14 @@ const VendorMaster = () => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Vendor'
+                    title='Edit Customer'
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)}/>
 
                 <button
-                    title='Delete Vendor'
+                    title='Delete Customer'
                     className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"VENDOR_MASTER" }))} />
+                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CUSTOMER_MASTER" }))} />
             </ActionCellContainer>
         )
     }
@@ -155,27 +135,27 @@ const VendorMaster = () => {
         return (
             <Fragment>
                 <Header>
-                    <HeaderSpan>Vendor History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreateVendor()}>
+                    <HeaderSpan>Customer History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreate()}>
                         <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Vendor
+                        Create Customer
                     </Button>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "vendor-master-treelist",
+                        id: "customer-master-treelist",
                         class: "project-treelist"
                     }}
-                    keyExpr={"vendorId"}
+                    keyExpr={"customerId"}
                     ref={treeListRef}
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={venderMaster}
+                    dataSource={customerMaster}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    noDataText={'No Vendor'}
+                    noDataText={'No customer'}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}>
@@ -185,81 +165,63 @@ const VendorMaster = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"Vendor-Id"}
-                        dataField={"vendorId"}
+                        caption={"Customer-Id"}
+                        dataField={"customerId"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVenderIdColumn}
+                        cellRender={renderCustomerIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Vendor Name"}
-                        dataField={"vendorName"}
+                        caption={"Name"}
+                        dataField={"customerName"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorNameColumn}
+                        cellRender={renderCustomerNameColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Vendor Group"}
-                        dataField={"vendorGroup"}
+                        caption={"Contact"}
+                        dataField={"customerNumber"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorGroupColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-                        
-                    <Column
-                        caption={"Vendor Type"}
-                        dataField={"vendorType"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderVendorTypeColumn} 
+                        cellRender={renderCustomerContactColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
                         caption={"Address"}
-                        dataField={"vendorAddress"}
+                        dataField={"customerAddress"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorAddressColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"Contact"}
-                        dataField={"vendorNumber"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderVendorContactColumn} 
+                        cellRender={renderCustomerAddressColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
                         caption={"Email"}
-                        dataField={"vendorEmail"}
+                        dataField={"customerEmail"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorEmailColumn} 
+                        cellRender={renderCustomerEmailColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
                     <Column
+                        width={115}
+                        minWidth={115}
                         caption={"Disable"}
-                        dataField={"isDisabled"}
+                        dataField={"disable"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorDisableColumn} 
+                        cellRender={renderCustomerDisableColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -285,25 +247,11 @@ const VendorMaster = () => {
     )
 }
 
-export default VendorMaster
+export default CustomerMaster
 
 const ActionCellContainer = styled.div`
     display: flex;
     font-size: 16px;
     align-items: center;
     justify-content: space-evenly;
-`
-
-const Header = styled.div`
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-`
-
-const HeaderSpan = styled.span`
-    color: #495057;
-    font-size: 16px;
-    font-weight: 500;
-    font-family: 'RobotoFallback';
 `

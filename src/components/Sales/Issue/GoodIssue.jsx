@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
@@ -10,107 +10,73 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { setPurchaseInvoiceRef } from '../../../actions/ViewActions'
-import { getGoodReceipt, getPurchaseInvoice, purchaseInvoiceActionType, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
+import { getGoodIssue, goodIssueActionType } from '../../../actions/SalesActions'
+import { setGoodIssueRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
 import styled from 'styled-components'
 
-const PurchaseInvoice = () => {
-
-    const goodReceipt = useSelector((state) => state.purchase.goodReceipt)
-    const purchaseInvoice = useSelector(state => state.purchase.purchaseInvoice)
+const GoodIssue = () => {
+    
+    const goodIssue = useSelector(state => state.sales.goodIssue)
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
-
+    
     const treeListRef = useRef()
 
     useEffect(() => {
-        dispatch(setPurchaseInvoiceRef(treeListRef))
+        dispatch(setGoodIssueRef(treeListRef))
     }, [])
 
     useEffect(() => {
-        dispatch(getPurchaseInvoice(0))
+        dispatch(getGoodIssue(0))
     }, [])
 
-    useEffect(() => {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        const pastDueDateInvoices = purchaseInvoice.filter(item => {
-            const dueDate = new Date(item.dueDate)
-            dueDate.setHours(0, 0, 0, 0)
-            return dueDate < today
-        }).filter((pi) => pi.pi_Status === "Un-Paid")
-        
-        if(pastDueDateInvoices.length !== 0){
-            pastDueDateInvoices.forEach((item) => {
-                item.pi_Status = "Over-Due"
-                dispatch(updatePurchaseInvoice(item, item.pi_Id)).then((res) => {
-                    if(res.payload.data.success){
-                        const gr = goodReceipt.find(item => item.gr_Id === res.payload.data.result.gr_Id)
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: "Over-Due" }, gr.gr_Id)).then((resX) => {
-                            if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
-                            }
-                        })
-                    }
-                })
-            })
-        }
-        
-    }, [])
-
-    const handleOnCreate = (e) => {
-        dispatch(purchaseInvoiceActionType({ node: null, type: "CREATE" }))
-        navigate('/app/Create_Purchase_Invoice')
-    }
-    
-    const handleOnEditClick = (e) => {
-        dispatch(purchaseInvoiceActionType({ node: e, type: "UPDATE" }))
-        navigate('/app/Create_Purchase_Invoice')
+    const handleOnClick = () => {
+        navigate('/app/Create_Good_Issue')
+        dispatch(goodIssueActionType({ node: null, type: "CREATE" }))
     }
 
     const handleOnViewClick = (e) => {
-        dispatch(purchaseInvoiceActionType({ node: e, type: "VIEW" }))
-        navigate('/app/Create_Purchase_Invoice')
+        dispatch(goodIssueActionType({ node: e, type: "VIEW" }))
+        navigate('/app/Create_Good_Issue')
     }
 
-    const renderPurchaseInvoice = (e) => {
+    const renderIdColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.pi_Id}
+                    {e.data.gi_Id}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderGoodReceipt = (e) => {
+    const renderSaleOrderColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.gr_Id}
+                    {e.data.saleOrder_Id}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderVendorName = (e) => {
+    const renderNameColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.vendorName}
+                    {e.data.customerName}
                 </CellContent>
             </CellContainer>
         )
     }
 
-    const renderVendorContact = (e) => {
+    const renderContactColumn = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.vendorNumber}
+                    {e.data.customerNumber}
                 </CellContent>
             </CellContainer>
         )
@@ -126,22 +92,12 @@ const PurchaseInvoice = () => {
         )
     }
 
-    const renderDueDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.dueDate).format("DD/MM/YYYY")}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
     const renderStatusColumn = (e) => {
         return (
-            <CellContainer style={{ alignItems: 'center' }}>
+             <CellContainer style={{ alignItems: 'center' }}>
                 <Badge className={"status-badge"} color={setColor(e)}>
                     <span className='fad fa-circle' style={{ fontSize: 8, marginRight: 5, left: -3 }} />
-                    <span>{e.data.pi_Status}</span>
+                    <span>{e.data.gi_Status}</span>
                 </Badge>
             </CellContainer>
         )
@@ -151,13 +107,16 @@ const PurchaseInvoice = () => {
         return (
             <ActionCellContainer>
                 <button
-                    title='Edit Purchase Invoice'
-                    className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick(e)} />
-                <button
-                    title='View Purchase Invoice'
+                    title='View Good Issue'
                     className='fal fa-eye treelist-edit-button'
                     onClick={() => handleOnViewClick(e)} />
+
+                {e.data.gi_Status === "Created" && (
+                    <button
+                        title='Cancel Good Issue'
+                        className='fal fa-trash treelist-delete-button'
+                        onClick={() => dispatch(toggleDeletePopup({ active: true, type:"GOOD_ISSUE" }))} />
+                )}
             </ActionCellContainer>
         )
     }
@@ -166,16 +125,16 @@ const PurchaseInvoice = () => {
         return (
             <Fragment>
                 <Header>
-                    <HeaderSpan>Purchase Invoice History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnCreate()}>
-                        <i style={{ marginRight: 10 }} className='fal fa-plus' />
-                        Create Purchase Invoice
+                    <HeaderSpan>Good Issue History</HeaderSpan>
+                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
+                        <i style={{marginRight: 10}} className='fal fa-plus' />
+                        Create Good Issue
                     </Button>
                 </Header>
 
                 <TreeList
                     elementAttr={{
-                        id: "purchase-invoice-treelist",
+                        id: "good-issue-treelist",
                         class: "project-treelist"
                     }}
                     ref={treeListRef}
@@ -184,55 +143,55 @@ const PurchaseInvoice = () => {
                     showColumnLines={true}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
-                    dataSource={purchaseInvoice}
-                    keyExpr={"pi_Id"}
+                    dataSource={goodIssue}
+                    keyExpr={"gi_Id"}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}
-                    noDataText={'No Purchase Invoice'}>
+                    noDataText={'No Good Issue'}>
 
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
 
                     <Column
-                        caption={"PI-Id"}
-                        dataField={"pi_Id"}
+                        caption={"GI-Id"}
+                        dataField={"gi_Id"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderPurchaseInvoice}
+                        cellRender={renderIdColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"GR-Id"}
-                        dataField={"gr_Id"}
+                        caption={"SO-Id"}
+                        dataField={"saleOrder_Id"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderGoodReceipt}
+                        cellRender={renderSaleOrderColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
-                        caption={"Vendor Name"}
-                        dataField={"vendorName"}
+                        caption={"Customer Name"}
+                        dataField={"customerName"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorName}
+                        cellRender={renderNameColumn}
                         headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
+                        cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
                         caption={"Contact"}
-                        dataField={"vendorNumber"}
+                        dataField={"customerNumber"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderVendorContact}
+                        cellRender={renderContactColumn}
                         headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
+                        cssClass={"project-treelist-item-column"}
                     />
 
                     <Column
@@ -240,29 +199,19 @@ const PurchaseInvoice = () => {
                         dataField={"creationDate"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderCreationDateColumn}
+                        cellRender={renderCreationDateColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
-
+                        
                     <Column
-                        caption={"Due Date"}
-                        dataField={"dueDate"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderDueDateColumn}
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        width={115}
-                        minWidth={115}
+                        width={123}
+                        minWidth={123}
                         caption={"Status"}
-                        dataField={"pi_Status"}
+                        dataField={"gi_Status"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderStatusColumn}
+                        cellRender={renderStatusColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
@@ -275,7 +224,7 @@ const PurchaseInvoice = () => {
                         alignment={"center"}
                         allowSorting={false}
                         cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell}
+                        headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}
                     />
                 </TreeList>
@@ -302,7 +251,7 @@ const PurchaseInvoice = () => {
     )
 }
 
-export default PurchaseInvoice
+export default GoodIssue
 
 const ActionCellContainer = styled.div`
     display: flex;
@@ -314,16 +263,22 @@ const ActionCellContainer = styled.div`
 const setColor = (e) => {
     let color
 
-    if(e.data.pi_Status === "Un-Paid"){
-        color = 'warning'
+    if(e.data.gi_Status === "Created"){
+        color = 'secondary'
     }
-    else if(e.data.pi_Status === "Paid"){
+    if(e.data.gi_Status === "Paid"){
         color = 'success'
     }
-    else if(e.data.pi_Status === "Over-Due"){
+    if(e.data.gi_Status === "Un-Paid"){
+        color = 'warning'
+    }
+    else if(e.data.gi_Status === "SI Created"){
+        color = 'info'
+    }
+    else if(e.data.gi_Status === "Cancelled"){
         color = 'danger'
     }
-    else if(e.data.pi_Status === "Cancelled"){
+    else if(e.data.gi_Status === "Over-Due"){
         color = 'danger'
     }
 

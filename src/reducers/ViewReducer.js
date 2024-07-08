@@ -5,12 +5,16 @@ const INITIAL_STATE = {
 	bomRef: null,
 	cropPlanRef: null,
 	resourceRef: null,
+	saleOrderRef: null,
 	warehouseRef: null,
+	goodIssueRef: null,
 	itemMasterRef: null,
 	goodReceiptRef: null,
+	saleInvoiceRef: null,
 	itemResourceRef: null,
 	vendorMasterRef: null,
 	purchaseOrderRef: null,
+	customerMasterRef: null,
 	vendorQuotationRef: null,
 	productionOrderRef: null,
 	purchaseRequestRef: null,
@@ -141,6 +145,30 @@ const ViewReducer = (state = INITIAL_STATE, action) => {
 			return {
 				...state,
 				purchaseInvoiceRef: action.payload
+			}
+		}
+		case "SET_CUSTOMER_MASTER_REF": {
+			return {
+				...state,
+				customerMasterRef: action.payload
+			}
+		}
+		case "SET_SALE_ORDER_REF": {
+			return {
+				...state,
+				saleOrderRef: action.payload
+			}
+		}
+		case "SET_GOOD_ISSUE_REF": {
+			return {
+				...state,
+				goodIssueRef: action.payload
+			}
+		}
+		case "SET_SALE_INVOICE_REF": {
+			return {
+				...state,
+				saleInvoiceRef: action.payload
 			}
 		}
 		default: return state

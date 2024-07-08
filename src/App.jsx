@@ -11,6 +11,7 @@ import Loading from './components/SupportComponents/Loading'
 import { getBom } from './actions/BomActions'
 import { getSeasons } from './actions/SeasonsAction'
 import { getItemMaster } from './actions/ItemActions'
+import { getSaleOrder } from './actions/SalesActions'
 import { getResource } from './actions/ResourceAction'
 import { getCookie } from './utilities/CommonUtilities'
 import { getWarehouse } from './actions/WarehouseAction'
@@ -18,6 +19,7 @@ import { getPlannedCrops } from './actions/CropsActions'
 import { getInventory } from './actions/InventoryAction'
 import { renderLoadingView } from './actions/ViewActions'
 import { getVendorMaster } from './actions/VendorActions'
+import { getCustomerMaster } from './actions/CustomerActions'
 import { getStockEntries } from './actions/StockEntriesAction'
 import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
@@ -43,10 +45,12 @@ const App = () => {
 		dispatch(getWarehouse()).catch((error) => console.error(error))
 		dispatch(getInventory()).catch((error) => console.error(error))
 		dispatch(getItemMaster()).catch((error) => console.error(error))
+		dispatch(getSaleOrder(0)).catch((error) => console.error(error))
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
 		dispatch(getStockEntries()).catch((error) => console.error(error))
 		dispatch(getVendorMaster()).catch((error) => console.error(error))
 		dispatch(getGoodReceipt(0)).catch((error) => console.error(error))
+		dispatch(getCustomerMaster()).catch((error) => console.error(error))
 		dispatch(getPurchaseOrder(0)).catch((error) => console.error(error))
 		dispatch(getProductionOrder(0)).catch((error) => console.error(error))
 		dispatch(getPurchaseRequest(0)).catch((error) => console.error(error))

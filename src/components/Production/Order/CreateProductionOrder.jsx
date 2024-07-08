@@ -14,11 +14,11 @@ import TreeList, { Column, Editing, Scrolling, Selection } from 'devextreme-reac
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { toggleCreateJobCardPopup, toggleLowSupplyPopup } from '../../../actions/PopupActions'
 import { setProductionOrderItemResource } from '../../../actions/ViewActions'
 import { getPlannedCrops, updateCropsPlan } from '../../../actions/CropsActions'
 import { addInventory, updateInventory } from '../../../actions/InventoryAction'
 import { addStockEntries, getStockEntries } from '../../../actions/StockEntriesAction'
+import { toggleCreateJobCardPopup, toggleLowSupplyPopup } from '../../../actions/PopupActions'
 import { addPoRouteStages, addProductionOrder, getProductionOrder, updatePoRouteStages, updateProductionOrder } from '../../../actions/ProductionOrderAction'
 
 import styled from 'styled-components'
@@ -469,17 +469,19 @@ const CreateProductionOrder = () => {
         }
     }
 
-    const ProgressBar = useCallback(() => {
+    const ProgressBar = () => {
         const totalRows = treeListData.length
         const completedRows = treeListData.filter(item => item.PO_Status === 'Completed').length
         const progress = (completedRows / totalRows) * 100
+
+        console.log(progress)
 
         return (
             <Progress multi style={{ height: 25 }}>
                 <Progress animated bar color="success" value={isNaN(progress) ? 0 : progress}>{`${progress.toFixed(0)}%`}</Progress>
             </Progress>
         )
-    }, [treeListData])
+    }
 
     const handleOnFocusOut = (e) => {
         const name = e.event.target.accessKey
@@ -652,7 +654,8 @@ const CreateProductionOrder = () => {
                     </div>
                 </Header>
 
-                <div style={{ margin: 10 }}>{ProgressBar()}</div>
+                {/* <div style={{ margin: 10 }}>{ProgressBar()}</div> */}
+                <div style={{ margin: 10 }}><ProgressBar /></div>
 
                 <form onSubmit={handleOnSubmit}>
                     <FormGroupContainer>

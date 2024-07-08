@@ -4,12 +4,19 @@ import { Route, Routes } from 'react-router-dom'
 import Purchase from '../components/Cards/Purchase'
 import Inventory from '../components/Cards/Inventory'
 import Production from '../components/Cards/Production'
+import GoodIssue from '../components/Sales/Issue/GoodIssue'
+import SaleOrder from '../components/Sales/Order/SaleOrder'
 import CropPlan from '../components/Production/Crops/CropPlan'
 import Resource from '../components/Inventory/Resource/Resource'
+import SalesInvoice from '../components/Sales/Invoice/SalesInvoice'
 import Warehouse from '../components/Inventory/Warehouse/Warehouse'
 import GoodReceipt from '../components/Purchase/Invoice/GoodReceipt'
 import StockEntries from '../components/Inventory/Stock/StockEntries'
 import ItemMaster from '../components/Inventory/ItemMaster/ItemMaster'
+import CreateSaleOrder from '../components/Sales/Order/CreateSaleOrder'
+import CreateGoodIssue from '../components/Sales/Issue/CreateGoodIssue'
+import CreateCustomer from '../components/Sales/Customer/CreateCustomer'
+import CustomerMaster from '../components/Sales/Customer/CustomerMaster'
 import CreateBOM from '../components/Production/BillOfMaterial/CreateBOM'
 import VendorMaster from '../components/Purchase/VendorMaster/VendorMaster'
 import CreateVendor from '../components/Purchase/VendorMaster/CreateVendor'
@@ -17,6 +24,7 @@ import ProductionOrder from '../components/Production/Order/ProductionOrder'
 import PurchaseInvoice from '../components/Purchase/Invoice/PurchaseInvoice'
 import PurchaseOrder from '../components/Purchase/PurchaseOrder/PurchaseOrder'
 import VendorQuotation from '../components/Purchase/Quotation/VendorQuotation'
+import CreateSalesInvoice from '../components/Sales/Invoice/CreateSalesInvoice'
 import CreateGoodReceipt from '../components/Purchase/Invoice/CreateGoodReceipt'
 import BillOfMaterial from '../components/Production/BillOfMaterial/BillOfMaterial'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
@@ -146,6 +154,38 @@ const AppRoutes = () => {
                 <Route
                     path="Create_Purchase_Invoice"
                     element={<CreatePurchaseInvoice />}>
+                </Route>
+                <Route
+                    path="Create_Customer"
+                    element={<CreateCustomer />}>
+                </Route>
+                <Route
+                    path="Customer_Master"
+                    element={<CustomerMaster />}>
+                </Route>
+                <Route
+                    path="Sale_Order"
+                    element={<SaleOrder />}>
+                </Route>
+                <Route
+                    path="Create_Sale_Order"
+                    element={<CreateSaleOrder />}>
+                </Route>
+                <Route
+                    path="Good_Issue"
+                    element={<GoodIssue />}>
+                </Route>
+                <Route
+                    path="Create_Good_Issue"
+                    element={<CreateGoodIssue />}>
+                </Route>
+                <Route
+                    path="Sale_Invoice"
+                    element={<SalesInvoice />}>
+                </Route>
+                <Route
+                    path="Create_Sale_Invoice"
+                    element={<CreateSalesInvoice />}>
                 </Route>
             </Routes>
         </div>

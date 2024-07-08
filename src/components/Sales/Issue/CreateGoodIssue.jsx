@@ -1,89 +1,90 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { Fragment, useEffect, useRef, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 
-import moment from 'moment'
-import notify from 'devextreme/ui/notify'
-import DataSource from 'devextreme/data/data_source'
+import moment from "moment"
+import notify from "devextreme/ui/notify"
+import DataSource from "devextreme/data/data_source"
 import FormBackground from '../../SupportComponents/FormBackground'
 
-import { Button } from 'reactstrap'
+import { Button } from "reactstrap"
+import { DateBox, SelectBox, TextBox, TreeList } from "devextreme-react"
 import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-list'
-import { CheckBox, DateBox, SelectBox, TextBox, TreeList } from 'devextreme-react'
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { assignClientId } from '../../../utilities/CommonUtilities'
-import { addPurchaseInvoice, getGoodReceipt, getPurchaseInvoice, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
+import { assignClientId } from "../../../utilities/CommonUtilities"
+import { getInventory, updateInventory } from "../../../actions/InventoryAction"
+import { addGoodIssue, getGoodIssue, getSaleOrder, updateSaleOrder } from "../../../actions/SalesActions"
 
-const CreatePurchaseInvoice = () => {
+const CreateGoodIssue = () => {
 
-    const goodReceipt = useSelector((state) => state.purchase.goodReceipt)
-    const purchaseInvoiceAction = useSelector(state => state.purchase.purchaseInvoiceAction)
+    const saleOrder = useSelector(state => state.sales.saleOrder)
+    const inventory = useSelector(state => state.inventory.inventoryStatus)
+    const goodIssueAction = useSelector(state => state.sales.goodIssueAction)
 
     const [treeListData, setTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ gr_Id: false, dueDate: false })
-    const [formData, setFormData] = useState({ gr_Id: "", creationDate: "", dueDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", pi_Status: "", paid: false })
+    const [invalid, setInvalid] = useState({ saleOrder_Id: false })
+    const [quantityAvaiable, isQuantityAvaiable] = useState(true)
+    const [formData, setFormData] = useState({ saleOrder_Id: "", creationDate: "", customerId: "", customerName: "", customerAddress: "", customerNumber: "", gi_Status: "" })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
 
-    const purchaseInvoiceDataSource = new DataSource({
+    const goodIssueDataSource = new DataSource({
         store: {
             data: assignClientId(treeListData),
             type: 'array',
             key: 'clientId',
         }
     })
-
+    
     useEffect(() => {
-        if (purchaseInvoiceAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), pi_Status: "Un-Paid" }))
+        if (goodIssueAction.type === "CREATE") {
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), gi_Status: "Pending" }))            
         }
-        else if (purchaseInvoiceAction.type === "UPDATE" || purchaseInvoiceAction.type === "VIEW") {
+        else if (goodIssueAction.type === "VIEW") {
             setFormData({
-                gr_Id: purchaseInvoiceAction.node.data.gr_Id, 
-                creationDate: purchaseInvoiceAction.node.data.creationDate,
-                dueDate: purchaseInvoiceAction.node.data.dueDate,
-                vendorId: purchaseInvoiceAction.node.data.vendorId,
-                vendorName: purchaseInvoiceAction.node.data.vendorName,
-                vendorAddress: purchaseInvoiceAction.node.data.vendorAddress,
-                vendorNumber: purchaseInvoiceAction.node.data.vendorNumber,
-                pi_Status: purchaseInvoiceAction.node.data.pi_Status,
-                paid: purchaseInvoiceAction.node.data.paid
+                saleOrder_Id: goodIssueAction.node.data.saleOrder_Id,
+                creationDate: goodIssueAction.node.data.creationDate,
+                customerId: goodIssueAction.node.data.customerId,
+                customerName: goodIssueAction.node.data.customerName,
+                customerAddress: goodIssueAction.node.data.customerAddress,
+                customerNumber: goodIssueAction.node.data.customerNumber,
+                gi_Status: goodIssueAction.node.data.gi_Status
             })
-            setTreeListData(purchaseInvoiceAction.node.data.children)
+            setTreeListData(goodIssueAction.node.data.children) 
         }
     }, [])
 
-    const onValueChanged = (e, name) => {
+    useEffect(() => {
+        if(!quantityAvaiable){
+            return notify("Some items are not available or less then required Quantity in inventory", "error", 2000)
+        }
+    }, [quantityAvaiable])
+
+    const onValueChanged = (e) => {
         let value = e.value
         if (value === null) value = ""
 
-        if(name === "gr_Id" && value && typeof value === 'object'){
-            setFormData((prevState) => ({
+        if(value && typeof value === 'object'){
+            setFormData((prevState) => ({ 
                 ...prevState,
-                gr_Id: value.gr_Id,
-                vendorId: value.vendorId,
-                vendorName: value.vendorName,
-                vendorAddress: value.vendorAddress,
-                vendorNumber: value.vendorNumber
+                saleOrder_Id: value.saleOrder_Id,
+                customerId: value.customerId,
+                customerName: value.customerName,
+                customerAddress: value.customerAddress,
+                customerNumber: value.customerNumber
             }))
 
-            const items = value.children.map((item) => {
-                item.pi_Id = ""
-                item.pi_ItemId = ""
-
-                return item
+            const items = value.children.map(item => {
+                return {
+                    ...item,
+                    gi_Id: "",
+                    gi_ItemId: ""
+                }
             })
 
             setTreeListData(items)
-        }
-        else if(name === "dueDate"){
-            setFormData(prevState => ({ ...prevState, dueDate: value }))
-            setInvalid(prevState => ({ ...prevState, dueDate: value === "" || !value ? true : false }))
-        }
-        else if(name === "paid"){
-            setFormData(prevState => ({ ...prevState, paid: value, pi_Status: value ? "Paid" : "Un-Paid" }))
         }
     }
 
@@ -98,8 +99,8 @@ const CreatePurchaseInvoice = () => {
     const handleOnFocusOut = (e) => {
         const name = e.event.target.accessKey
         if (formData[name] === null) formData[name] = ""
-
-        if (name === "gr_Id") {
+        
+        if(name === "saleOrder_Id"){
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 [name]: formData[name].trim() === "" ? true : false
@@ -109,90 +110,85 @@ const CreatePurchaseInvoice = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault()
-
-        if (formData.gr_Id === "" || formData.dueDate === "") {
+    
+        if (formData.saleOrder_Id === "") {
             return notify("Form fields cannot be empty", "error", 2000)
         }
 
-        if(invalid.gr_Id === true || invalid.dueDate === true){
+        if (invalid.saleOrder_Id === true) {
             return notify("Please correct the invalid fields", "error", 2000)
         }
 
-        const purchaseInvoice = {
-            pi_Id: "",
-            dueDate: moment(formData.dueDate).format('YYYY-MM-DD'),
+        if(!quantityAvaiable){
+            return notify("Some items are not available or less then required Quantity in inventory", "error", 2000)
+        }
+
+        const goodIssue = {
+            gi_Id: "",
             creationDate : moment(formData.creationDate).format('YYYY-MM-DD'),
-            gr_Id: formData.gr_Id,
-            vendorId : formData.vendorId,
-            vendorName : formData.vendorName,
-            vendorAddress : formData.vendorAddress,
-            vendorNumber : formData.vendorNumber,
-            pi_Status : formData.pi_Status,
-            paid: formData.paid,
+            saleOrder_Id : formData.saleOrder_Id,
+            customerId : formData.customerId,
+            customerName : formData.customerName,
+            customerAddress : formData.customerAddress,
+            customerNumber : formData.customerNumber,
             total : calculateTotal(),
+            gi_Status : "Created",
             children: [...treeListData]
         }
 
-        if(purchaseInvoiceAction.type === "CREATE"){
-            dispatch(addPurchaseInvoice(purchaseInvoice)).then((res) => {
+        if (goodIssueAction.type === "CREATE") {
+            dispatch(addGoodIssue(goodIssue)).then((res) => {
                 const response = res.payload.data
                 if(response.success){
-                    const gr = goodReceipt.find(item => item.gr_Id === formData.gr_Id)
-                    if(gr){
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: formData.pi_Status }, gr.gr_Id)).then((resX) => {
+                    const SO = saleOrder.find(item => item.saleOrder_Id === formData.saleOrder_Id)
+                    if(SO){
+                        dispatch(updateSaleOrder({ ...SO, so_Status: "GI Created" }, SO.saleOrder_Id)).then((resX) => {
                             if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
+                                dispatch(getSaleOrder(0))
                             }
                         })
                     }
 
+                    response.result.children.forEach((child) => {
+                        if(inventory.some((item) => item.inventoryItem === child.itemName)){
+                            const item = inventory.find((item) => item.inventoryItem === child.itemName)
+                            if(item){
+                                dispatch(updateInventory(item.inventoryId, {
+                                    ...item,
+                                    inventoryQuantity: item.inventoryQuantity - child.itemQuantity
+                                }))
+                            }
+                        }
+                    })
+
                     setFormData((prevState) => ({
                         ...prevState,
-                        gr_Id: "",
-                        dueDate: "",
-                        vendorId: "",
-                        vendorName: "",
-                        vendorNumber: "",
-                        vendorAddress: "",
-                        pi_Status: "Un-Paid",
-                        paid: false,
+                        saleOrder_Id: "",
+                        customerId: "",
+                        customerName: "",
+                        customerAddress: "",
+                        customerNumber: ""
                     }))
                     setTreeListData([])
-                    dispatch(getPurchaseInvoice(0))
-                    notify("Purchase Invoice Created Successfully")
-                }
-            })
-        }
-        else if(purchaseInvoiceAction.type === "UPDATE") {
-            dispatch(updatePurchaseInvoice(purchaseInvoice, purchaseInvoiceAction.node.data.pi_Id)).then((res) => {
-                const response = res.payload.data
-                if(response.success){
-                    const gr = goodReceipt.find(item => item.gr_Id === formData.gr_Id)
-                    if(gr){
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: formData.pi_Status }, gr.gr_Id)).then((resX) => {
-                            if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
-                            }
-                        })
-                    }
-                    dispatch(getPurchaseInvoice(0))
-                    notify("Purchase Invoice Updated Successfully")
+                    dispatch(getInventory())
+                    dispatch(getGoodIssue(0))
+                    notify("Good Receipt Created Successfully")
                 }
             })
         }
     }
 
     const renderContent = () => {
-        return (
+        return(
             <Fragment>
                 <Header>
-                    <HeaderSpan>Create Purchase Invoice</HeaderSpan>
+                    <HeaderSpan>Create Good Receipt</HeaderSpan>
                 </Header>
 
                 <form onSubmit={handleOnSubmit}>
                     <FormGroupContainer>
                         <div style={{ display: 'flex', justifyContent: "", marginTop: 5, marginBottom: 5 }}>
-                            <div style={{ width: 500, margin: "0 20px 20px 20px" }}>
+                            <div style={{width: 500, margin: "0 20px 20px 20px"}}>
                                 <FormGroupItem>
                                     <FormLabel>Creation Date</FormLabel>
                                     <DateBox
@@ -207,151 +203,36 @@ const CreatePurchaseInvoice = () => {
                                         placeholder={"DD/MM/YYYY"}
                                         displayFormat={"dd/MM/yyyy"}
                                         value={formData.creationDate}
-                                        validationStatus={'valid'}
+                                        validationStatus={"valid"}
                                     />
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Good Receipt</FormLabel>
-                                    {purchaseInvoiceAction.type === "CREATE" ?
-                                        <SelectBox
-                                            elementAttr={{
-                                                class: "form-selectbox"
-                                            }}
-                                            searchTimeout={200}
-                                            accessKey={'gr_Id'}
-                                            searchEnabled={true}
-                                            displayExpr={'gr_Id'}
-                                            searchMode={'contains'}
-                                            searchExpr={'vendorName'}
-                                            dataSource={goodReceipt.filter((gr) => gr.gr_Status === "Created").map(item => {
-                                                return {
-                                                    gr_Id: item.gr_Id,
-                                                    vendorId: item.vendorId,
-                                                    vendorName: item.vendorName,
-                                                    vendorAddress: item.vendorAddress,
-                                                    vendorNumber: item.vendorNumber,
-                                                    children: item.children
-                                                }
-                                            })}
-                                            value={formData.gr_Id}
-                                            openOnFieldClick={true}
-                                            acceptCustomValue={true}
-                                            onFocusIn={handleOnFocusIn}
-                                            onFocusOut={handleOnFocusOut}
-                                            itemRender={(e) => {
-                                                return (
-                                                    <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                                                        <span>{e.gr_Id}</span>
-                                                        <span style={{ marginLeft: "auto", }}>
-                                                            {e.vendorName}
-                                                        </span>
-                                                    </div>
-                                                )
-                                            }}
-                                            placeholder={"Select Good Receipt"}
-                                            dropDownOptions={{ maxHeight: 300 }}
-                                            onValueChanged={(e) => onValueChanged(e, "gr_Id")}
-                                            validationStatus={invalid.gr_Id === false ? "valid" : "invalid"}
-                                        />
-                                        :
-                                        <TextBox
-                                            elementAttr={{
-                                                class: "form-textbox"
-                                            }}
-                                            readOnly={true}
-                                            accessKey={'gr_Id'}
-                                            value={formData.gr_Id}
-                                        />
-                                    }
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Name</FormLabel>
+                                    <FormLabel>Customer Id</FormLabel>
                                     <TextBox
                                         elementAttr={{
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'vendorName'}
-                                        placeholder={"Enter Name"}
-                                        value={formData.vendorName}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Address</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorAddress'}
+                                        accessKey={'customerId'}
                                         placeholder={"Enter Address"}
-                                        value={formData.vendorAddress}
+                                        value={formData.customerId}
                                     />
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Paid</FormLabel>
-                                    <CheckBox
-                                        width={20}
-                                        value={formData.paid}
-                                        style={{ marginTop: 10 }}
-                                        onValueChanged={(e) => onValueChanged(e, 'paid')}
-                                        disabled={purchaseInvoiceAction.type === "VIEW" ? true : false}
-                                    />
-                                </FormGroupItem>
-                            </div>
-
-                            <div style={{ width: 500, margin: "0 20px" }}>
-                                <FormGroupItem>
-                                    <FormLabel>Due Date</FormLabel>
-                                    <DateBox
-                                        elementAttr={{
-                                            class: "form-datebox",
-                                        }}
-
-                                        type={"date"}
-                                        min={new Date()}
-                                        accessKey={'dueDate'}
-                                        openOnFieldClick={true}
-                                        value={formData.dueDate}
-                                        placeholder={"DD/MM/YYYY"}
-                                        displayFormat={"dd/MM/yyyy"}
-                                        validationMessagePosition={"bottom"}
-                                        onValueChanged={(e) => onValueChanged(e, "dueDate")}
-                                        validationStatus={invalid.dueDate === false ? "valid" : "invalid"}
-                                        readOnly={purchaseInvoiceAction.type === "VIEW" || formData.pi_Status === "Over-Due" ? true : false}
-                                    />
-                                </FormGroupItem>
-
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Id</FormLabel>
+                                    <FormLabel>Customer Address</FormLabel>
                                     <TextBox
                                         elementAttr={{
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'vendorId'}
-                                        placeholder={"Enter Vendor"}
-                                        value={formData.vendorId}
+                                        accessKey={'customerAddress'}
+                                        placeholder={"Enter Address"}
+                                        value={formData.customerAddress}
                                     />
                                 </FormGroupItem>
 
-                                <FormGroupItem>
-                                    <FormLabel>Vendor Contact</FormLabel>
-                                    <TextBox
-                                        elementAttr={{
-                                            class: "form-textbox"
-                                        }}
-                                        readOnly={true}
-                                        accessKey={'vendorNumber'}
-                                        placeholder={"Enter Contact"}
-                                        value={formData.vendorNumber}
-                                    />
-                                </FormGroupItem>
-                               
                                 <FormGroupItem>
                                     <FormLabel>Status</FormLabel>
                                     <TextBox
@@ -359,16 +240,97 @@ const CreatePurchaseInvoice = () => {
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'pi_Status'}
-                                        value={formData.pi_Status}
+                                        accessKey={'gi_Status'}
+                                        value={formData.gi_Status}
                                         placeholder={'Status'}
                                     />
                                 </FormGroupItem>
+                            </div>
+                            <div style={{width: 500, margin: "0 20px"}}>
+                                <FormGroupItem>
+                                    <FormLabel>Sale Order</FormLabel>
+                                    {goodIssueAction.type === "CREATE" ?
+                                        <SelectBox
+                                            elementAttr={{
+                                                class: "form-selectbox"
+                                            }}
+                                            searchTimeout={200}
+                                            accessKey={'saleOrder_Id'}
+                                            searchEnabled={true}
+                                            displayExpr={'saleOrder_Id'}
+                                            searchMode={'contains'}
+                                            searchExpr={'customerName'}
+                                            dataSource={saleOrder.filter((SO) => SO.so_Status === "Created").map(item => {
+                                                return {
+                                                    saleOrder_Id: item.saleOrder_Id,
+                                                    customerId: item.customerId,
+                                                    customerName: item.customerName,
+                                                    customerAddress: item.customerAddress,
+                                                    customerNumber: item.customerNumber,
+                                                    children: item.children
+                                                }
+                                            })}
+                                            value={formData.saleOrder_Id}
+                                            openOnFieldClick={true}
+                                            acceptCustomValue={true}
+                                            onFocusIn={handleOnFocusIn}
+                                            onFocusOut={handleOnFocusOut}
+                                            itemRender={(e) => {
+                                                return (
+                                                    <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
+                                                        <span>{e.saleOrder_Id}</span>
+                                                        <span style={{ marginLeft: "auto", }}>
+                                                            {e.customerName}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            }}
+                                            placeholder={"Select Sale Order"}
+                                            dropDownOptions={{ maxHeight: 300 }}
+                                            onValueChanged={(e) => onValueChanged(e)}
+                                            validationStatus={invalid.saleOrder_Id === false ? "valid" : "invalid"}
+                                        />
+                                        :
+                                        <TextBox
+                                            elementAttr={{
+                                                class: "form-textbox"
+                                            }}
+                                            readOnly={true}
+                                            accessKey={'saleOrder_Id'}
+                                            value={formData.saleOrder_Id}
+                                        />
+                                    }
+                                </FormGroupItem>
 
-                                {purchaseInvoiceAction.type !== "VIEW" && (
-                                    <FormButtonContainer style={{ marginTop: 25 }}>
+                                <FormGroupItem>
+                                    <FormLabel>Customer Name</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'customerName'}
+                                        placeholder={"Enter Name"}
+                                        value={formData.customerName}
+                                    />
+                                </FormGroupItem>
+
+                                <FormGroupItem>
+                                    <FormLabel>Customer Contact</FormLabel>
+                                    <TextBox
+                                        elementAttr={{
+                                            class: "form-textbox"
+                                        }}
+                                        readOnly={true}
+                                        accessKey={'customerNumber'}
+                                        placeholder={"Enter Contact"}
+                                        value={formData.customerNumber}
+                                    />
+                                </FormGroupItem>
+                                {goodIssueAction.type === "CREATE" && (
+                                    <FormButtonContainer style={{ marginTop: 45 }}>
                                         <Button size="sm" className={"form-action-button"}>
-                                            {purchaseInvoiceAction.type === "UPDATE" ? "Update" : "Save"} Purchase Invoice
+                                            Save Good Issue
                                         </Button>
                                     </FormButtonContainer>
                                 )}
@@ -409,17 +371,22 @@ const CreatePurchaseInvoice = () => {
         if (!data.itemQuantity) data.itemQuantity = 0
         if (!data.rate) data.rate = 0
 
-        //For Now
         setTreeListData(prevData => {
             return [...prevData].sort((a, b) => a.clientId - b.clientId)
         })
     }
 
     const handleOnCellPrepared = (e) => {
-        if (e.rowType === "data") {
-            if (e.column.dataField === "itemQuantity") {
-                if (e.value < 0) {
+        if (e.rowType === "data" && e.column.dataField === "itemQuantity") {
+            if(goodIssueAction.type === "CREATE" && treeListData[e.rowIndex]){
+                const item = treeListData[e.rowIndex].itemName
+                const requiredQuantity = treeListData[e.rowIndex].itemQuantity
+
+                const inventoryItem = inventory.find(inv => inv.inventoryItem === item)
+
+                if (inventoryItem && inventoryItem.inventoryQuantity < requiredQuantity) {
                     e.cellElement.style.setProperty("background-color", "#ff00004f", "important")
+                    isQuantityAvaiable(false)
                 }
             }
         }
@@ -435,21 +402,21 @@ const CreatePurchaseInvoice = () => {
         )
     }
 
-    const renderItemIdCell = ({ data }) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {data.itemId}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
     const renderItemNameCell = (e) => {
         return (
             <CellContainer>
                 <CellContent>
                     {e.data.itemName}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderItemIdCell = ({ data }) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {data.itemId}
                 </CellContent>
             </CellContainer>
         )
@@ -464,12 +431,12 @@ const CreatePurchaseInvoice = () => {
             </CellContainer>
         )
     }
-    
-    const renderUomCell = (e) => {
+
+    const renderUomCell = ({ data }) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.uom}
+                    {data.uom}
                 </CellContent>
             </CellContainer>
         )
@@ -507,7 +474,7 @@ const CreatePurchaseInvoice = () => {
 
                 <TreeList
                     elementAttr={{
-                        id: "create-purchase-invoice-treelist",
+                        id: "create-good-issue-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"clientId"}
@@ -515,7 +482,7 @@ const CreatePurchaseInvoice = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={purchaseInvoiceDataSource}
+                    dataSource={goodIssueDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     noDataText={'No Data'}
@@ -523,7 +490,7 @@ const CreatePurchaseInvoice = () => {
                     columnResizingMode={"nextColumn"}
                     onSaved={handleOnSaved}
                     onCellPrepared={handleOnCellPrepared}>
-
+                    
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
@@ -532,7 +499,7 @@ const CreatePurchaseInvoice = () => {
                         mode='cell'
                         allowUpdating={true}
                         startEditAction='dblClick'
-                        selectTextOnEditStart={true}
+                        selectTextOnEditStart={true} 
                         texts={{ confirmDeleteMessage: '' }}
                     />
 
@@ -541,13 +508,12 @@ const CreatePurchaseInvoice = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
-                        allowEditing={true}
+                        allowEditing={false}
                         cellRender={renderItemIdCell}
-                        editCellRender={renderItemIdCell}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
+                    
                     <Column
                         caption={"Item Name"}
                         dataField={"itemName"}
@@ -558,7 +524,7 @@ const CreatePurchaseInvoice = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
+                        
                     <Column
                         caption={"Quantity"}
                         dataField={"itemQuantity"}
@@ -570,7 +536,7 @@ const CreatePurchaseInvoice = () => {
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
-
+                    
                     <Column
                         caption={"UoM"}
                         dataField={"uom"}
@@ -579,7 +545,7 @@ const CreatePurchaseInvoice = () => {
                         allowEditing={false}
                         cellRender={renderUomCell}
                         headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-item-column"}
+                        cssClass={"project-treelist-column"}
                     />
 
                     <Column
@@ -588,18 +554,18 @@ const CreatePurchaseInvoice = () => {
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderRateCell}
+                        cellRender={renderRateCell} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
-
+ 
                     <Column
                         caption={"Amount"}
                         dataField={"amount"}
                         alignment={"left"}
                         allowEditing={false}
                         allowSorting={false}
-                        cellRender={renderAmountCell}
+                        cellRender={renderAmountCell} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />
@@ -615,4 +581,4 @@ const CreatePurchaseInvoice = () => {
     )
 }
 
-export default CreatePurchaseInvoice
+export default CreateGoodIssue

@@ -14,12 +14,15 @@ import InventoryReducer from "./InventoryReducer"
 import ProductionReducer from "./ProductionReducer"
 import StockEntriesReducer from "./StockEntriesReducer"
 import VendorMasterReducer from "./VendorMasterReducer"
+import CustomerMasterReducer from "./CustomerMasterReducer"
+import SalesReducer from "./SalesReducer"
 
 const rootReducers = combineReducers({
     bom: BomReducer,
     user: UserReducer,
     view: ViewReducer,
     item: ItemReducer,
+    sales: SalesReducer,
     popup: PopupReducer,
     crops: CropsReducer,
     seasons: SeasonsReducer,
@@ -29,7 +32,8 @@ const rootReducers = combineReducers({
     warehouse: WarehouseReducer,
     vendor: VendorMasterReducer,
     inventory : InventoryReducer,
-    production: ProductionReducer
+    production: ProductionReducer,
+    customer: CustomerMasterReducer
 })
 
 export default rootReducers

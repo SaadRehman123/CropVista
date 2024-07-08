@@ -12,22 +12,23 @@ import { CheckBox, DateBox, SelectBox, TextBox, TreeList } from 'devextreme-reac
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { addPurchaseInvoice, getGoodReceipt, getPurchaseInvoice, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
+import { addSaleInvoice, getGoodIssue, getSaleInvoice, updateGoodIssue, updateSaleInvoice } from '../../../actions/SalesActions'
 
-const CreatePurchaseInvoice = () => {
+const CreateSalesInvoice = () => {
 
-    const goodReceipt = useSelector((state) => state.purchase.goodReceipt)
-    const purchaseInvoiceAction = useSelector(state => state.purchase.purchaseInvoiceAction)
+    const goodIssue = useSelector(state => state.sales.goodIssue)
+    const saleInvoice = useSelector((state) => state.sales.saleInvoice)
+    const saleInvoiceAction = useSelector(state => state.sales.saleInvoiceAction)
 
     const [treeListData, setTreeListData] = useState([])
 
-    const [invalid, setInvalid] = useState({ gr_Id: false, dueDate: false })
-    const [formData, setFormData] = useState({ gr_Id: "", creationDate: "", dueDate: "", vendorId: "", vendorName: "", vendorAddress: "", vendorNumber: "", pi_Status: "", paid: false })
+    const [invalid, setInvalid] = useState({ gi_Id: false, dueDate: false })
+    const [formData, setFormData] = useState({ gi_Id: "", creationDate: "", dueDate: "", customerId: "", customerName: "", customerAddress: "", customerNumber: "", si_Status: "", paid: false })
 
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
 
-    const purchaseInvoiceDataSource = new DataSource({
+    const saleInvoiceDataSource = new DataSource({
         store: {
             data: assignClientId(treeListData),
             type: 'array',
@@ -36,22 +37,22 @@ const CreatePurchaseInvoice = () => {
     })
 
     useEffect(() => {
-        if (purchaseInvoiceAction.type === "CREATE") {
-            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), pi_Status: "Un-Paid" }))
+        if (saleInvoiceAction.type === "CREATE") {
+            setFormData(prevState => ({ ...prevState, creationDate: Date.now(), si_Status: "Un-Paid" }))
         }
-        else if (purchaseInvoiceAction.type === "UPDATE" || purchaseInvoiceAction.type === "VIEW") {
+        else if (saleInvoiceAction.type === "UPDATE" || saleInvoiceAction.type === "VIEW") {
             setFormData({
-                gr_Id: purchaseInvoiceAction.node.data.gr_Id, 
-                creationDate: purchaseInvoiceAction.node.data.creationDate,
-                dueDate: purchaseInvoiceAction.node.data.dueDate,
-                vendorId: purchaseInvoiceAction.node.data.vendorId,
-                vendorName: purchaseInvoiceAction.node.data.vendorName,
-                vendorAddress: purchaseInvoiceAction.node.data.vendorAddress,
-                vendorNumber: purchaseInvoiceAction.node.data.vendorNumber,
-                pi_Status: purchaseInvoiceAction.node.data.pi_Status,
-                paid: purchaseInvoiceAction.node.data.paid
+                gi_Id: saleInvoiceAction.node.data.gi_Id,
+                creationDate: saleInvoiceAction.node.data.creationDate,
+                dueDate: saleInvoiceAction.node.data.dueDate,
+                customerId: saleInvoiceAction.node.data.customerId,
+                customerName: saleInvoiceAction.node.data.customerName,
+                customerAddress: saleInvoiceAction.node.data.customerAddress,
+                customerNumber: saleInvoiceAction.node.data.customerNumber,
+                si_Status: saleInvoiceAction.node.data.si_Status,
+                paid: saleInvoiceAction.node.data.paid
             })
-            setTreeListData(purchaseInvoiceAction.node.data.children)
+            setTreeListData(saleInvoiceAction.node.data.children)
         }
     }, [])
 
@@ -59,19 +60,19 @@ const CreatePurchaseInvoice = () => {
         let value = e.value
         if (value === null) value = ""
 
-        if(name === "gr_Id" && value && typeof value === 'object'){
+        if(name === "gi_Id" && value && typeof value === 'object'){
             setFormData((prevState) => ({
                 ...prevState,
-                gr_Id: value.gr_Id,
-                vendorId: value.vendorId,
-                vendorName: value.vendorName,
-                vendorAddress: value.vendorAddress,
-                vendorNumber: value.vendorNumber
+                gi_Id: value.gi_Id,
+                customerId: value.customerId,
+                customerName: value.customerName,
+                customerAddress: value.customerAddress,
+                customerNumber: value.customerNumber
             }))
 
             const items = value.children.map((item) => {
-                item.pi_Id = ""
-                item.pi_ItemId = ""
+                item.si_ItemId = ""
+                item.salesInvoice_Id = ""
 
                 return item
             })
@@ -83,7 +84,7 @@ const CreatePurchaseInvoice = () => {
             setInvalid(prevState => ({ ...prevState, dueDate: value === "" || !value ? true : false }))
         }
         else if(name === "paid"){
-            setFormData(prevState => ({ ...prevState, paid: value, pi_Status: value ? "Paid" : "Un-Paid" }))
+            setFormData(prevState => ({ ...prevState, paid: value, si_Status: value ? "Paid" : "Un-Paid" }))
         }
     }
 
@@ -99,7 +100,7 @@ const CreatePurchaseInvoice = () => {
         const name = e.event.target.accessKey
         if (formData[name] === null) formData[name] = ""
 
-        if (name === "gr_Id") {
+        if (name === "gi_Id") {
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
                 [name]: formData[name].trim() === "" ? true : false
@@ -110,73 +111,73 @@ const CreatePurchaseInvoice = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
 
-        if (formData.gr_Id === "" || formData.dueDate === "") {
+        if (formData.gi_Id === "" || formData.dueDate === "") {
             return notify("Form fields cannot be empty", "error", 2000)
         }
 
-        if(invalid.gr_Id === true || invalid.dueDate === true){
+        if(invalid.gi_Id === true || invalid.dueDate === true){
             return notify("Please correct the invalid fields", "error", 2000)
         }
 
-        const purchaseInvoice = {
-            pi_Id: "",
+        const saleInvoice = {
+            salesInvoice_Id: "",
+            gi_Id: formData.gi_Id,
             dueDate: moment(formData.dueDate).format('YYYY-MM-DD'),
             creationDate : moment(formData.creationDate).format('YYYY-MM-DD'),
-            gr_Id: formData.gr_Id,
-            vendorId : formData.vendorId,
-            vendorName : formData.vendorName,
-            vendorAddress : formData.vendorAddress,
-            vendorNumber : formData.vendorNumber,
-            pi_Status : formData.pi_Status,
+            customerId : formData.customerId,
+            customerName : formData.customerName,
+            customerAddress : formData.customerAddress,
+            customerNumber : formData.customerNumber,
+            si_Status : formData.si_Status,
             paid: formData.paid,
             total : calculateTotal(),
             children: [...treeListData]
         }
 
-        if(purchaseInvoiceAction.type === "CREATE"){
-            dispatch(addPurchaseInvoice(purchaseInvoice)).then((res) => {
+        if(saleInvoiceAction.type === "CREATE"){
+            dispatch(addSaleInvoice(saleInvoice)).then((res) => {
                 const response = res.payload.data
                 if(response.success){
-                    const gr = goodReceipt.find(item => item.gr_Id === formData.gr_Id)
-                    if(gr){
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: formData.pi_Status }, gr.gr_Id)).then((resX) => {
+                    const gi = goodIssue.find(item => item.gi_Id === formData.gi_Id)
+                    if(gi){
+                        dispatch(updateGoodIssue({ ...gi, gi_Status: formData.si_Status }, gi.gi_Id)).then((resX) => {
                             if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
+                                dispatch(getGoodIssue(0))
                             }
                         })
                     }
 
                     setFormData((prevState) => ({
                         ...prevState,
-                        gr_Id: "",
+                        gi_Id: "",
                         dueDate: "",
-                        vendorId: "",
-                        vendorName: "",
-                        vendorNumber: "",
-                        vendorAddress: "",
-                        pi_Status: "Un-Paid",
+                        customerId: "",
+                        customerName: "",
+                        customerNumber: "",
+                        customerAddress: "",
+                        si_Status: "Un-Paid",
                         paid: false,
                     }))
                     setTreeListData([])
-                    dispatch(getPurchaseInvoice(0))
-                    notify("Purchase Invoice Created Successfully")
+                    dispatch(getSaleInvoice(0))
+                    notify("Sale Invoice Created Successfully")
                 }
             })
         }
-        else if(purchaseInvoiceAction.type === "UPDATE") {
-            dispatch(updatePurchaseInvoice(purchaseInvoice, purchaseInvoiceAction.node.data.pi_Id)).then((res) => {
+        else if(saleInvoiceAction.type === "UPDATE") {
+            dispatch(updateSaleInvoice(saleInvoice, saleInvoiceAction.node.data.salesInvoice_Id)).then((res) => {
                 const response = res.payload.data
                 if(response.success){
-                    const gr = goodReceipt.find(item => item.gr_Id === formData.gr_Id)
-                    if(gr){
-                        dispatch(updateGoodReceipt({ ...gr, gr_Status: formData.pi_Status }, gr.gr_Id)).then((resX) => {
+                    const gi = goodIssue.find(item => item.gi_Id === formData.gi_Id)
+                    if(gi){
+                        dispatch(updateGoodIssue({ ...gi, gi_Status: formData.si_Status }, gi.gi_Id)).then((resX) => {
                             if(resX.payload.data.success){
-                                dispatch(getGoodReceipt(0))
+                                dispatch(getGoodIssue(0))
                             }
                         })
                     }
-                    dispatch(getPurchaseInvoice(0))
-                    notify("Purchase Invoice Updated Successfully")
+                    dispatch(getSaleInvoice(0))
+                    notify("Sale Invoice Updated Successfully")
                 }
             })
         }
@@ -186,7 +187,7 @@ const CreatePurchaseInvoice = () => {
         return (
             <Fragment>
                 <Header>
-                    <HeaderSpan>Create Purchase Invoice</HeaderSpan>
+                    <HeaderSpan>Create Sale Invoice</HeaderSpan>
                 </Header>
 
                 <form onSubmit={handleOnSubmit}>
@@ -212,29 +213,29 @@ const CreatePurchaseInvoice = () => {
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Good Receipt</FormLabel>
-                                    {purchaseInvoiceAction.type === "CREATE" ?
+                                    <FormLabel>Good Issue</FormLabel>
+                                    {saleInvoiceAction.type === "CREATE" ?
                                         <SelectBox
                                             elementAttr={{
                                                 class: "form-selectbox"
                                             }}
                                             searchTimeout={200}
-                                            accessKey={'gr_Id'}
+                                            accessKey={'gi_Id'}
                                             searchEnabled={true}
-                                            displayExpr={'gr_Id'}
+                                            displayExpr={'gi_Id'}
                                             searchMode={'contains'}
-                                            searchExpr={'vendorName'}
-                                            dataSource={goodReceipt.filter((gr) => gr.gr_Status === "Created").map(item => {
+                                            searchExpr={'customerName'}
+                                            dataSource={goodIssue.filter((gi) => gi.gi_Status === "Created").map(item => {
                                                 return {
-                                                    gr_Id: item.gr_Id,
-                                                    vendorId: item.vendorId,
-                                                    vendorName: item.vendorName,
-                                                    vendorAddress: item.vendorAddress,
-                                                    vendorNumber: item.vendorNumber,
+                                                    gi_Id: item.gi_Id,
+                                                    customerId: item.customerId,
+                                                    customerName: item.customerName,
+                                                    customerAddress: item.customerAddress,
+                                                    customerNumber: item.customerNumber,
                                                     children: item.children
                                                 }
                                             })}
-                                            value={formData.gr_Id}
+                                            value={formData.gi_Id}
                                             openOnFieldClick={true}
                                             acceptCustomValue={true}
                                             onFocusIn={handleOnFocusIn}
@@ -242,17 +243,17 @@ const CreatePurchaseInvoice = () => {
                                             itemRender={(e) => {
                                                 return (
                                                     <div style={{ display: "flex", flexDirection: "row", whiteSpace: 'pre-line' }}>
-                                                        <span>{e.gr_Id}</span>
+                                                        <span>{e.gi_Id}</span>
                                                         <span style={{ marginLeft: "auto", }}>
-                                                            {e.vendorName}
+                                                            {e.customerName}
                                                         </span>
                                                     </div>
                                                 )
                                             }}
-                                            placeholder={"Select Good Receipt"}
+                                            placeholder={"Select Good Issue"}
                                             dropDownOptions={{ maxHeight: 300 }}
-                                            onValueChanged={(e) => onValueChanged(e, "gr_Id")}
-                                            validationStatus={invalid.gr_Id === false ? "valid" : "invalid"}
+                                            onValueChanged={(e) => onValueChanged(e, "gi_Id")}
+                                            validationStatus={invalid.gi_Id === false ? "valid" : "invalid"}
                                         />
                                         :
                                         <TextBox
@@ -260,35 +261,35 @@ const CreatePurchaseInvoice = () => {
                                                 class: "form-textbox"
                                             }}
                                             readOnly={true}
-                                            accessKey={'gr_Id'}
-                                            value={formData.gr_Id}
+                                            accessKey={'gi_Id'}
+                                            value={formData.gi_Id}
                                         />
                                     }
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Vendor Name</FormLabel>
+                                    <FormLabel>Customer Name</FormLabel>
                                     <TextBox
                                         elementAttr={{
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'vendorName'}
+                                        accessKey={'customerName'}
                                         placeholder={"Enter Name"}
-                                        value={formData.vendorName}
+                                        value={formData.customerName}
                                     />
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Vendor Address</FormLabel>
+                                    <FormLabel>Customer Address</FormLabel>
                                     <TextBox
                                         elementAttr={{
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'vendorAddress'}
+                                        accessKey={'customerAddress'}
                                         placeholder={"Enter Address"}
-                                        value={formData.vendorAddress}
+                                        value={formData.customerAddress}
                                     />
                                 </FormGroupItem>
 
@@ -299,7 +300,7 @@ const CreatePurchaseInvoice = () => {
                                         value={formData.paid}
                                         style={{ marginTop: 10 }}
                                         onValueChanged={(e) => onValueChanged(e, 'paid')}
-                                        disabled={purchaseInvoiceAction.type === "VIEW" ? true : false}
+                                        disabled={saleInvoiceAction.type === "VIEW" ? true : false}
                                     />
                                 </FormGroupItem>
                             </div>
@@ -322,33 +323,33 @@ const CreatePurchaseInvoice = () => {
                                         validationMessagePosition={"bottom"}
                                         onValueChanged={(e) => onValueChanged(e, "dueDate")}
                                         validationStatus={invalid.dueDate === false ? "valid" : "invalid"}
-                                        readOnly={purchaseInvoiceAction.type === "VIEW" || formData.pi_Status === "Over-Due" ? true : false}
+                                        readOnly={saleInvoiceAction.type === "VIEW" || formData.si_Status === "Over-Due" ? true : false}
                                     />
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Vendor Id</FormLabel>
+                                    <FormLabel>Customer Id</FormLabel>
                                     <TextBox
                                         elementAttr={{
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'vendorId'}
-                                        placeholder={"Enter Vendor"}
-                                        value={formData.vendorId}
+                                        accessKey={'customerId'}
+                                        placeholder={"Enter Customer"}
+                                        value={formData.customerId}
                                     />
                                 </FormGroupItem>
 
                                 <FormGroupItem>
-                                    <FormLabel>Vendor Contact</FormLabel>
+                                    <FormLabel>Customer Contact</FormLabel>
                                     <TextBox
                                         elementAttr={{
                                             class: "form-textbox"
                                         }}
                                         readOnly={true}
-                                        accessKey={'vendorNumber'}
+                                        accessKey={'customerNumber'}
                                         placeholder={"Enter Contact"}
-                                        value={formData.vendorNumber}
+                                        value={formData.customerNumber}
                                     />
                                 </FormGroupItem>
                                
@@ -360,15 +361,15 @@ const CreatePurchaseInvoice = () => {
                                         }}
                                         readOnly={true}
                                         accessKey={'pi_Status'}
-                                        value={formData.pi_Status}
+                                        value={formData.si_Status}
                                         placeholder={'Status'}
                                     />
                                 </FormGroupItem>
 
-                                {purchaseInvoiceAction.type !== "VIEW" && (
+                                {saleInvoiceAction.type !== "VIEW" && (
                                     <FormButtonContainer style={{ marginTop: 25 }}>
                                         <Button size="sm" className={"form-action-button"}>
-                                            {purchaseInvoiceAction.type === "UPDATE" ? "Update" : "Save"} Purchase Invoice
+                                            {saleInvoiceAction.type === "UPDATE" ? "Update" : "Save"} Sale Invoice
                                         </Button>
                                     </FormButtonContainer>
                                 )}
@@ -507,7 +508,7 @@ const CreatePurchaseInvoice = () => {
 
                 <TreeList
                     elementAttr={{
-                        id: "create-purchase-invoice-treelist",
+                        id: "create-sale-invoice-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"clientId"}
@@ -515,7 +516,7 @@ const CreatePurchaseInvoice = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={purchaseInvoiceDataSource}
+                    dataSource={saleInvoiceDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     noDataText={'No Data'}
@@ -615,4 +616,4 @@ const CreatePurchaseInvoice = () => {
     )
 }
 
-export default CreatePurchaseInvoice
+export default CreateSalesInvoice

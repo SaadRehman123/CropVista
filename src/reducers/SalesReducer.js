@@ -33,16 +33,16 @@ const SalesReducer = (state = INITIAL_STATE, action) => {
                 saleOrderAction: action.payload
             }
         }
-        case "SALE_INVOICE_ACTION_TYPE": {
-            return {
-                ...state,
-                saleInvoiceAction: action.payload
-            }
-        }
         case "GOOD_ISSUE_ACTION_TYPE": {
             return {
                 ...state,
                 goodIssueAction: action.payload
+            }
+        }
+        case "SALE_INVOICE_ACTION_TYPE": {
+            return {
+                ...state,
+                saleInvoiceAction: action.payload
             }
         }
 		default: return state

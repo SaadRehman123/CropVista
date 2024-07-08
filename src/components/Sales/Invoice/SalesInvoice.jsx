@@ -46,7 +46,7 @@ const SalesInvoice = () => {
         if(pastDueDateInvoices.length !== 0){
             pastDueDateInvoices.forEach((item) => {
                 item.si_Status = "Over-Due"
-                dispatch(updateSaleInvoice(item, item.saleInvoice_Id)).then((res) => {
+                dispatch(updateSaleInvoice(item, item.salesInvoice_Id)).then((res) => {
                     if(res.payload.data.success){
                         const gi = goodIssue.find(item => item.gi_Id === res.payload.data.result.gi_Id)
                         dispatch(updateGoodIssue({ ...gi, gi_Status: "Over-Due" }, gi.gi_Id)).then((resX) => {
@@ -61,21 +61,26 @@ const SalesInvoice = () => {
         
     }, [])
 
-    const handleOnEditClick = (e) => {
-        dispatch(saleInvoiceActionType({ node: e, type: "UPDATE" }))
-        navigate('/app/Create_Sale_Invoice')
-    }
-    
     const handleOnCreate = (e) => {
         dispatch(saleInvoiceActionType({ node: null, type: "CREATE" }))
         navigate('/app/Create_Sale_Invoice')
     }
 
+    const handleOnEditClick = (e) => {
+        dispatch(saleInvoiceActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Sale_Invoice')
+    }
+    
+    const handleOnViewClick = (e) => {
+        dispatch(saleInvoiceActionType({ node: e, type: "VIEW" }))
+        navigate('/app/Create_Sale_Invoice')
+    }
+    
     const renderSaleInvoice = (e) => {
         return (
             <CellContainer>
                 <CellContent>
-                    {e.data.si_Id}
+                    {e.data.salesInvoice_Id}
                 </CellContent>
             </CellContainer>
         )
@@ -140,6 +145,10 @@ const SalesInvoice = () => {
                     title='Edit Sale Invoice'
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)} />
+                <button
+                    title='View Sale Invoice'
+                    className='fal fa-eye treelist-edit-button'
+                    onClick={() => handleOnViewClick(e)} />
             </ActionCellContainer>
         )
     }
@@ -167,7 +176,7 @@ const SalesInvoice = () => {
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     dataSource={saleInvoice}
-                    keyExpr={"pi_Id"}
+                    keyExpr={"salesInvoice_Id"}
                     height={"calc(100vh - 195px)"}
                     className={'dev-form-treelist'}
                     columnResizingMode={"nextColumn"}
@@ -192,7 +201,7 @@ const SalesInvoice = () => {
                         dataField={"gi_Id"}
                         alignment={"left"}
                         allowSorting={false}
-                        cellRender={renderSaleInvoice}
+                        cellRender={renderGoodIssue}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />

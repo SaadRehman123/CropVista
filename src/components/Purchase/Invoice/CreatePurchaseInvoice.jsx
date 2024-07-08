@@ -27,7 +27,7 @@ const CreatePurchaseInvoice = () => {
     const dispatch = useDispatch()
     const treelistRef = useRef(null)
 
-    const goodReceiptDataSource = new DataSource({
+    const purchaseInvoiceDataSource = new DataSource({
         store: {
             data: assignClientId(treeListData),
             type: 'array',
@@ -39,7 +39,7 @@ const CreatePurchaseInvoice = () => {
         if (purchaseInvoiceAction.type === "CREATE") {
             setFormData(prevState => ({ ...prevState, creationDate: Date.now(), pi_Status: "Un-Paid" }))
         }
-        else if (purchaseInvoiceAction.type === "UPDATE") {
+        else if (purchaseInvoiceAction.type === "UPDATE" || purchaseInvoiceAction.type === "VIEW") {
             setFormData({
                 gr_Id: purchaseInvoiceAction.node.data.gr_Id, 
                 creationDate: purchaseInvoiceAction.node.data.creationDate,
@@ -213,7 +213,7 @@ const CreatePurchaseInvoice = () => {
 
                                 <FormGroupItem>
                                     <FormLabel>Good Receipt</FormLabel>
-                                    {purchaseInvoiceAction.type !== "UPDATE" ?
+                                    {purchaseInvoiceAction.type === "CREATE" ?
                                         <SelectBox
                                             elementAttr={{
                                                 class: "form-selectbox"
@@ -296,9 +296,10 @@ const CreatePurchaseInvoice = () => {
                                     <FormLabel>Paid</FormLabel>
                                     <CheckBox
                                         width={20}
-                                        style={{ marginTop: 10 }}
                                         value={formData.paid}
+                                        style={{ marginTop: 10 }}
                                         onValueChanged={(e) => onValueChanged(e, 'paid')}
+                                        disabled={purchaseInvoiceAction.type === "VIEW" ? true : false}
                                     />
                                 </FormGroupItem>
                             </div>
@@ -321,6 +322,7 @@ const CreatePurchaseInvoice = () => {
                                         validationMessagePosition={"bottom"}
                                         onValueChanged={(e) => onValueChanged(e, "dueDate")}
                                         validationStatus={invalid.dueDate === false ? "valid" : "invalid"}
+                                        readOnly={purchaseInvoiceAction.type === "VIEW" || formData.pi_Status === "Over-Due" ? true : false}
                                     />
                                 </FormGroupItem>
 
@@ -363,11 +365,13 @@ const CreatePurchaseInvoice = () => {
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 25 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {purchaseInvoiceAction.type === "UPDATE" ? "Update" : "Save"} Purchase Invoice
-                                    </Button>
-                                </FormButtonContainer>
+                                {purchaseInvoiceAction.type !== "VIEW" && (
+                                    <FormButtonContainer style={{ marginTop: 25 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            {purchaseInvoiceAction.type === "UPDATE" ? "Update" : "Save"} Purchase Invoice
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
                             </div>
                         </div>
                     </FormGroupContainer>
@@ -503,7 +507,7 @@ const CreatePurchaseInvoice = () => {
 
                 <TreeList
                     elementAttr={{
-                        id: "create-good-receipt-treelist",
+                        id: "create-purchase-invoice-treelist",
                         class: "project-treelist"
                     }}
                     keyExpr={"clientId"}
@@ -511,7 +515,7 @@ const CreatePurchaseInvoice = () => {
                     showBorders={true}
                     showRowLines={true}
                     showColumnLines={true}
-                    dataSource={goodReceiptDataSource}
+                    dataSource={purchaseInvoiceDataSource}
                     allowColumnResizing={true}
                     rowAlternationEnabled={true}
                     noDataText={'No Data'}

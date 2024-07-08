@@ -61,34 +61,19 @@ const PurchaseInvoice = () => {
         
     }, [])
 
-    const handleOnEditClick = (e) => {
-        dispatch(purchaseInvoiceActionType({ node: e, type: "UPDATE" }))
-        navigate('/app/Create_Purchase_Invoice')
-    }
-    
     const handleOnCreate = (e) => {
         dispatch(purchaseInvoiceActionType({ node: null, type: "CREATE" }))
         navigate('/app/Create_Purchase_Invoice')
     }
-
-    const renderCreationDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.creationDate).format("DD/MM/YYYY")}
-                </CellContent>
-            </CellContainer>
-        )
+    
+    const handleOnEditClick = (e) => {
+        dispatch(purchaseInvoiceActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Purchase_Invoice')
     }
 
-    const renderDueDateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {moment(e.data.dueDate).format("DD/MM/YYYY")}
-                </CellContent>
-            </CellContainer>
-        )
+    const handleOnViewClick = (e) => {
+        dispatch(purchaseInvoiceActionType({ node: e, type: "VIEW" }))
+        navigate('/app/Create_Purchase_Invoice')
     }
 
     const renderPurchaseInvoice = (e) => {
@@ -131,6 +116,26 @@ const PurchaseInvoice = () => {
         )
     }
 
+    const renderCreationDateColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {moment(e.data.creationDate).format("DD/MM/YYYY")}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderDueDateColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {moment(e.data.dueDate).format("DD/MM/YYYY")}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
     const renderStatusColumn = (e) => {
         return (
             <CellContainer style={{ alignItems: 'center' }}>
@@ -149,6 +154,10 @@ const PurchaseInvoice = () => {
                     title='Edit Purchase Invoice'
                     className='fal fa-pen treelist-edit-button'
                     onClick={() => handleOnEditClick(e)} />
+                <button
+                    title='View Purchase Invoice'
+                    className='fal fa-eye treelist-edit-button'
+                    onClick={() => handleOnViewClick(e)} />
             </ActionCellContainer>
         )
     }

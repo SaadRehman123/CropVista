@@ -16,6 +16,7 @@ import { setGoodIssueRef, toggleDeletePopup } from '../../../actions/ViewActions
 import styled from 'styled-components'
 
 const GoodIssue = () => {
+    
     const goodIssue = useSelector(state => state.sales.goodIssue)
 
     const navigate = useNavigate()
@@ -263,12 +264,21 @@ const setColor = (e) => {
     let color
 
     if(e.data.gi_Status === "Created"){
+        color = 'secondary'
+    }
+    if(e.data.gi_Status === "Paid"){
         color = 'success'
+    }
+    if(e.data.gi_Status === "Un-Paid"){
+        color = 'warning'
     }
     else if(e.data.gi_Status === "SI Created"){
         color = 'info'
     }
     else if(e.data.gi_Status === "Cancelled"){
+        color = 'danger'
+    }
+    else if(e.data.gi_Status === "Over-Due"){
         color = 'danger'
     }
 

@@ -179,7 +179,7 @@ const AppRoutes = () => {
                     element={<CreateGoodIssue />}>
                 </Route>
                 <Route
-                    path="saleInvoice"
+                    path="Sale_Invoice"
                     element={<SalesInvoice />}>
                 </Route>
             </Routes>

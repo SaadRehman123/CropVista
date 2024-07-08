@@ -103,6 +103,44 @@ export const updateGoodIssue = (obj, id) => {
     }
 }
 
+export const getSaleInvoice = (id) => {
+    const result = axios({
+        method: 'GET',
+        url: `rest/saleInvoice/getSaleInvoice/${id}`,
+        ...Properties,
+    })
+    return {
+        type: 'GET_SALE_INVOICE',
+        payload: result
+    }
+}
+
+export const addSaleInvoice = (obj) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/saleInvoice/create`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'ADD_SALE_INVOICE',
+        payload: result
+    }
+}
+
+export const updateSaleInvoice = (obj, id) => {
+    const result = axios({
+        method: 'POST',
+        url: `rest/saleInvoice/update/${id}`,
+        data: obj,
+        ...Properties,
+    })
+    return {
+        type: 'UPDATE_SALE_INVOICE',
+        payload: result
+    }
+}
+
 export const saleOrderActionType = (obj) => {
     return {
         type: "SALE_ORDER_ACTION_TYPE",

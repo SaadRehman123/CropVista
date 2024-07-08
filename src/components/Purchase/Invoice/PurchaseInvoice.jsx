@@ -10,7 +10,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
-import { setPurchaseInvoiceRef, toggleDeletePopup } from '../../../actions/ViewActions'
+import { setPurchaseInvoiceRef } from '../../../actions/ViewActions'
 import { getGoodReceipt, getPurchaseInvoice, purchaseInvoiceActionType, updateGoodReceipt, updatePurchaseInvoice } from '../../../actions/PurchaseAction'
 
 import styled from 'styled-components'
@@ -101,11 +101,31 @@ const PurchaseInvoice = () => {
         )
     }
 
+    const renderGoodReceipt = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.gr_Id}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
     const renderVendorName = (e) => {
         return (
             <CellContainer>
                 <CellContent>
                     {e.data.vendorName}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
+    const renderVendorContact = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.vendorNumber}
                 </CellContent>
             </CellContainer>
         )
@@ -167,6 +187,46 @@ const PurchaseInvoice = () => {
                     <Scrolling mode={"standard"} />
 
                     <Column
+                        caption={"PI-Id"}
+                        dataField={"pi_Id"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderPurchaseInvoice}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+
+                    <Column
+                        caption={"GR-Id"}
+                        dataField={"gr_Id"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderGoodReceipt}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-item-column"}
+                    />
+
+                    <Column
+                        caption={"Vendor Name"}
+                        dataField={"vendorName"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderVendorName}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"Contact"}
+                        dataField={"vendorNumber"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderVendorContact}
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
                         caption={"Creation Date"}
                         dataField={"creationDate"}
                         alignment={"left"}
@@ -182,26 +242,6 @@ const PurchaseInvoice = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderDueDateColumn}
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"PI-Id"}
-                        dataField={"pi_Id"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderPurchaseInvoice}
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-item-column"}
-                    />
-
-                    <Column
-                        caption={"Vendor Name"}
-                        dataField={"vendorName"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderVendorName}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

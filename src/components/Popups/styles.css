@@ -156,6 +156,20 @@
     background-color: #099280 !important;
 }
 
+.logout-button{
+    border-color: #e24f15 !important;
+    background-color: #e24f15 !important;
+}
+
+.logout-button:focus{
+    box-shadow: none !important;
+}
+
+.logout-button:hover{
+    border-color: #922909 !important;
+    background-color: #922909 !important;
+}
+
 .form-close-button{
     width: 70px !important;
     margin-right: 10px !important;

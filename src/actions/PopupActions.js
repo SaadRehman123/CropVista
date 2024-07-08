@@ -1,4 +1,4 @@
-export const toggleSettingPopup = (obj) => {
+export const toggleLogoutPopup = (obj) => {
     return {
 		type : "TOGGLE_SETTING_POPUP",
 		payload : obj

@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { getInitials } from '../../utilities/CommonUtilities'
-import { toggleSettingPopup } from '../../actions/PopupActions'
+import { toggleLogoutPopup } from '../../actions/PopupActions'
 
 import "./styles.css"
 import styled from 'styled-components'
@@ -15,7 +15,7 @@ const SettingButton = () => {
     const renderSettingBtn = () => {
         if(user){
             const initials = getInitials(user.name)
-            return <div className='setting-btn' onClick={() => dispatch(toggleSettingPopup(true))}>{initials}</div>
+            return <div className='setting-btn' onClick={() => dispatch(toggleLogoutPopup(true))}>{initials}</div>
         }
     }
 

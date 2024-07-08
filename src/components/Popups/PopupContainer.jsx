@@ -1,12 +1,12 @@
 import React from 'react'
 
+import LowSupply from './LowSupply'
 import CreateItem from './CreateItem'
 import CreatePlan from './CreatePlan'
 import DeletePopup from './DeletePopup'
+import LogoutPopup from './LogoutPopup'
 import CreateResource from './CreateResource'
 import CreateWarehouse from './CreateWarehouse'
-import GeneralSettingPopup from './GeneralSettingPopup'
-import LowSupply from './LowSupply'
 
 const PopupContainer = () => {
     return (
@@ -15,9 +15,9 @@ const PopupContainer = () => {
             <CreatePlan />
             <CreateItem />
             <DeletePopup />
+            <LogoutPopup />
             <CreateResource />
             <CreateWarehouse />
-            <GeneralSettingPopup />
         </>
     )
 }

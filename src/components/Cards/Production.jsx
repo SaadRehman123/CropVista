@@ -5,8 +5,8 @@ import { Card, CardBody, CardHeader, CardText, CardTitle } from 'reactstrap'
 
 import FormBackground from '../SupportComponents/FormBackground'
 
-import styled from 'styled-components'
 import './styles.css'
+import styled from 'styled-components'
 
 const Production = () => {
 
@@ -14,10 +14,10 @@ const Production = () => {
 
     const handleOnCardClick = (id) => {
         if (id === 1) {
-            navigate('/app/Crop-Plan')
+            navigate('/app/Bill_Of_Material')
         }
         else if (id === 2) {
-            navigate('/app/Bill_Of_Material')
+            navigate('/app/Crop-Plan')
         }
         else if (id === 3) {
             navigate('/app/Production_Order')
@@ -56,7 +56,7 @@ const CardContainer = styled.div`
 `
 
 const card = [
-    { id: 1, name: "Crop-Plan", text: "Explore and manage your crop plans to visualize and organize cultivation strategies for different crops"},
-    { id: 2, name: "Bill Of Material", text: "Create and manage detailed Bills of Material to ensure accurate planning and inventory management for your production processes"},
+    { id: 1, name: "Bill Of Material", text: "Create and manage detailed Bills of Material to ensure accurate planning and inventory management for your production processes"},
+    { id: 2, name: "Crop-Plan", text: "Explore and manage your crop plans to visualize and organize cultivation strategies for different crops"},
     { id: 3, name: "Production Order", text: "Track and manage production orders to streamline your manufacturing processes and ensure timely delivery of finished goods"},
 ]

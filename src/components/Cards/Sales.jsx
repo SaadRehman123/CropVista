@@ -8,24 +8,22 @@ import FormBackground from '../SupportComponents/FormBackground'
 import './styles.css'
 import styled from 'styled-components'
 
-const Inventory = () => {
+const Sales = () => {
+
     const navigate = useNavigate()
 
     const handleOnCardClick = (id) => {
         if (id === 1) {
-            navigate('/app/Resources')
+            navigate('/app/Sale_Order')
         }
         else if (id === 2) {
-            navigate('/app/Warehouse')
+            navigate('/app/Good_Issue')
         }
         else if (id === 3) {
-            navigate('/app/Item_Master')
+            navigate('/app/Sale_Invoice')
         }
         else if (id === 4) {
-            navigate('/app/Stock_Entries')
-        }
-        else if (id === 5) {
-            navigate('/app/Inventory_Status')
+            navigate('/app/Customer_Master')
         }
     }
 
@@ -52,7 +50,7 @@ const Inventory = () => {
     )
 }
 
-export default Inventory
+export default Sales
 
 const CardContainer = styled.div`
     padding: 10px 20px;
@@ -61,9 +59,8 @@ const CardContainer = styled.div`
 `
 
 const card = [
-    { id: 1, name: "Resource", text: "Efficiently manage your resources with real-time data. Add, update, and delete resources seamlessly to ensure smooth operations and optimal utilization"},
-    { id: 2, name: "Warehouse", text: "Manage your warehouse inventory efficiently by categorizing items into Raw Materials, Finished Goods, and Quarantine. Track stock levels, organize storage to ensure smooth supply chain management"},
-    { id: 3, name: "Item Master", text: "Maintain a comprehensive database of all items with detailed information to streamline procurement, production, and inventory management"},
-    { id: 4, name: "Stock Entries", text: "Record and track stock entries to ensure accurate inventory levels and efficient warehouse management"},
-    { id: 5, name: "Inventory Status", text: "Monitor and analyze real-time inventory status to make informed decisions and maintain optimal stock levels throughout operations"}
+    { id: 1, name: "Sale Order", text: "Efficiently manage sale orders with real-time tracking. Create, update, and review sale orders to streamline your sales process and ensure timely fulfillment."},
+    { id: 2, name: "Good Issue", text: "Track the movement of goods with ease. Record goods issue transactions to ensure accurate inventory levels and smooth material handling within your organization."},
+    { id: 3, name: "Sale Invoice", text: "Simplify billing with detailed sales invoices. Generate, send, and manage invoices to keep your financial records accurate and up-to-date."},
+    { id: 4, name: "Customer Master", text: "Maintain comprehensive customer profiles. Store and update customer information to enhance relationships and provide personalized service."}
 ]

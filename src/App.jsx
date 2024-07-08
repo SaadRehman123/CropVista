@@ -11,7 +11,6 @@ import Loading from './components/SupportComponents/Loading'
 import { getBom } from './actions/BomActions'
 import { getSeasons } from './actions/SeasonsAction'
 import { getItemMaster } from './actions/ItemActions'
-import { getSaleOrder } from './actions/SalesActions'
 import { getResource } from './actions/ResourceAction'
 import { getCookie } from './utilities/CommonUtilities'
 import { getWarehouse } from './actions/WarehouseAction'
@@ -23,6 +22,7 @@ import { getCustomerMaster } from './actions/CustomerActions'
 import { getStockEntries } from './actions/StockEntriesAction'
 import { getProductionOrder } from './actions/ProductionOrderAction'
 import { getAllUsers, getLoggedInUser } from './actions/UserActions'
+import { getGoodIssue, getSaleInvoice, getSaleOrder } from './actions/SalesActions'
 import { getGoodReceipt, getPurchaseInvoice, getPurchaseOrder, getPurchaseRequest, getRequestForQuotation, getVendorQuotation } from './actions/PurchaseAction'
 
 import './App.css'
@@ -46,9 +46,11 @@ const App = () => {
 		dispatch(getInventory()).catch((error) => console.error(error))
 		dispatch(getItemMaster()).catch((error) => console.error(error))
 		dispatch(getSaleOrder(0)).catch((error) => console.error(error))
+		dispatch(getGoodIssue(0)).catch((error) => console.error(error))
 		dispatch(getPlannedCrops()).catch((error) => console.error(error))
 		dispatch(getStockEntries()).catch((error) => console.error(error))
 		dispatch(getVendorMaster()).catch((error) => console.error(error))
+		dispatch(getSaleInvoice(0)).catch((error) => console.error(error))
 		dispatch(getGoodReceipt(0)).catch((error) => console.error(error))
 		dispatch(getCustomerMaster()).catch((error) => console.error(error))
 		dispatch(getPurchaseOrder(0)).catch((error) => console.error(error))

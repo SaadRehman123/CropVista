@@ -8,8 +8,8 @@ import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-li
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import { getItemMaster } from '../../../actions/ItemActions'
+import { setItemMasterTreeRef } from '../../../actions/ViewActions'
 import { toggleCreateItemPopup } from '../../../actions/PopupActions'
-import { setItemMasterTreeRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
 import styled from 'styled-components'
 
@@ -64,26 +64,6 @@ const ItemMaster = () => {
             <CellContainer>
                 <CellContent>
                     {e.data.itemType}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderSellingRateColumn = (e) => {
-        return (
-            <CellContainer>
-                <CellContent>
-                    {e.data.sellingRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
-                </CellContent>
-            </CellContainer>
-        )
-    }
-
-    const renderValuationRateColumn =(e)=>{
-        return(
-            <CellContainer>
-                <CellContent>
-                    {e.data.valuationRate.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                 </CellContent>
             </CellContainer>
         )
@@ -181,26 +161,6 @@ const ItemMaster = () => {
                         allowSorting={false}
                         cellRender={renderItemTypeColumn} 
                         headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column
-                        caption={"Selling Rate"}
-                        dataField={"sellingRate"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        cellRender={renderSellingRateColumn} 
-                        headerCellRender={renderHeaderCell}
-                        cssClass={"project-treelist-column"}
-                    />
-
-                    <Column 
-                        caption={"Valuation Rate"}
-                        dataField={"valuationRate"}
-                        alignment={"left"}
-                        allowSorting={false}
-                        headerCellRender={renderHeaderCell}
-                        cellRender={renderValuationRateColumn} 
                         cssClass={"project-treelist-column"}
                     />
 

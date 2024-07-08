@@ -21,7 +21,7 @@ const CreateItem = () => {
     const createItemPopup = useSelector(state => state.popup.toggleCreateItemPopup)
 
     const [itemType, setItemType] = useState("")
-    const [formData, setFormData]= useState({ active: false, itemName:"", itemType:"", valuationRate:"", sellingRate:"", UOM:"", season: "", warehouseId: "" })
+    const [formData, setFormData]= useState({ active: false, itemName:"", itemType:"", valuationRate:"0", sellingRate:"0", UOM:"", season: "", warehouseId: "" })
     const [invalid, setInvalid] = useState({ itemId: false, itemName: false, itemType: false, sellingRate: false, valuationRate: false, UOM: false, season: false, warehouseId: false })
     
     const [warehouseDateSource, setWarehouseDateSource]= useState([])
@@ -130,26 +130,6 @@ const CreateItem = () => {
                 season: itemType === "Finish Good" && formData.season === "" ? true : false
             }))
         }
-        else if (name === "sellingRate") {
-            let flag = false
-            if(parseInt(formData.sellingRate) <= 0){
-                flag = true
-            }
-            setInvalid((prevInvalid) => ({
-                ...prevInvalid,
-                [name]: setFormateNumber(formData).trim() === "" || flag === true ? true : false,
-            }))
-        }
-        else if (name === "valuationRate") {
-            let flag = false
-            if(parseInt(formData.valuationRate) <= 0){
-                flag = true
-            }
-            setInvalid((prevInvalid) => ({
-                ...prevInvalid,
-                [name]: setFormateNumber(formData).trim() === "" || flag === true ? true : false,
-            }))
-        }
         else {
             setInvalid((prevInvalid) => ({
                 ...prevInvalid,
@@ -164,7 +144,7 @@ const CreateItem = () => {
         const instance = itemMasterRef.current.instance
         const selectedRow = instance.getSelectedRowsData()
 
-        if (formData.itemName === "" || formData.itemType === "" || setFormateNumber(formData).trim() === "" ||  formData.UOM === "") {
+        if (formData.itemName === "" || formData.itemType === "" || formData.UOM === "") {
             return notify("Form fields cannot be empty", "error", 2000)
         }
 
@@ -180,8 +160,8 @@ const CreateItem = () => {
             itemId: "",
             itemName: formData.itemName,
             itemType: formData.itemType,
-            sellingRate: formData.sellingRate,
-            valuationRate: formData.valuationRate,
+            sellingRate: 0,
+            valuationRate: 0,
             disable: formData.active,
             UOM: formData.UOM,
             season: formData.season,
@@ -376,46 +356,6 @@ const CreateItem = () => {
                             validationStatus={invalid.warehouseId === false ? "valid" : "invalid"}
                         />
                     </FormGroupItem>
-                    
-                    <div style={{ display: 'flex', justifyContent: "space-between", marginTop: 5, marginBottom: 5 }}>
-                        <FormGroupItem>
-                            <FormLabel>Selling Rate</FormLabel>
-                            <NumberBox
-                                elementAttr={{
-                                    class: "form-numberbox"
-                                }}
-                                step={1}
-                                width={225}
-                                type={'number'}
-                                accessKey={'sellingRate'}
-                                value={formData.sellingRate}
-                                onFocusIn={handleOnFocusIn}
-                                onFocusOut={handleOnFocusOut}
-                                placeholder={"Enter Selling Rate"}
-                                onValueChanged={(e) => onValueChanged(e, 'sellingRate')}
-                                validationStatus={invalid.sellingRate === false ? "valid" : "invalid"}
-                            />
-                        </FormGroupItem>
-
-                        <FormGroupItem>
-                            <FormLabel>Valuation Rate</FormLabel>
-                            <NumberBox
-                                elementAttr={{
-                                    class: "form-numberbox"
-                                }}
-                                step={1}
-                                width={225}
-                                type={'number'}
-                                accessKey={'valuationRate'}
-                                value={formData.valuationRate}
-                                onFocusIn={handleOnFocusIn}
-                                onFocusOut={handleOnFocusOut}
-                                placeholder={"Enter Valuation Rate"}
-                                onValueChanged={(e) => onValueChanged(e, 'valuationRate')}
-                                validationStatus={invalid.valuationRate === false ? "valid" : "invalid"}
-                            />
-                        </FormGroupItem>
-                    </div>
 
                     <div style={{ display: 'flex', marginTop: 5, marginBottom: 5 }}>
                         <FormGroupItem>
@@ -473,14 +413,3 @@ const CreateItem = () => {
 }
 
 export default CreateItem
-
-const setFormateNumber = (formData) => {
-    let result = ''
-    if (formData.sellingRate !== null && formData.sellingRate !== undefined) {
-        result = formData.sellingRate.toString()
-    } 
-    else if (formData.valuationRate !== null && formData.valuationRate !== undefined) {
-        result = formData.valuationRate.toString()
-    }
-    return result
-}

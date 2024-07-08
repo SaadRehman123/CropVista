@@ -7,7 +7,7 @@ const ProductionChart = ({ selectedYear }) => {
 
     const stockEntries = useSelector(state => state.stock.stockEntries)
 
-    const [dataSource, setDataSource] = useState()
+    const [dataSource, setDataSource] = useState([])
 
     useEffect(() => {
         const filteredData = stockEntries.filter(stock => {

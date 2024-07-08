@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment/moment'
 import notify from 'devextreme/ui/notify'
 
-import { DateBox, NumberBox, SelectBox, TextBox } from 'devextreme-react'
 import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap'
+import { DateBox, NumberBox, SelectBox, TextBox } from 'devextreme-react'
 import { FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../SupportComponents/StyledComponents'
 
 import { toggleCreatePlanPopup } from '../../actions/PopupActions'

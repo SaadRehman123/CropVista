@@ -102,17 +102,17 @@ const CreateJobCard = (props) => {
                                     }))
                                 }
                             }
+                            
+                            dispatch(getProductionOrder(0)).then((resX) => {
+                                if (resX.payload.data.success) {
+                                    dispatch(getInventory())
+                                    notify("Route Stage Completed", "info", 2000)
+                                }
+                            })
+                            toggle()
                         }
                     })
                 })
-
-                dispatch(getProductionOrder(0)).then((resX) => {
-                    if (resX.payload.data.success) {
-                        dispatch(getInventory())
-                        notify("Route Stage Completed", "info", 2000)
-                    }
-                })
-                toggle()
             }
         }
     }

@@ -226,11 +226,10 @@ const CreateVendor = () => {
 
                                 <FormGroupItem>
                                     <FormLabel>Contact Number</FormLabel>
-                                    <NumberBox
+                                    <TextBox
                                         elementAttr={{
-                                            class: "form-numberbox"
+                                            class: "form-textbox"
                                         }}
-                                        type={"number"}
                                         onFocusIn={handleOnFocusIn}
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.vendorNumber}

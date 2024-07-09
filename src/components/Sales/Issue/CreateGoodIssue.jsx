@@ -172,7 +172,7 @@ const CreateGoodIssue = () => {
                     setTreeListData([])
                     dispatch(getInventory())
                     dispatch(getGoodIssue(0))
-                    notify("Good Receipt Created Successfully")
+                    notify("Good Issue Created Successfully")
                 }
             })
         }
@@ -182,7 +182,7 @@ const CreateGoodIssue = () => {
         return(
             <Fragment>
                 <Header>
-                    <HeaderSpan>Create Good Receipt</HeaderSpan>
+                    <HeaderSpan>Create Good Issue</HeaderSpan>
                 </Header>
 
                 <form onSubmit={handleOnSubmit}>

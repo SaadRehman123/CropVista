@@ -161,7 +161,7 @@ const CreateWarehouse = () => {
                             placeholder={"Select Warehouse Type"}
                             onFocusOut={handleOnFocusOut}
                             onValueChanged={(e) => onValueChanged(e, 'wrType')}
-                            dataSource={["Quarantine", "Finish Good", "Raw Material"]}
+                            dataSource={["Finish Good", "Raw Material"]}
                             validationStatus={invalid.wrType === false ? "valid" : "invalid"}
                         />
                     </FormGroupItem>

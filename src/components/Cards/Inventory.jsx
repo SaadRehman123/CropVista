@@ -62,7 +62,7 @@ const CardContainer = styled.div`
 
 const card = [
     { id: 1, name: "Resource", text: "Efficiently manage your resources with real-time data. Add, update, and delete resources seamlessly to ensure smooth operations and optimal utilization"},
-    { id: 2, name: "Warehouse", text: "Manage your warehouse inventory efficiently by categorizing items into Raw Materials, Finished Goods, and Quarantine. Track stock levels, organize storage to ensure smooth supply chain management"},
+    { id: 2, name: "Warehouse", text: "Manage your warehouse inventory efficiently by categorizing items into Raw Materials and Finished Goods. Track stock levels, organize storage to ensure smooth supply chain management"},
     { id: 3, name: "Item Master", text: "Maintain a comprehensive database of all items with detailed information to streamline procurement, production, and inventory management"},
     { id: 4, name: "Stock Entries", text: "Record and track stock entries to ensure accurate inventory levels and efficient warehouse management"},
     { id: 5, name: "Inventory Status", text: "Monitor and analyze real-time inventory status to make informed decisions and maintain optimal stock levels throughout operations"}

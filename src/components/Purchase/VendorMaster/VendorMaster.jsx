@@ -40,6 +40,11 @@ const VendorMaster = () => {
         navigate('/app/Create_Vendor')
     }
 
+    const handleOnViewClick = (e) => {
+        dispatch(vendorMasterActionType({ node: e, type: "VIEW" }))
+        navigate('/app/Create_Vendor')
+    }
+
     const renderActionHeaderCell = (e) => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
     }
@@ -144,9 +149,9 @@ const VendorMaster = () => {
                     onClick={() => handleOnEditClick(e)}/>
 
                 <button
-                    title='Delete Vendor'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"VENDOR_MASTER" }))} />
+                    title='View Vendor'
+                    className='fal fa-eye treelist-edit-button'
+                    onClick={() => handleOnViewClick(e)} />
             </ActionCellContainer>
         )
     }

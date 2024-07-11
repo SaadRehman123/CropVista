@@ -5,7 +5,7 @@ import notify from 'devextreme/ui/notify'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Button } from 'reactstrap'
-import { NumberBox, SelectBox, TextBox, CheckBox } from 'devextreme-react'
+import { SelectBox, TextBox, CheckBox } from 'devextreme-react'
 import { FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
 
 import { addVendorMaster, getVendorMaster, updateVendorMaster } from '../../../actions/VendorActions'
@@ -22,7 +22,7 @@ const CreateVendor = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if (vendorMasterAction.type === "UPDATE") {          
+        if (vendorMasterAction.type === "UPDATE" || vendorMasterAction.type === "VIEW") {          
             
             const data = vendorMasterAction.node.data;
             
@@ -143,6 +143,7 @@ const CreateVendor = () => {
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.vendorName}
                                         onValueChanged={(e) => onValueChanged(e, 'vendorName')}
+                                        readOnly={vendorMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.vendorName === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
@@ -162,6 +163,7 @@ const CreateVendor = () => {
                                         placeholder={"Select Vendor Type"}
                                         dropDownOptions={{ maxHeight: 300 }}
                                         onValueChanged={(e) => onValueChanged(e, 'vendorType')}
+                                        readOnly={vendorMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.vendorType === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
@@ -178,6 +180,7 @@ const CreateVendor = () => {
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.vendorAddress}
                                         onValueChanged={(e) => onValueChanged(e, 'vendorAddress')}
+                                        readOnly={vendorMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.vendorAddress === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
@@ -187,6 +190,7 @@ const CreateVendor = () => {
                                     <CheckBox
                                         style={{ marginTop: 7 }}
                                         value={formData.isDisabled}
+                                        disabled={vendorMasterAction.type === "VIEW" ? true : false}
                                         onValueChanged={(e) => onValueChanged(e, 'isDisabled')}
                                     />
                                 </FormGroupItem>
@@ -205,6 +209,7 @@ const CreateVendor = () => {
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.vendorGroup}
                                         onValueChanged={(e) => onValueChanged(e, 'vendorGroup')}
+                                        readOnly={vendorMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.vendorGroup === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
@@ -221,6 +226,7 @@ const CreateVendor = () => {
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.vendorEmail}
                                         onValueChanged={(e) => onValueChanged(e, 'vendorEmail')}
+                                        readOnly={vendorMasterAction.type === "VIEW" ? true : false}
                                     />
                                 </FormGroupItem>
 
@@ -236,15 +242,18 @@ const CreateVendor = () => {
                                         accessKey={'vendorNumber'}
                                         placeholder='Enter Contact Number'
                                         onValueChanged={(e) => onValueChanged(e, 'vendorNumber')}
+                                        readOnly={vendorMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.vendorNumber === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
-
-                                <FormButtonContainer style={{ marginTop: 45 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {vendorMasterAction.type === "UPDATE" ? "Update" : "Save"} Vendor
-                                    </Button>
-                                </FormButtonContainer>
+                                
+                                {vendorMasterAction.type !== "VIEW" && (
+                                    <FormButtonContainer style={{ marginTop: 45 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            {vendorMasterAction.type === "UPDATE" ? "Update" : "Save"} Vendor
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
                             </div>
                         </div>
                     </FormGroupContainer>

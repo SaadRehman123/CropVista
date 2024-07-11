@@ -39,6 +39,11 @@ const CustomerMaster = () => {
         dispatch(customerMasterActionType({ node: e, type: "UPDATE" }))
         navigate('/app/Create_Customer')
     }
+    
+    const handleOnViewClick = (e) => {
+        dispatch(customerMasterActionType({ node: e, type: "VIEW" }))
+        navigate('/app/Create_Customer')
+    }
 
     const renderActionHeaderCell = (e) => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
@@ -125,8 +130,8 @@ const CustomerMaster = () => {
 
                 <button
                     title='Delete Customer'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CUSTOMER_MASTER" }))} />
+                    className='fal fa-eye treelist-edit-button'
+                    onClick={() => handleOnViewClick(e)} />
             </ActionCellContainer>
         )
     }

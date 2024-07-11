@@ -30,6 +30,12 @@ const Warehouse = () => {
         }, 0)
     }
 
+    const handleOnViewClick = () => {
+        setTimeout(() => {
+            dispatch(toggleCreateWarehousePopup({ open: true, type: "VIEW" }))
+        }, 0)
+    }
+
     const renderWarehouseIdColumn = (e) => {
         return (
             <CellContainer>
@@ -87,12 +93,12 @@ const Warehouse = () => {
                 <button
                     title='Edit Warehouse'
                     className='fal fa-pen treelist-edit-button'
-                    onClick={() => handleOnEditClick()} />
+                    onClick={handleOnEditClick} />
 
                 <button
-                    title='Delete Warehouse'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"WAREHOUSE" }))} />
+                    title='View Warehouse'
+                    className='fal fa-eye treelist-edit-button'
+                    onClick={handleOnViewClick} />
             </ActionCellContainer>
         )
     }

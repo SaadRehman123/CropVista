@@ -9,7 +9,7 @@ import StockEntryReport from '../../Reports/StockEntryReport'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import { getStockEntries } from '../../../actions/StockEntriesAction'
@@ -131,6 +131,8 @@ const StockEntries = () => {
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
+
+                    <HeaderFilter visible={true} allowSearch={true} />
 
                     <Column
                         caption={"Entry-Id"}

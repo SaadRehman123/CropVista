@@ -9,7 +9,7 @@ import InventoryReport from '../../Reports/InventoryReport'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import { getInventory } from '../../../actions/InventoryAction'
@@ -111,6 +111,8 @@ const InventoryStatus = () => {
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
+
+                    <HeaderFilter visible={true} allowSearch={true} />
 
                     <Column
                         caption={"Inventory-Id"}

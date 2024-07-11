@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import { getItemMaster } from '../../../actions/ItemActions'
@@ -134,6 +134,8 @@ const ItemMaster = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"Item-Id"}
                         dataField={"itemId"}
@@ -182,7 +184,7 @@ const ItemMaster = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderDisableColumn} 
-                        headerCellRender={renderDisableHeaderCell}
+                        headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
@@ -193,6 +195,7 @@ const ItemMaster = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}
@@ -204,16 +207,6 @@ const ItemMaster = () => {
 
     const renderActionHeaderCell = (e) => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
-    }
-
-    const renderDisableHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
     }
 
     const renderHeaderCell = (e) => {

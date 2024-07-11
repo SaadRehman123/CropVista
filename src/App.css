@@ -181,3 +181,15 @@ input::-webkit-inner-spin-button {
     margin-left: 12px !important;
     align-items: center !important;
 }
+
+.dx-list-select-all {
+    display: none !important;
+}
+
+.dx-column-indicators {
+    margin-right: 8px !important;
+}
+
+.dx-treelist .dx-column-indicators.dx-visibility-hidden{
+    display: none !important;
+}

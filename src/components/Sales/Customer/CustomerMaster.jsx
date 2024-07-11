@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { setCustomerMasterRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -169,6 +169,8 @@ const CustomerMaster = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"Customer-Id"}
                         dataField={"customerId"}
@@ -238,6 +240,7 @@ const CustomerMaster = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={true}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

@@ -7,7 +7,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
-import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { getSaleOrder, saleOrderActionType } from '../../../actions/SalesActions'
@@ -168,6 +168,8 @@ const SaleOrder = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"SO-Id"}
                         dataField={"saleOrder_Id"}
@@ -237,6 +239,7 @@ const SaleOrder = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

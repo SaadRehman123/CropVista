@@ -7,7 +7,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
-import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { setRequestForQuotationRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -158,6 +158,8 @@ const RequestForQuotation = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"RFQ-Id"}
                         dataField={"rfq_Id"}
@@ -216,6 +218,7 @@ const RequestForQuotation = () => {
                         caption={"Actions"}
                         dataField={"actions"}
                         alignment={"center"}
+                        allowFiltering={false}
                         allowSorting={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 

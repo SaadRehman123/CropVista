@@ -7,7 +7,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
-import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { setPurchaseOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -144,6 +144,8 @@ const PurchaseOrder = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"PRO-Id"}
                         dataField={"pro_Id"}
@@ -203,6 +205,7 @@ const PurchaseOrder = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

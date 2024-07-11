@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import { setVendorMasterRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -189,6 +189,8 @@ const VendorMaster = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"Vendor-Id"}
                         dataField={"vendorId"}
@@ -260,6 +262,8 @@ const VendorMaster = () => {
                     />
 
                     <Column
+                        width={107}
+                        minWidth={107}
                         caption={"Disable"}
                         dataField={"isDisabled"}
                         alignment={"left"}
@@ -276,6 +280,7 @@ const VendorMaster = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

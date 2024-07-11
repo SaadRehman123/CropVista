@@ -7,7 +7,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
-import { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { getGoodIssue, goodIssueActionType } from '../../../actions/SalesActions'
@@ -154,6 +154,8 @@ const GoodIssue = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"GI-Id"}
                         dataField={"gi_Id"}
@@ -223,6 +225,7 @@ const GoodIssue = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

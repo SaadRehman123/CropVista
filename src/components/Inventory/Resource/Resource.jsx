@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 
 import { toggleCreateResourcePopup } from '../../../actions/PopupActions'
 import { setResourceRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -110,6 +110,8 @@ const Resource = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"Resource-Id"}
                         dataField={"rId"}
@@ -148,7 +150,8 @@ const Resource = () => {
                         alignment={"center"}
                         allowSorting={false}
                         cellRender={renderActionColumn}
-                        headerCellRender={renderActionHeaderCell} 
+                        headerCellRender={renderActionHeaderCell}
+                        allowFiltering={false}
                         cssClass={"project-treelist-column"}
                     />
                 </TreeList>

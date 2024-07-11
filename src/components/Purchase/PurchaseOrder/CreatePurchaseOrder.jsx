@@ -86,7 +86,7 @@ const CreatePurchaseOrder = () => {
             }
         }
         else if(name === "pr_Id"){
-            const id = requestForQuotation.find(item => item.pr_Id === value)
+            const id = requestForQuotation.find(item => item.pr_Id === value && item.rfq_Status !== "Cancelled")
             const date = purchaseRequest.find(item => item.purchaseRequestId === value)
 
             if(id){
@@ -164,6 +164,9 @@ const CreatePurchaseOrder = () => {
                     
                     const rfq = requestForQuotation.find(item => item.pr_Id === formData.pr_Id)
                     const vq = vendorQuotation.filter(item => item.rfq_Id === rfq.rfq_Id)
+
+                    console.log(rfq);
+                    console.log(vq);
 
                     if(vq){
                         vq.forEach((item) => {

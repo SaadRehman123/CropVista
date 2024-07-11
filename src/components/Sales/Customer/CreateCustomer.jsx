@@ -20,7 +20,7 @@ const CreateCustomer = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if (customerMasterAction.type === "UPDATE") {          
+        if (customerMasterAction.type === "UPDATE" || customerMasterAction.type === "VIEW") {          
             
             const data = customerMasterAction.node.data
             
@@ -131,6 +131,7 @@ const CreateCustomer = () => {
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.customerName}
                                         onValueChanged={(e) => onValueChanged(e, 'customerName')}
+                                        readOnly={customerMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.customerName === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
@@ -147,6 +148,7 @@ const CreateCustomer = () => {
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.customerAddress}
                                         onValueChanged={(e) => onValueChanged(e, 'customerAddress')}
+                                        readOnly={customerMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.customerAddress === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
@@ -157,6 +159,7 @@ const CreateCustomer = () => {
                                         style={{ marginTop: 7 }}
                                         value={formData.disable}
                                         onValueChanged={(e) => onValueChanged(e, 'disable')}
+                                        disabled={customerMasterAction.type === "VIEW" ? true : false}
                                     />
                                 </FormGroupItem>
                             </div>
@@ -174,6 +177,7 @@ const CreateCustomer = () => {
                                         accessKey={'customerNumber'}
                                         placeholder='Enter Contact Number'
                                         onValueChanged={(e) => onValueChanged(e, 'customerNumber')}
+                                        readOnly={customerMasterAction.type === "VIEW" ? true : false}
                                         validationStatus={invalid.customerNumber === false ? "valid" : "invalid"}
                                     />
                                 </FormGroupItem>
@@ -190,14 +194,17 @@ const CreateCustomer = () => {
                                         onFocusOut={handleOnFocusOut}
                                         value={formData.customerEmail}
                                         onValueChanged={(e) => onValueChanged(e, 'customerEmail')}
+                                        readOnly={customerMasterAction.type === "VIEW" ? true : false}
                                     />
                                 </FormGroupItem>
 
-                                <FormButtonContainer style={{ marginTop: 45 }}>
-                                    <Button size="sm" className={"form-action-button"}>
-                                        {customerMasterAction.type === "UPDATE" ? "Update" : "Save"} Customer
-                                    </Button>
-                                </FormButtonContainer>
+                                {customerMasterAction.type !== "VIEW" && (
+                                    <FormButtonContainer style={{ marginTop: 45 }}>
+                                        <Button size="sm" className={"form-action-button"}>
+                                            {customerMasterAction.type === "UPDATE" ? "Update" : "Save"} Customer
+                                        </Button>
+                                    </FormButtonContainer>
+                                )}
                             </div>
                         </div>
                     </FormGroupContainer>

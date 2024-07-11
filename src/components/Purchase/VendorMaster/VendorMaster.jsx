@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
 
 import { setVendorMasterRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -37,6 +37,11 @@ const VendorMaster = () => {
 
     const handleOnEditClick = (e) => {
         dispatch(vendorMasterActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Vendor')
+    }
+
+    const handleOnViewClick = (e) => {
+        dispatch(vendorMasterActionType({ node: e, type: "VIEW" }))
         navigate('/app/Create_Vendor')
     }
 
@@ -144,9 +149,9 @@ const VendorMaster = () => {
                     onClick={() => handleOnEditClick(e)}/>
 
                 <button
-                    title='Delete Vendor'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"VENDOR_MASTER" }))} />
+                    title='View Vendor'
+                    className='fal fa-eye treelist-edit-button'
+                    onClick={() => handleOnViewClick(e)} />
             </ActionCellContainer>
         )
     }
@@ -183,6 +188,8 @@ const VendorMaster = () => {
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
+
+                    <HeaderFilter visible={true} allowSearch={true} />
 
                     <Column
                         caption={"Vendor-Id"}
@@ -255,6 +262,8 @@ const VendorMaster = () => {
                     />
 
                     <Column
+                        width={107}
+                        minWidth={107}
                         caption={"Disable"}
                         dataField={"isDisabled"}
                         alignment={"left"}
@@ -271,6 +280,7 @@ const VendorMaster = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

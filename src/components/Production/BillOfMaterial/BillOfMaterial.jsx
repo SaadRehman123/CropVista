@@ -7,7 +7,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Button } from 'reactstrap'
 import { CellContainer, CellContent } from '../../SupportComponents/StyledComponents'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 
 import { bomActionType, getBom } from '../../../actions/BomActions'
 import { setBomRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -126,9 +126,11 @@ const BillOfMaterial = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"BOM-Id"}
-                        dataField={"BID"}
+                        dataField={"bid"}
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderBomIdColumn}
@@ -173,6 +175,7 @@ const BillOfMaterial = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

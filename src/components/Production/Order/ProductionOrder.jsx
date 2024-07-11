@@ -10,7 +10,7 @@ import FormBackground from '../../SupportComponents/FormBackground'
 import ProductionOrderReport from '../../Reports/ProductionOrderReport'
 
 import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { getBom } from '../../../actions/BomActions'
@@ -208,6 +208,8 @@ const ProductionOrder = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"Production Order-Id"}
                         dataField={"productionOrderId"}
@@ -287,6 +289,7 @@ const ProductionOrder = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

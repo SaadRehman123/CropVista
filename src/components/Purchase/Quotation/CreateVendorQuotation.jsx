@@ -89,6 +89,7 @@ const CreateVendorQuotation = () => {
             }))
 
             const RFQ = rfqDataSource.find((rfq) => rfq.rfq_Id === value)
+            console.log(RFQ);
             if(RFQ){
                 const uniqueItemData = RFQ.childrenItems.reduce((acc, current) => {
                     if (!acc.some(item => item.rfq_ItemId === current.rfq_ItemId)) {

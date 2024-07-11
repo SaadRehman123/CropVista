@@ -21,7 +21,7 @@ const CreateWarehouse = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if (createWarehouse.type === "UPDATE") {            
+        if (createWarehouse.type === "UPDATE" || createWarehouse.type === "VIEW") {            
             const instance = warehouseRef.current.instance
             const selectedRow = instance.getSelectedRowsData()
             
@@ -127,6 +127,7 @@ const CreateWarehouse = () => {
     const renderHeader = () => {
         if (createWarehouse.type === "CREATE") return "Create Warehouse"
         else if (createWarehouse.type === "UPDATE") return "Update Warehouse"
+        else if (createWarehouse.type === "VIEW") return "View Warehouse"
     }
 
     const renderBody = () => {
@@ -145,6 +146,7 @@ const CreateWarehouse = () => {
                             placeholder={"Enter Name"}
                             onFocusOut={handleOnFocusOut}
                             onValueChanged={(e) => onValueChanged(e, 'name')}
+                            readOnly={createWarehouse.type === "VIEW" ? true : false}
                             validationStatus={invalid.name === false ? "valid" : "invalid"}
                         />
                     </FormGroupItem>
@@ -158,10 +160,11 @@ const CreateWarehouse = () => {
                             accessKey={'wrType'}
                             value={formData.wrType}
                             onFocusIn={handleOnFocusIn}
-                            placeholder={"Select Warehouse Type"}
                             onFocusOut={handleOnFocusOut}
-                            onValueChanged={(e) => onValueChanged(e, 'wrType')}
+                            placeholder={"Select Warehouse Type"}
                             dataSource={["Finish Good", "Raw Material"]}
+                            onValueChanged={(e) => onValueChanged(e, 'wrType')}
+                            readOnly={createWarehouse.type === "VIEW" ? true : false}
                             validationStatus={invalid.wrType === false ? "valid" : "invalid"}
                         />
                     </FormGroupItem>
@@ -180,6 +183,7 @@ const CreateWarehouse = () => {
                                 placeholder={"Enter Location"}
                                 onFocusOut={handleOnFocusOut}
                                 onValueChanged={(e) => onValueChanged(e, 'location')}
+                                readOnly={createWarehouse.type === "VIEW" ? true : false}
                                 validationStatus={invalid.location === false ? "valid" : "invalid"}
                             />
                         </FormGroupItem>
@@ -192,19 +196,22 @@ const CreateWarehouse = () => {
                                 }}
                                 value={formData.active}
                                 onValueChanged={(e) => onValueChanged(e, 'active')}
+                                disabled={createWarehouse.type === "VIEW" ? true : false}
                             />
                         </FormGroupItem>
                     </div>
 
                 </FormGroupContainer>
-                <FormButtonContainer style={{ marginTop: 20 }}>
-                    <Button size="sm" className={"form-action-button"}>
-                        {createWarehouse.type === "UPDATE" ? "Update" : "Create"} Warehouse
-                    </Button>
-                    <Button size="sm" className={"form-close-button"} onClick={() => toggle()}>
-                        Close
-                    </Button>
-                </FormButtonContainer>
+                {createWarehouse.type !== "VIEW" && (
+                    <FormButtonContainer style={{ marginTop: 20 }}>
+                        <Button size="sm" className={"form-action-button"}>
+                            {createWarehouse.type === "UPDATE" ? "Update" : "Create"} Warehouse
+                        </Button>
+                        <Button size="sm" className={"form-close-button"} onClick={() => toggle()}>
+                            Close
+                        </Button>
+                    </FormButtonContainer>
+                )}
             </form>
         )
     }

@@ -9,10 +9,7 @@ import notify from 'devextreme/ui/notify'
 import { toggleDeletePopup } from '../../actions/ViewActions'
 import { deleteResource, getResource } from '../../actions/ResourceAction'
 import { updateProductionOrder } from '../../actions/ProductionOrderAction'
-import { deleteVendor, getVendorMaster } from '../../actions/VendorActions'
-import { deleteWarehouse, getWarehouse } from '../../actions/WarehouseAction'
 import { getInventory, updateInventory } from '../../actions/InventoryAction'
-import { deleteCustomer, getCustomerMaster } from '../../actions/CustomerActions'
 import { deleteBom, deleteBomItemResource, getBom } from '../../actions/BomActions'
 import { deleteCropsPlan, getPlannedCrops, updateCropsPlan } from '../../actions/CropsActions'
 import { getGoodIssue, getSaleOrder, updateGoodIssue, updateSaleOrder } from '../../actions/SalesActions'
@@ -28,17 +25,14 @@ const DeletePopup = () => {
     const cropPlanRef = useSelector((state) => state.view.cropPlanRef)
     const deletePopup = useSelector((state) => state.view.deletePopup)
     const plannedCrops = useSelector(state => state.crops.plannedCrops)
-    const warehouseRef = useSelector((state) => state.view.warehouseRef)
     const saleOrderRef = useSelector((state) => state.view.saleOrderRef)
     const goodIssueRef = useSelector((state) => state.view.goodIssueRef)
     const inventory = useSelector(state => state.inventory.inventoryStatus)
     const purchaseOrder = useSelector(state => state.purchase.purchaseOrder)
     const goodReceiptRef = useSelector((state) => state.view.goodReceiptRef)
-    const vendorMasterRef = useSelector((state) => state.view.vendorMasterRef)
     const purchaseOrderRef = useSelector((state) => state.view.purchaseOrderRef)
     const purchaseRequest = useSelector(state => state.purchase.purchaseRequest)
     const vendorQuotation = useSelector(state => state.purchase.vendorQuotation)
-    const customerMasterRef = useSelector((state) => state.view.customerMasterRef)
     const vendorQuotationRef = useSelector((state) => state.view.vendorQuotationRef)
     const productionOrderRef = useSelector((state) => state.view.productionOrderRef)
     const purchaseRequestRef = useSelector((state) => state.view.purchaseRequestRef)
@@ -53,9 +47,6 @@ const DeletePopup = () => {
         if (deletePopup.type === 'CROP_PLAN') {
             return 'Delete Crop Plan'
         }
-        else if (deletePopup.type === 'WAREHOUSE') {
-            return 'Delete Warehouse'
-        }
         else if (deletePopup.type === 'RESOURCE') {
             return 'Delete Resource'
         }
@@ -64,12 +55,6 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'PRODUCTION_ORDER') {
             return 'Cancel Production Order'
-        }
-        else if (deletePopup.type === 'VENDOR_MASTER') {
-            return 'Delete Vendor'
-        }
-        else if (deletePopup.type === 'CUSTOMER_MASTER') {
-            return 'Delete Customer'
         }
         else if (deletePopup.type === 'PURCHASE_REQUEST') {
             return 'Cancel Purchase Request'
@@ -98,9 +83,6 @@ const DeletePopup = () => {
         if (deletePopup.type === 'CROP_PLAN') {
             return 'Are you sure you want to delete selected Crop Plan?'
         }
-        else if (deletePopup.type === 'WAREHOUSE') {
-            return 'Are you sure you want to delete selected Warehouse?'
-        }
         else if (deletePopup.type === 'RESOURCE') {
             return 'Are you sure you want to delete selected Resource?'
         }
@@ -109,12 +91,6 @@ const DeletePopup = () => {
         }
         else if (deletePopup.type === 'PRODUCTION_ORDER') {
             return 'Are you sure you want to cancel selected Production Order?'
-        }
-        else if (deletePopup.type === 'VENDOR_MASTER') {
-            return 'Are you sure you want to delete selected Vendor?'
-        }
-        else if (deletePopup.type === 'CUSTOMER_MASTER') {
-            return 'Are you sure you want to delete selected Customer?'
         }
         else if (deletePopup.type === 'PURCHASE_REQUEST') {
             return 'Are you sure you want to cancel purchase request?'
@@ -166,31 +142,6 @@ const DeletePopup = () => {
                 else {
                     notify(data.message + " ...Refreshing", "info", 2000)
                     setTimeout(() => dispatch(getPlannedCrops()), 1000)
-                }
-            })
-            handleOnToggle(deletePopup.type)
-        }
-        else if(deletePopup.type === "WAREHOUSE") {
-            const instance = warehouseRef.current.instance
-            const selectedRow = instance.getSelectedRowsData()
-            
-            const obj = {
-                wrId: selectedRow[0].wrId,
-                name: selectedRow[0].name,
-                wrType: selectedRow[0].wrType,
-                location: selectedRow[0].location,
-                active: selectedRow[0].active
-            }
-
-            dispatch(deleteWarehouse(selectedRow[0].wrId, obj)).then(res => {
-                const data = res.payload.data
-                if(data.success){
-                    instance.getDataSource().store().remove(data.result.wrId)
-                    instance.refresh()
-                }
-                else {
-                    notify(data.message + " ...Refreshing", "info", 2000)
-                    setTimeout(() => dispatch(getWarehouse()), 1000)
                 }
             })
             handleOnToggle(deletePopup.type)
@@ -300,55 +251,6 @@ const DeletePopup = () => {
                     }
 
                     notify("Production Order Cancelled", "info", 2000)
-                }
-            })
-            handleOnToggle(deletePopup.type)
-        }
-        else if(deletePopup.type === "CUSTOMER_MASTER") {
-            const instance = customerMasterRef.current.instance
-            const selectedRow = instance.getSelectedRowsData()
-            
-            const obj = {
-                customerId: selectedRow[0].customerId,
-                customerName: selectedRow[0].customerName, 
-                customerAddress: selectedRow[0].customerAddress,
-                customerEmail: selectedRow[0].customerEmail,
-                customerNumber: selectedRow[0].customerNumber,
-                disable: selectedRow[0].disable
-            }
-
-            dispatch(deleteCustomer(selectedRow[0].customerId, obj)).then(res => {
-                const data = res.payload.data
-                if(data.success){
-                    dispatch(getCustomerMaster())
-                }
-            })
-            handleOnToggle(deletePopup.type)
-        }
-        else if(deletePopup.type === "VENDOR_MASTER") {
-            const instance = vendorMasterRef.current.instance
-            const selectedRow = instance.getSelectedRowsData()
-            
-            const obj = {
-                vendorId: selectedRow[0].vendorId,
-                vendorName: selectedRow[0].vendorName,
-                vendorGroup: selectedRow[0].vendorGroup,
-                vendorType: selectedRow[0].vendorType,
-                isDisabled: selectedRow[0].isDisabled,
-                vendorAddress: selectedRow[0].vendorAddress,
-                vendorNumber: selectedRow[0].vendorNumber.toString(),
-                vendorEmail: selectedRow[0].vendorEmail 
-            }
-
-            dispatch(deleteVendor(selectedRow[0].vendorId, obj)).then(res => {
-                const data = res.payload.data
-                if(data.success){
-                    instance.getDataSource().store().remove(data.result.vendorId)
-                    instance.refresh()
-                }
-                else {
-                    notify(data.message + " ...Refreshing", "info", 2000)
-                    setTimeout(() => dispatch(getVendorMaster()), 1000)
                 }
             })
             handleOnToggle(deletePopup.type)

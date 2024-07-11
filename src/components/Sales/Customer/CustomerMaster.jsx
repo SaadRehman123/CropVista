@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { setCustomerMasterRef, toggleDeletePopup } from '../../../actions/ViewActions'
@@ -37,6 +37,11 @@ const CustomerMaster = () => {
 
     const handleOnEditClick = (e) => {
         dispatch(customerMasterActionType({ node: e, type: "UPDATE" }))
+        navigate('/app/Create_Customer')
+    }
+    
+    const handleOnViewClick = (e) => {
+        dispatch(customerMasterActionType({ node: e, type: "VIEW" }))
         navigate('/app/Create_Customer')
     }
 
@@ -125,8 +130,8 @@ const CustomerMaster = () => {
 
                 <button
                     title='Delete Customer'
-                    className='fal fa-trash treelist-delete-button'
-                    onClick={() => dispatch(toggleDeletePopup({ active: true, type:"CUSTOMER_MASTER" }))} />
+                    className='fal fa-eye treelist-edit-button'
+                    onClick={() => handleOnViewClick(e)} />
             </ActionCellContainer>
         )
     }
@@ -163,6 +168,8 @@ const CustomerMaster = () => {
                     <Selection mode={"single"} />
 
                     <Scrolling mode={"standard"} />
+
+                    <HeaderFilter visible={true} allowSearch={true} />
 
                     <Column
                         caption={"Customer-Id"}
@@ -233,6 +240,7 @@ const CustomerMaster = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={true}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}

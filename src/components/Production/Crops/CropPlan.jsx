@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Badge, Button } from 'reactstrap'
-import TreeList, { Column, Scrolling, Selection } from 'devextreme-react/tree-list'
+import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 
 import FormBackground from '../../SupportComponents/FormBackground'
 
@@ -176,6 +176,8 @@ const CropPlan = () => {
 
                     <Scrolling mode={"standard"} />
 
+                    <HeaderFilter visible={true} allowSearch={true} />
+
                     <Column
                         caption={"Plan-Id"}
                         dataField={"id"}
@@ -228,7 +230,7 @@ const CropPlan = () => {
 
                     <Column
                         caption={"Start Date"}
-                        dataField={"startDate"}
+                        dataField={"startdate"}
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderStartDateColumn} 
@@ -238,7 +240,7 @@ const CropPlan = () => {
 
                     <Column
                         caption={"End Date"}
-                        dataField={"endDate"}
+                        dataField={"enddate"}
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderEndDateColumn} 
@@ -247,14 +249,14 @@ const CropPlan = () => {
                     />
                     
                     <Column
-                        width={115}
-                        minWidth={115}
+                        width={120}
+                        minWidth={120}
                         caption={"Status"}
                         dataField={"status"}
                         alignment={"center"}
                         allowSorting={false}
                         cellRender={renderStatusColumn} 
-                        headerCellRender={renderStatusHeaderCell}
+                        headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
 
@@ -265,6 +267,7 @@ const CropPlan = () => {
                         dataField={"actions"}
                         alignment={"center"}
                         allowSorting={false}
+                        allowFiltering={false}
                         cellRender={renderActionColumn}
                         headerCellRender={renderActionHeaderCell} 
                         cssClass={"project-treelist-column"}
@@ -276,16 +279,6 @@ const CropPlan = () => {
 
     const renderActionHeaderCell = (e) => {
         return <span style={{ fontWeight: "bold", fontSize: "14px", color: "black" }}> {e.column.caption} </span>
-    }
-
-    const renderStatusHeaderCell = (e) => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 29 }}>
-                <span style={{ color: "#444", fontSize: "14px", fontWeight: "700" }}>
-                    {e.column.caption}
-                </span>
-            </div>
-        )
     }
 
     const renderHeaderCell = (e) => {

@@ -30,30 +30,32 @@ const InventoryReport = (props) => {
             const instance = props.reportGridRef.current.instance
 
             instance.forEachNode((node) => {
-                rowElements.push(
-                    <View wrap={false} key={node.key} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0" }}>
-                        <View style={{ width: 160, padding: 4 }}>
-                            <Text>{node.data.inventoryId}</Text>
+                if (node.visible === true) {
+                    rowElements.push(
+                        <View wrap={false} key={node.key} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0" }}>
+                            <View style={{ width: 160, padding: 4 }}>
+                                <Text>{node.data.inventoryId}</Text>
+                            </View>
+                            <View style={{ width: 500, padding: 4 }}>
+                                <Text>{node.data.inventoryItem}</Text>
+                            </View>
+                            <View style={{ width: 100, padding: 4 }}>
+                                <Text>{node.data.inventoryQuantity}</Text>
+                            </View>
+                            <View style={{ width: 100, padding: 4 }}>
+                                <Text>{node.data.inventoryWarehouse}</Text>
+                            </View>
                         </View>
-                        <View style={{ width: 500, padding: 4 }}>
-                            <Text>{node.data.inventoryItem}</Text>
-                        </View>
-                        <View style={{ width: 100, padding: 4 }}>
-                            <Text>{node.data.inventoryQuantity}</Text>
-                        </View>
-                        <View style={{ width: 100, padding: 4 }}>
-                            <Text>{node.data.inventoryWarehouse}</Text>
-                        </View>
-                    </View>
-                )
-                count++
+                    )
+                    count++
+                }
             })
 
             return (
                 <View style={{ display: "flex", marginTop: 10, width: "auto", fontSize: 10, paddingLeft: 6 }}>
                     <View key={"0"} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0", fontSize: 11, fontFamily: "Helvetica-Bold" }}>
                         <View style={{ width: 160, padding: 4 }}>
-                            <Text>Inventory-Id</Text>
+                            <Text>Inventory-ID</Text>
                         </View>
                         <View style={{ width: 500, padding: 4 }}>
                             <Text>Item Name</Text>

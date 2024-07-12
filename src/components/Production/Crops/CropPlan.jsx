@@ -331,8 +331,11 @@ const setColor = (e) => {
     else if(e.data.status === "Completed"){
         color = 'success'
     }
-    else if(e.data.status === "Closed"){
+    else if(e.data.status === "Cancelled"){
         color = 'danger'
+    }
+    else if(e.data.status === "Closed"){
+        color = 'secondary'
     }
 
     return color

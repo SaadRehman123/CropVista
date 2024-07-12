@@ -336,7 +336,7 @@ const CreateItem = () => {
                             searchMode={'contains'}
                             searchExpr={'name'}
                             disabled={warehouseDateSource.length === 0 ? true : false}
-                            dataSource={warehouseDateSource.map(item => {
+                            dataSource={warehouseDateSource.filter((wr) => wr.active === true).map(item => {
                                 return {
                                     wrId: item.wrId,
                                     name: item.name,

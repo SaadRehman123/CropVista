@@ -482,7 +482,7 @@ const CreateBOM = () => {
         if(value === "Item"){
             setItemDataSource({
                 type: "Item",
-                dataSource: itemMaster.filter((item) => item.itemType !== "Finish Good")
+                dataSource: itemMaster.filter((item) => item.itemType !== "Finish Good" && item.disable === false)
             })
         }
         else if(value === "Resource"){

@@ -3,12 +3,12 @@ import moment from 'moment'
 
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 
-const StockEntryReport = (props) => {
+const PurchaseInvoiceReport = (props) => {
 
     const renderProjectTitle = useMemo(() => {
         return (
             <View style={{ display: "flex", textAlign: "center", justifyContent: 'center', alignItems: 'center', fontSize: 15, color: "#4285f4", marginTop: 10, fontWeight: "bold" }}>
-                <Text>Stock Entry Report</Text>
+                <Text>Purchase Invoice Report</Text>
             </View>
         )
     })
@@ -21,7 +21,7 @@ const StockEntryReport = (props) => {
             </View>
         )
     })
-
+    
     const renderTreeTable = useMemo(() => {
         if (props.reportGridRef.current) {
 
@@ -34,22 +34,25 @@ const StockEntryReport = (props) => {
                     rowElements.push(
                         <View wrap={false} key={node.key} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0" }}>
                             <View style={{ width: 160, padding: 4 }}>
-                                <Text>{node.data.stockEntryId}</Text>
+                                <Text>{node.data.pi_Id}</Text>
+                            </View>
+                            <View style={{ width: 160, padding: 4 }}>
+                                <Text>{node.data.gr_Id}</Text>
                             </View>
                             <View style={{ width: 450, padding: 4 }}>
-                                <Text>{node.data.stockEntryName}</Text>
+                                <Text>{node.data.vendorName}</Text>
                             </View>
-                            <View style={{ width: 180, padding: 4 }}>
-                                <Text>{node.data.productionOrderId === "" ? node.data.stockEntryWarehouse : `Production - ${node.data.productionOrderId}`}</Text>
-                            </View>
-                            <View style={{ width: 100, padding: 4 }}>
-                                <Text>{node.data.stockEntryQuantity}</Text>
+                            <View style={{ width: 160, padding: 4 }}>
+                                <Text>{node.data.vendorNumber}</Text>
                             </View>
                             <View style={{ width: 140, padding: 4 }}>
-                                <Text>{node.data.productionOrderId === "" ? node.data.stockEntryTo : `Inventory - ${node.data.stockEntryWarehouse}`}</Text>
+                                <Text>{node.data.creationDate}</Text>
                             </View>
                             <View style={{ width: 140, padding: 4 }}>
-                                <Text>{moment(node.data.stockEntryDate).format("DD/MM/YYYY")}</Text>
+                                <Text>{node.data.dueDate}</Text>
+                            </View>
+                            <View style={{ width: 140, padding: 4 }}>
+                                <Text>{node.data.pi_Status}</Text>
                             </View>
                         </View>
                     )
@@ -61,22 +64,25 @@ const StockEntryReport = (props) => {
                 <View style={{ display: "flex", marginTop: 10, width: "auto", fontSize: 10, paddingLeft: 6 }}>
                     <View key={"0"} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0", fontSize: 11, fontFamily: "Helvetica-Bold" }}>
                         <View style={{ width: 160, padding: 4 }}>
-                            <Text>Entry-ID</Text>
+                            <Text>PI-ID</Text>
+                        </View>
+                        <View style={{ width: 160, padding: 4 }}>
+                            <Text>GR-ID</Text>
                         </View>
                         <View style={{ width: 450, padding: 4 }}>
-                            <Text>Item Name</Text>
+                            <Text>Vendor Name</Text>
                         </View>
-                        <View style={{ width: 180, padding: 4 }}>
-                            <Text>Entry From</Text>
-                        </View>
-                        <View style={{ width: 100, padding: 4 }}>
-                            <Text>Quantity</Text>
+                        <View style={{ width: 160, padding: 4 }}>
+                            <Text>Contact</Text>
                         </View>
                         <View style={{ width: 140, padding: 4 }}>
-                            <Text>Entry To</Text>
+                            <Text>Creation Date</Text>
                         </View>
                         <View style={{ width: 140, padding: 4 }}>
-                            <Text>Entry Date</Text>
+                            <Text>Due Date</Text>
+                        </View>
+                        <View style={{ width: 140, padding: 4 }}>
+                            <Text>Status</Text>
                         </View>
                     </View>
                     {rowElements}
@@ -99,7 +105,7 @@ const StockEntryReport = (props) => {
     )
 }
 
-export default StockEntryReport
+export default PurchaseInvoiceReport
 
 const styles = StyleSheet.create({
     page: {

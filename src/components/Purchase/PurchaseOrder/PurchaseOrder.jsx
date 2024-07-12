@@ -2,8 +2,12 @@ import React, { Fragment, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { saveAs } from 'file-saver'
+import { pdf } from '@react-pdf/renderer'
+
 import moment from 'moment'
 import FormBackground from '../../SupportComponents/FormBackground'
+import PurchaseOrderReport from '../../Reports/PurchaseOrderReport'
 
 import { Badge, Button } from 'reactstrap'
 import { TreeList } from 'devextreme-react'
@@ -17,6 +21,7 @@ import styled from 'styled-components'
 
 const PurchaseOrder = () => {
     
+    const user = useSelector(state => state.user.loginUser)
     const purchaseOrder = useSelector(state => state.purchase.purchaseOrder)
 
     const navigate = useNavigate()
@@ -31,6 +36,16 @@ const PurchaseOrder = () => {
     useEffect(() => {
         dispatch(getPurchaseOrder(0))
     }, [])
+    
+    const handlePdfGenrating = async () => {
+        const blob = await pdf(
+            <PurchaseOrderReport
+                user={user}
+                reportGridRef={treeListRef}
+            />
+        ).toBlob()
+        saveAs(blob, `Purchase Order Report.pdf`)
+    }
 
     const handleOnClick = () => {
         navigate('/app/Create_Purchase_Order')
@@ -116,10 +131,17 @@ const PurchaseOrder = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Purchase Order History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
-                        <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Purchase Order
-                    </Button>
+                    <div>
+                        <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
+                            <i style={{marginRight: 10}} className='fal fa-plus' />
+                            Create Purchase Order
+                        </Button>
+
+                        <Button style={{ marginLeft: 10 }} size="sm" className={"form-action-button"} onClick={() => handlePdfGenrating()}>
+                            <i style={{marginRight: 10}} className='fal fa-file-pdf' />
+                            Generate Pdf
+                        </Button>
+                    </div>
                 </Header>
 
                 <TreeList

@@ -2,8 +2,12 @@ import React, { Fragment, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { saveAs } from 'file-saver'
+import { pdf } from '@react-pdf/renderer'
+
 import moment from 'moment'
 import styled from 'styled-components'
+import GoodReceiptReport from '../../Reports/GoodReceiptReport'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
@@ -16,6 +20,7 @@ import { getGoodReceipt, goodReceiptActionType } from '../../../actions/Purchase
 
 const GoodReceipt = () => {
 
+    const user = useSelector(state => state.user.loginUser)
     const goodReceipt = useSelector((state) => state.purchase.goodReceipt)
 
     const navigate = useNavigate()
@@ -30,6 +35,16 @@ const GoodReceipt = () => {
     useEffect(() => {
         dispatch(getGoodReceipt(0))
     }, [])
+
+    const handlePdfGenrating = async () => {
+        const blob = await pdf(
+            <GoodReceiptReport
+                user={user}
+                reportGridRef={treeListRef}
+            />
+        ).toBlob()
+        saveAs(blob, `Good Receipt Report.pdf`)
+    }
 
     const handleOnClick = () => {
         navigate('/app/Create_Good_Receipt')
@@ -115,10 +130,17 @@ const GoodReceipt = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Good Receipt History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
-                        <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Good Receipt
-                    </Button>
+                    <div>
+                        <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
+                            <i style={{marginRight: 10}} className='fal fa-plus' />
+                            Create Good Receipt
+                        </Button>
+
+                        <Button style={{ marginLeft: 10 }} size="sm" className={"form-action-button"} onClick={() => handlePdfGenrating()}>
+                            <i style={{marginRight: 10}} className='fal fa-file-pdf' />
+                            Generate Pdf
+                        </Button>
+                    </div>
                 </Header>
                 
                 <TreeList
@@ -255,6 +277,9 @@ const setColor = (e) => {
         color = 'success'
     }
     else if(e.data.gr_Status === "Cancelled"){
+        color = 'secondary'
+    }
+    else if(e.data.gr_Status === "Over-Due"){
         color = 'danger'
     }
 

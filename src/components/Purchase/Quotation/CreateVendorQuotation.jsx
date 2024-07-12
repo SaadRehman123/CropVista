@@ -12,7 +12,7 @@ import { Column, Editing, Scrolling, Selection } from 'devextreme-react/tree-lis
 import { CellContainer, CellContent, FormButtonContainer, FormGroupContainer, FormGroupItem, FormLabel, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { assignClientId } from '../../../utilities/CommonUtilities'
-import { addVendorQuotation, getVendorQuotation, updateVendorQuotation } from '../../../actions/PurchaseAction'
+import { addVendorQuotation, getRequestForQuotation, getVendorQuotation, updateRequestForQuotation, updateVendorQuotation } from '../../../actions/PurchaseAction'
 
 const CreateVendorQuotation = () => {
 
@@ -89,7 +89,6 @@ const CreateVendorQuotation = () => {
             }))
 
             const RFQ = rfqDataSource.find((rfq) => rfq.rfq_Id === value)
-            console.log(RFQ);
             if(RFQ){
                 const uniqueItemData = RFQ.childrenItems.reduce((acc, current) => {
                     if (!acc.some(item => item.rfq_ItemId === current.rfq_ItemId)) {
@@ -214,7 +213,19 @@ const CreateVendorQuotation = () => {
                             return item
                         })
                     )
-                    dispatch(getVendorQuotation(0))
+                    dispatch(getVendorQuotation(0)).then((resX) => {
+                        const response = resX.payload.data 
+                        if(response.success){
+                            const rfq = requestForQuotation.find((rfq) => rfq.rfq_Id === formData.rfq_Id && rfq.rfq_Status !== "Cancelled")                            
+                            if (rfq) {
+                                dispatch(updateRequestForQuotation({ ...rfq, rfq_Status: "VQ Created" }, rfq.rfq_Id)).then((x) => {
+                                    if(x.payload.data.success){
+                                        dispatch(getRequestForQuotation(0))
+                                    }
+                                })
+                            }
+                        }
+                    })
                     setVendorDataSource(updatedVendorDataSource)
                     notify("Vendor Quotation Created Successfully")
                 }
@@ -348,7 +359,7 @@ const CreateVendorQuotation = () => {
                                             searchEnabled={true}
                                             searchMode={'contains'}
                                             accessKey={'rfq_Id'}
-                                            dataSource={rfqDataSource.filter(rfq => rfq.rfq_Status === "Created").map((item) => {
+                                            dataSource={rfqDataSource.filter(rfq => rfq.rfq_Status === "VQ Created" || rfq.rfq_Status === "Created").map((item) => {
                                                 return item.rfq_Id
                                             })}
                                             value={formData.rfq_Id}

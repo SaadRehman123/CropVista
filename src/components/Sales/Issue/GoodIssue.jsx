@@ -2,7 +2,11 @@ import React, { Fragment, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
+import { saveAs } from 'file-saver'
+import { pdf } from '@react-pdf/renderer'
+
 import moment from 'moment'
+import GoodIssueReport from '../../Reports/GoodIssueReport'
 import FormBackground from '../../SupportComponents/FormBackground'
 
 import { Badge, Button } from 'reactstrap'
@@ -17,6 +21,7 @@ import styled from 'styled-components'
 
 const GoodIssue = () => {
     
+    const user = useSelector(state => state.user.loginUser)
     const goodIssue = useSelector(state => state.sales.goodIssue)
 
     const navigate = useNavigate()
@@ -31,6 +36,16 @@ const GoodIssue = () => {
     useEffect(() => {
         dispatch(getGoodIssue(0))
     }, [])
+
+    const handlePdfGenrating = async () => {
+        const blob = await pdf(
+            <GoodIssueReport
+                user={user}
+                reportGridRef={treeListRef}
+            />
+        ).toBlob()
+        saveAs(blob, `Good Issue Report.pdf`)
+    }
 
     const handleOnClick = () => {
         navigate('/app/Create_Good_Issue')
@@ -126,10 +141,17 @@ const GoodIssue = () => {
             <Fragment>
                 <Header>
                     <HeaderSpan>Good Issue History</HeaderSpan>
-                    <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
-                        <i style={{marginRight: 10}} className='fal fa-plus' />
-                        Create Good Issue
-                    </Button>
+                    <div>
+                        <Button size="sm" className={"form-action-button"} onClick={() => handleOnClick()}>
+                            <i style={{marginRight: 10}} className='fal fa-plus' />
+                            Create Good Issue
+                        </Button>
+
+                        <Button style={{ marginLeft: 10 }} size="sm" className={"form-action-button"} onClick={() => handlePdfGenrating()}>
+                            <i style={{marginRight: 10}} className='fal fa-file-pdf' />
+                            Generate Pdf
+                        </Button>
+                    </div>
                 </Header>
 
                 <TreeList

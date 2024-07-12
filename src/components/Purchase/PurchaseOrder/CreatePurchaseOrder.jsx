@@ -153,7 +153,7 @@ const CreatePurchaseOrder = () => {
                 const response = res.payload.data
                 if(response.success){
 
-                    const pr = purchaseRequest.find(item => item.purchaseRequestId === formData.pr_Id)
+                    const pr = purchaseRequest.find(item => item.purchaseRequestId === formData.pr_Id && item.pR_Status === "RFQ Created")
                     if(pr){
                         dispatch(updatePurchaseRequest({ ...pr, pR_Status: "Ordered" }, pr.purchaseRequestId)).then((resX) => {
                             if(resX.payload.data.success){
@@ -162,11 +162,8 @@ const CreatePurchaseOrder = () => {
                         })
                     }
                     
-                    const rfq = requestForQuotation.find(item => item.pr_Id === formData.pr_Id)
-                    const vq = vendorQuotation.filter(item => item.rfq_Id === rfq.rfq_Id)
-
-                    console.log(rfq);
-                    console.log(vq);
+                    const rfq = requestForQuotation.find(item => item.pr_Id === formData.pr_Id && item.rfq_Status === "VQ Created")
+                    const vq = vendorQuotation.filter(item => item.rfq_Id === rfq.rfq_Id && item.vq_Status === "Created")
 
                     if(vq){
                         vq.forEach((item) => {

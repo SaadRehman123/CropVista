@@ -201,8 +201,8 @@ const RequestForQuotation = () => {
                     />
 
                     <Column
-                        width={110}
-                        minWidth={110}
+                        width={120}
+                        minWidth={120}
                         caption={"Status"}
                         dataField={"rfq_Status"}
                         alignment={"left"}

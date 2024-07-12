@@ -3,12 +3,12 @@ import moment from 'moment'
 
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 
-const StockEntryReport = (props) => {
+const GoodIssueReport = (props) => {
 
     const renderProjectTitle = useMemo(() => {
         return (
             <View style={{ display: "flex", textAlign: "center", justifyContent: 'center', alignItems: 'center', fontSize: 15, color: "#4285f4", marginTop: 10, fontWeight: "bold" }}>
-                <Text>Stock Entry Report</Text>
+                <Text>Good Issue Report</Text>
             </View>
         )
     })
@@ -34,22 +34,22 @@ const StockEntryReport = (props) => {
                     rowElements.push(
                         <View wrap={false} key={node.key} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0" }}>
                             <View style={{ width: 160, padding: 4 }}>
-                                <Text>{node.data.stockEntryId}</Text>
+                                <Text>{node.data.gi_Id}</Text>
+                            </View>
+                            <View style={{ width: 160, padding: 4 }}>
+                                <Text>{node.data.saleOrder_Id}</Text>
                             </View>
                             <View style={{ width: 450, padding: 4 }}>
-                                <Text>{node.data.stockEntryName}</Text>
+                                <Text>{node.data.customerName}</Text>
                             </View>
-                            <View style={{ width: 180, padding: 4 }}>
-                                <Text>{node.data.productionOrderId === "" ? node.data.stockEntryWarehouse : `Production - ${node.data.productionOrderId}`}</Text>
-                            </View>
-                            <View style={{ width: 100, padding: 4 }}>
-                                <Text>{node.data.stockEntryQuantity}</Text>
+                            <View style={{ width: 160, padding: 4 }}>
+                                <Text>{node.data.customerNumber}</Text>
                             </View>
                             <View style={{ width: 140, padding: 4 }}>
-                                <Text>{node.data.productionOrderId === "" ? node.data.stockEntryTo : `Inventory - ${node.data.stockEntryWarehouse}`}</Text>
+                                <Text>{node.data.creationDate}</Text>
                             </View>
                             <View style={{ width: 140, padding: 4 }}>
-                                <Text>{moment(node.data.stockEntryDate).format("DD/MM/YYYY")}</Text>
+                                <Text>{node.data.gi_Status}</Text>
                             </View>
                         </View>
                     )
@@ -61,22 +61,22 @@ const StockEntryReport = (props) => {
                 <View style={{ display: "flex", marginTop: 10, width: "auto", fontSize: 10, paddingLeft: 6 }}>
                     <View key={"0"} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0", fontSize: 11, fontFamily: "Helvetica-Bold" }}>
                         <View style={{ width: 160, padding: 4 }}>
-                            <Text>Entry-ID</Text>
+                            <Text>GI-ID</Text>
+                        </View>
+                        <View style={{ width: 160, padding: 4 }}>
+                            <Text>SO-ID</Text>
                         </View>
                         <View style={{ width: 450, padding: 4 }}>
-                            <Text>Item Name</Text>
+                            <Text>Customer Name</Text>
                         </View>
-                        <View style={{ width: 180, padding: 4 }}>
-                            <Text>Entry From</Text>
-                        </View>
-                        <View style={{ width: 100, padding: 4 }}>
-                            <Text>Quantity</Text>
+                        <View style={{ width: 160, padding: 4 }}>
+                            <Text>Contact</Text>
                         </View>
                         <View style={{ width: 140, padding: 4 }}>
-                            <Text>Entry To</Text>
+                            <Text>Creation Date</Text>
                         </View>
                         <View style={{ width: 140, padding: 4 }}>
-                            <Text>Entry Date</Text>
+                            <Text>Status</Text>
                         </View>
                     </View>
                     {rowElements}
@@ -99,7 +99,7 @@ const StockEntryReport = (props) => {
     )
 }
 
-export default StockEntryReport
+export default GoodIssueReport
 
 const styles = StyleSheet.create({
     page: {

@@ -30,42 +30,44 @@ const ProductionOrderReport = (props) => {
             const instance = props.reportGridRef.current.instance
 
             instance.forEachNode((node) => {
-                rowElements.push(
-                    <View wrap={false} key={node.key} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0" }}>
-                        <View style={{ width: 160, padding: 4 }}>
-                            <Text>{node.data.productionOrderId}</Text>
+                if (node.visible === true) {
+                    rowElements.push(
+                        <View wrap={false} key={node.key} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0" }}>
+                            <View style={{ width: 160, padding: 4 }}>
+                                <Text>{node.data.productionOrderId}</Text>
+                            </View>
+                            <View style={{ width: 100, padding: 4 }}>
+                                <Text>{node.data.productionNo}</Text>
+                            </View>
+                            <View style={{ width: 500, padding: 4 }}>
+                                <Text>{node.data.productDescription}</Text>
+                            </View>
+                            <View style={{ width: 100, padding: 4 }}>
+                                <Text>{node.data.quantity}</Text>
+                            </View>
+                            <View style={{ width: 140, padding: 4 }}>
+                                <Text>{moment(node.data.startDate).format("DD/MM/YYYY")}</Text>
+                            </View>
+                            <View style={{ width: 140, padding: 4 }}>
+                                <Text>{moment(node.data.endDate).format("DD/MM/YYYY")}</Text>
+                            </View>
+                            <View style={{ width: 140, padding: 4 }}>
+                                <Text>{node.data.status}</Text>
+                            </View>
                         </View>
-                        <View style={{ width: 100, padding: 4 }}>
-                            <Text>{node.data.productionNo}</Text>
-                        </View>
-                        <View style={{ width: 500, padding: 4 }}>
-                            <Text>{node.data.productDescription}</Text>
-                        </View>
-                        <View style={{ width: 100, padding: 4 }}>
-                            <Text>{node.data.quantity}</Text>
-                        </View>
-                        <View style={{ width: 140, padding: 4 }}>
-                            <Text>{moment(node.data.startDate).format("DD/MM/YYYY")}</Text>
-                        </View>
-                        <View style={{ width: 140, padding: 4 }}>
-                            <Text>{moment(node.data.endDate).format("DD/MM/YYYY")}</Text>
-                        </View>
-                        <View style={{ width: 140, padding: 4 }}>
-                            <Text>{node.data.status}</Text>
-                        </View>
-                    </View>
-                )
-                count++
+                    )
+                    count++
+                }
             })
 
             return (
                 <View style={{ display: "flex", marginTop: 10, width: "auto", fontSize: 10, paddingLeft: 6 }}>
                     <View key={"0"} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0", fontSize: 11, fontFamily: "Helvetica-Bold" }}>
                         <View style={{ width: 160, padding: 4 }}>
-                            <Text>Production Order-Id</Text>
+                            <Text>Production Order-ID</Text>
                         </View>
                         <View style={{ width: 100, padding: 4 }}>
-                            <Text>Product Id</Text>
+                            <Text>Product ID</Text>
                         </View>
                         <View style={{ width: 500, padding: 4 }}>
                             <Text>Product Description</Text>

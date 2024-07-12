@@ -293,7 +293,7 @@ const DeletePopup = () => {
             dispatch(updateRequestForQuotation(obj, obj.rfq_Id)).then((res) => {
                 const data = res.payload.data
                 if(data.success){
-                    const pr = purchaseRequest.find((item) => item.purchaseRequestId === obj.pr_Id)
+                    const pr = purchaseRequest.find((item) => item.purchaseRequestId === obj.pr_Id && item.pR_Status === "RFQ Created")
                     if(pr){
                         dispatch(updatePurchaseRequest({ ...pr, pR_Status: "Created" }, pr.purchaseRequestId)).then((resX) => {
                             const data = resX.payload.data
@@ -327,7 +327,22 @@ const DeletePopup = () => {
             dispatch(deleteVendorQuotation(obj, obj.vq_Id)).then(res => {
                 const data = res.payload.data
                 if(data.success){
-                    dispatch(getVendorQuotation(0))
+                    dispatch(getVendorQuotation(0)).then((resX) => {
+                        const response = resX.payload.data 
+                        if(response.success){
+                            const vq = response.result.find((vq) => vq.rfq_Id === obj.rfq_Id && vq.vq_Status === "Created")
+                            if(!vq){
+                                const rfq = requestForQuotation.find((rfq) => rfq.rfq_Id === obj.rfq_Id && rfq.rfq_Status === "VQ Created")                            
+                                if (rfq) {
+                                    dispatch(updateRequestForQuotation({ ...rfq, rfq_Status: "Created" }, rfq.rfq_Id)).then((x) => {
+                                        if(x.payload.data.success){
+                                            dispatch(getRequestForQuotation(0))
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    })
                 }
             })
             handleOnToggle(deletePopup.type)
@@ -352,9 +367,9 @@ const DeletePopup = () => {
 
             dispatch(updatePurchaseOrder(obj, obj.pro_Id)).then(res => {
                 if(res.payload.data.success){
-                    const rfq = requestForQuotation.find(item => item.pr_Id === obj.pr_Id)
+                    const rfq = requestForQuotation.find(item => item.pr_Id === obj.pr_Id && item.rfq_Status === "Closed")
                     const vq = vendorQuotation.filter(item => item.rfq_Id === rfq.rfq_Id)
-                    const pr = purchaseRequest.find((item) => item.purchaseRequestId === obj.pr_Id)
+                    const pr = purchaseRequest.find((item) => item.purchaseRequestId === obj.pr_Id && item.pR_Status === "Ordered")
 
                     if(pr) dispatch(updatePurchaseRequest({ ...pr, pR_Status: "RFQ Created" }, pr.purchaseRequestId))
                     if(vq){
@@ -362,7 +377,7 @@ const DeletePopup = () => {
                             dispatch(updateVendorQuotation( { ...item, vq_Status: "Created" } , item.vq_Id))
                         })
                     }
-                    if(rfq) dispatch(updateRequestForQuotation({ ...rfq, rfq_Status: "Created" }, rfq.rfq_Id))
+                    if(rfq) dispatch(updateRequestForQuotation({ ...rfq, rfq_Status: "VQ Created" }, rfq.rfq_Id))
                  
                     dispatch(getPurchaseOrder(0))
                     dispatch(getPurchaseRequest(0))
@@ -391,7 +406,7 @@ const DeletePopup = () => {
 
             dispatch(updateGoodReceipt(obj, obj.gr_Id)).then((res) => {
                 if(res.payload.data.success){
-                    const pro = purchaseOrder.find(item => item.pro_Id === obj.pro_Id)
+                    const pro = purchaseOrder.find(item => item.pro_Id === obj.pro_Id && item.purchaseOrderStatus === "GR Created")
                    
                     if(pro) dispatch(updatePurchaseOrder({ ...pro, purchaseOrderStatus: "Created" }, pro.pro_Id))
                         

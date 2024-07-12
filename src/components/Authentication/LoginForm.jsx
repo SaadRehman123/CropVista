@@ -24,7 +24,7 @@ const LoginForm = () => {
 
     useEffect(() => {
         const cookie = getCookie("_auth")
-        if (cookie !== null) navigate('/app/Dashboard')
+        if (cookie !== null) navigate('/app/weather')
     }, [])
 
     const handleOnChange = (e) => {
@@ -57,7 +57,7 @@ const LoginForm = () => {
                     })
 
                     dispatch(setLogin(true))
-                    navigate('/app/Dashboard')
+                    navigate('/app/weather')
 
                     setTimeout(() => { // remove this later
                         dispatch(renderLoadingView(false))

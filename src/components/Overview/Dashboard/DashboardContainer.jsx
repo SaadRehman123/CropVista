@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 import { SelectBox } from 'devextreme-react'
-import { FormGroupItem, FormLabel } from '../../SupportComponents/StyledComponents'
+import { FormGroupItem } from '../../SupportComponents/StyledComponents'
 
 import BarChart from '../Charts/BarChart'
 import SalesChart from '../Charts/SalesChart'

@@ -27,6 +27,7 @@ import PurchaseOrder from '../components/Purchase/PurchaseOrder/PurchaseOrder'
 import VendorQuotation from '../components/Purchase/Quotation/VendorQuotation'
 import CreateSalesInvoice from '../components/Sales/Invoice/CreateSalesInvoice'
 import CreateGoodReceipt from '../components/Purchase/Invoice/CreateGoodReceipt'
+import WeatherContainer from '../components/Overview/Dashboard/WeatherContainer'
 import BillOfMaterial from '../components/Production/BillOfMaterial/BillOfMaterial'
 import DashboardContainer from '../components/Overview/Dashboard/DashboardContainer'
 import PurchaseRequest from '../components/Purchase/PurchaseRequest/PurchaseRequest'
@@ -61,6 +62,10 @@ const AppRoutes = () => {
                 </Route>
                 <Route
                     index
+                    path="weather"
+                    element={<WeatherContainer />}>
+                </Route>
+                <Route
                     path="Dashboard"
                     element={<DashboardContainer />}>
                 </Route>

@@ -75,9 +75,9 @@
 
 .year-picker-dropdown {
     position: absolute;
-    top: 35px; /* Adjust as needed */
-    width: 100px; /* Adjust as needed */
-    max-height: 100px; /* Adjust as needed */
+    top: 35px;
+    width: 100px;
+    max-height: 100px;
     overflow-y: auto;
     border: 1px solid #ccc;
     background-color: #fff;

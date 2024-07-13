@@ -5,6 +5,7 @@ import UserReducer from "./UserReducer"
 import ViewReducer from "./ViewReducer"
 import ItemReducer from "./ItemReducer"
 import PopupReducer from "./PopupReducer"
+import SalesReducer from "./SalesReducer"
 import CropsReducer from "./CropsReducer"
 import SeasonsReducer from "./SeasonsReducer"
 import ResourceReducer from "./ResourceReducer"
@@ -15,7 +16,6 @@ import ProductionReducer from "./ProductionReducer"
 import StockEntriesReducer from "./StockEntriesReducer"
 import VendorMasterReducer from "./VendorMasterReducer"
 import CustomerMasterReducer from "./CustomerMasterReducer"
-import SalesReducer from "./SalesReducer"
 
 const rootReducers = combineReducers({
     bom: BomReducer,

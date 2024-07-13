@@ -21,7 +21,7 @@ const INITIAL_STATE = {
 	purchaseInvoiceRef: null,
 	requestForQuotationRef: null,
 	setProductionOrderItemResourceRef: null,
-	setNavToolbarTitle: 'Dashboard',
+	setNavToolbarTitle: 'Weather',
     deletePopup: { active: false, type: "" },
 }
 

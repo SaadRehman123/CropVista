@@ -74,7 +74,7 @@ const App = () => {
 					if(response.payload.data.success && response.payload.data.result !== null){
 						setAppReady(true)
 						dispatch(renderLoadingView(false))
-						navigate("/app/Dashboard")
+						navigate("/app/weather")
 					}
 				}).catch((error) => {
 					console.error(error)

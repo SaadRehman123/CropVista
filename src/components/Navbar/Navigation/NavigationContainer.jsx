@@ -54,6 +54,10 @@ const NavigationContainer = () => {
             navigate('/app/Dashboard')
             dispatch(setNavToolbarTitle(obj.name))
         }
+        if(obj.id === "weather"){
+            navigate('/app/weather')
+            dispatch(setNavToolbarTitle(obj.name))
+        }
         else if(obj.id === "crop-plan"){
             navigate('/app/Crop-Plan')
             dispatch(setNavToolbarTitle(obj.name))
@@ -154,6 +158,7 @@ const Container = styled.div`
 `
 
 const navigations = [
+    {id: "weather", name: "Weather", icon: "fal fa-clouds", pad: 10, type: "overview"},
     {id: "dashboard", name: "Dashboard", icon: "fal fa-analytics", pad: 10, type: "overview"},
     {id: "resource", name: "Resources", icon: "fal fa-user-plus", pad: 10, type: "inventory"},
     {id: "warehouse", name: "Warehouse", icon: "fal fa-warehouse", pad: 10, type: "inventory"},

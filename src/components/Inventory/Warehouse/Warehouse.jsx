@@ -145,6 +145,7 @@ const Warehouse = () => {
                         dataField={"wrId"}
                         alignment={"left"}
                         allowSorting={false}
+                        sortOrder={"asc"}
                         cellRender={renderWarehouseIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}

@@ -76,7 +76,16 @@ const VendorQuotation = () => {
             </CellContainer>
         )
     }
-
+    
+    const renderTotalColumn = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.total.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                </CellContent>
+            </CellContainer>
+        )
+    }
     
     const renderCreationDateColumn = (e) => {
         return (
@@ -197,6 +206,16 @@ const VendorQuotation = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderCreationDateColumn} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+                        
+                    <Column
+                        caption={"Total"}
+                        dataField={"total"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        cellRender={renderTotalColumn}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

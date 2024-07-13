@@ -185,6 +185,7 @@ const GoodIssue = () => {
                         allowSorting={false}
                         cellRender={renderIdColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

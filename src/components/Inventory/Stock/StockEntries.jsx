@@ -140,6 +140,7 @@ const StockEntries = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderStockEntryIdColumn} 
+                        sortOrder={"asc"}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />

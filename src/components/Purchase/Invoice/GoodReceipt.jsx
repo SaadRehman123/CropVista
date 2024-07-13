@@ -174,6 +174,7 @@ const GoodReceipt = () => {
                         allowSorting={false}
                         cellRender={renderGoodReceiptIdColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

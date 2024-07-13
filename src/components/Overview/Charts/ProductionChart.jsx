@@ -5,6 +5,7 @@ import PieChart, { Legend, Series, Tooltip, Label, Connector, Export, Size } fro
 
 const ProductionChart = ({ selectedYear }) => {
 
+    const itemMaster = useSelector(state => state.item.itemMaster)
     const stockEntries = useSelector(state => state.stock.stockEntries)
 
     const [dataSource, setDataSource] = useState([])
@@ -29,10 +30,19 @@ const ProductionChart = ({ selectedYear }) => {
         setDataSource(formattedData)
     }, [selectedYear])
 
+    const setUom = (arg) => {
+        const item = itemMaster.find((item) => item.itemName === arg.argument)
+        if(item) {
+            return item.uom
+        }
+        else {
+            return ""
+        }
+    }
 
     const customizeTooltip = (arg) => {
         return {
-            text: `${arg.valueText} Kg`,
+            text: `${arg.valueText} ${setUom(arg)}`,
         }
     }
 
@@ -55,7 +65,7 @@ const ProductionChart = ({ selectedYear }) => {
             dataSource={dataSource}
             onLegendClick={legendClickHandler}>
             <Series argumentField="crop" valueField="val">
-                <Label visible={true} customizeText={(arg) => `${arg.valueText} Kg`} >
+                <Label visible={true} customizeText={(arg) => `${arg.valueText} ${setUom(arg)}`} >
                     <Connector visible={true} />
                 </Label>
             </Series>

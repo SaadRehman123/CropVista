@@ -175,6 +175,7 @@ const PurchaseOrder = () => {
                         allowSorting={false}
                         cellRender={renderPurchaseOrderIdColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

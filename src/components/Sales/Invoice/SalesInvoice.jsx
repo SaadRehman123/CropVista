@@ -216,6 +216,7 @@ const SalesInvoice = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderSaleInvoice}
+                        sortOrder={"asc"}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />

@@ -226,6 +226,7 @@ const PurchaseInvoice = () => {
                         allowSorting={false}
                         cellRender={renderPurchaseInvoice}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

@@ -135,6 +135,7 @@ const BillOfMaterial = () => {
                         allowSorting={false}
                         cellRender={renderBomIdColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

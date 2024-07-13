@@ -184,6 +184,7 @@ const CropPlan = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderPlanIdColumn} 
+                        sortOrder={"asc"}
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
                     />

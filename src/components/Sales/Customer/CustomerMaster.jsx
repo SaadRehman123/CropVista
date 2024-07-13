@@ -188,6 +188,7 @@ const CustomerMaster = () => {
                         allowSorting={false}
                         cellRender={renderCustomerNameColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

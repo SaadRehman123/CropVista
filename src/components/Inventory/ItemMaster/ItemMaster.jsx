@@ -141,6 +141,7 @@ const ItemMaster = () => {
                         dataField={"itemId"}
                         alignment={"left"}
                         allowSorting={false}
+                        sortOrder={"asc"}
                         cellRender={renderItemIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}

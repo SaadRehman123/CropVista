@@ -94,3 +94,7 @@ input:focus, select:focus, textarea:focus, button:focus, div:focus span:focus {
     margin-top: -50px;
     margin-left: 60px;
 }
+
+.dx-sort.dx-sort-up{
+    display: none !important;
+}

@@ -122,6 +122,7 @@ const InventoryStatus = () => {
                         cellRender={renderInventoryIdColumn} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-item-column"}
+                        sortOrder={"asc"}
                     />
 
                     <Column

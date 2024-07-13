@@ -198,6 +198,7 @@ const VendorMaster = () => {
                         allowSorting={false}
                         cellRender={renderVenderIdColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

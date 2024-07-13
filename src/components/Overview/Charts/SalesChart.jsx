@@ -24,7 +24,7 @@ const SalesChart = ({ selectedYear }) => {
 
     const customizeTooltip = (arg) => {
         return {
-            text: `${arg.valueText} - ${(arg.percent * 100).toFixed(2)}%`,
+            text: `${arg.valueText} Qty - ${(arg.percent * 100).toFixed(2)}%`,
         }
     }
     
@@ -42,7 +42,7 @@ const SalesChart = ({ selectedYear }) => {
         <PieChart
             id="pie"
             palette="Bright"
-            title="Annual Crop Sales Distribution"
+            title="Annual Crop Sales Distribution Of Quantity"
             dataSource={dataSource}
             onLegendClick={legendClickHandler}>
             <Series 

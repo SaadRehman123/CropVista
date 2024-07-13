@@ -116,6 +116,7 @@ const Resource = () => {
                         caption={"Resource-Id"}
                         dataField={"rId"}
                         alignment={"left"}
+                        sortOrder={"asc"}
                         allowSorting={false}
                         cellRender={renderResourceIdColumn} 
                         headerCellRender={renderHeaderCell}

@@ -217,6 +217,7 @@ const ProductionOrder = () => {
                         allowSorting={false}
                         cellRender={renderProductionOrderIdColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

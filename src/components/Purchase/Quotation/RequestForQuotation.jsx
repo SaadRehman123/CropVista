@@ -167,6 +167,7 @@ const RequestForQuotation = () => {
                         allowSorting={false}
                         cellRender={renderRequestForQuotationIdColumn}
                         headerCellRender={renderHeaderCell}
+                        sortOrder={"asc"}
                         cssClass={"project-treelist-item-column"}
                     />
 

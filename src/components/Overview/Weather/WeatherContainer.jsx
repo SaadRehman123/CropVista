@@ -68,11 +68,12 @@ const WeatherContainer = () => {
             <div className='weather-background'>
                 <div className="search-location">
                     <input
+                        type="text"
                         value={location}
-                        onChange={event => setLocation(event.target.value)}
                         onKeyPress={searchLocation}
                         placeholder='Enter Location'
-                        type="text" />
+                        style={{ textAlign: "center" }}
+                        onChange={event => setLocation(event.target.value)} />
                 </div>
                 <div className="container">
                     <div style={{ display: "flex", alignContent: "center", justifyContent: "space-between" }} className="top">

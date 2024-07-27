@@ -14,6 +14,7 @@ import { TreeList } from 'devextreme-react'
 import { Column, HeaderFilter, Scrolling, Selection } from 'devextreme-react/tree-list'
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
+import { getInventory } from '../../../actions/InventoryAction'
 import { getGoodIssue, goodIssueActionType } from '../../../actions/SalesActions'
 import { setGoodIssueRef, toggleDeletePopup } from '../../../actions/ViewActions'
 
@@ -34,6 +35,7 @@ const GoodIssue = () => {
     }, [])
 
     useEffect(() => {
+        dispatch(getInventory())
         dispatch(getGoodIssue(0))
     }, [])
 

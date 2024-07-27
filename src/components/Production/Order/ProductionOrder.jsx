@@ -14,6 +14,7 @@ import TreeList, { Column, HeaderFilter, Scrolling, Selection } from 'devextreme
 import { CellContainer, CellContent, Header, HeaderSpan } from '../../SupportComponents/StyledComponents'
 
 import { getBom } from '../../../actions/BomActions'
+import { getInventory } from '../../../actions/InventoryAction'
 import { getPlannedCrops } from '../../../actions/CropsActions'
 import { setProductionOrderRef, toggleDeletePopup } from '../../../actions/ViewActions'
 import { getProductionOrder, productionOrderActionType } from '../../../actions/ProductionOrderAction'
@@ -36,6 +37,7 @@ const ProductionOrder = () => {
 
     useEffect(() => {
         dispatch(getBom(0))
+        dispatch(getInventory())
         dispatch(getPlannedCrops())
         dispatch(getProductionOrder(0))
     }, [])

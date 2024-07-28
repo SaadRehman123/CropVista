@@ -131,6 +131,16 @@ const ProductionOrder = () => {
         )
     }
 
+    const renderStCost = (e) => {
+        return (
+            <CellContainer>
+                <CellContent>
+                    {e.data.productionStdCost.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
     const renderTotal = (e) => {
         const totalPO = e.data.children.reduce((acc, order) => acc + order.pO_Total, 0);
         return (
@@ -280,6 +290,17 @@ const ProductionOrder = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderEndDateColumn} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"Prd Std Cost"}
+                        dataField={"productionStdCost"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowFiltering={false}
+                        cellRender={renderStCost} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />

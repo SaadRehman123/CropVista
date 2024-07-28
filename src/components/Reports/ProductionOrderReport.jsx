@@ -31,6 +31,7 @@ const ProductionOrderReport = (props) => {
 
             instance.forEachNode((node) => {
                 if (node.visible === true) {
+                    const totalPO = node.data.children.reduce((acc, order) => acc + order.pO_Total, 0);
                     rowElements.push(
                         <View wrap={false} key={node.key} style={{ display: "flex", flexDirection: "row", border: "1px solid #E0E0E0" }}>
                             <View style={{ width: 160, padding: 4 }}>
@@ -50,6 +51,9 @@ const ProductionOrderReport = (props) => {
                             </View>
                             <View style={{ width: 140, padding: 4 }}>
                                 <Text>{moment(node.data.endDate).format("DD/MM/YYYY")}</Text>
+                            </View>
+                            <View style={{ width: 140, padding: 4 }}>
+                                <Text>{totalPO && totalPO.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</Text>
                             </View>
                             <View style={{ width: 140, padding: 4 }}>
                                 <Text>{node.data.status}</Text>
@@ -80,6 +84,9 @@ const ProductionOrderReport = (props) => {
                         </View>
                         <View style={{ width: 140, padding: 4 }}>
                             <Text>End Date</Text>
+                        </View>
+                        <View style={{ width: 140, padding: 4 }}>
+                            <Text>Total</Text>
                         </View>
                         <View style={{ width: 140, padding: 4 }}>
                             <Text>Status</Text>

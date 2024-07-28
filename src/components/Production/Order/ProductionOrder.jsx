@@ -131,6 +131,17 @@ const ProductionOrder = () => {
         )
     }
 
+    const renderTotal = (e) => {
+        const totalPO = e.data.children.reduce((acc, order) => acc + order.pO_Total, 0);
+        return (
+            <CellContainer>
+                <CellContent>
+                    {totalPO && totalPO.toLocaleString("en", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                </CellContent>
+            </CellContainer>
+        )
+    }
+
     const renderStatusColumn = (e) => {
         return (
             <CellContainer style={{ alignItems: 'center' }}>
@@ -269,6 +280,17 @@ const ProductionOrder = () => {
                         alignment={"left"}
                         allowSorting={false}
                         cellRender={renderEndDateColumn} 
+                        headerCellRender={renderHeaderCell}
+                        cssClass={"project-treelist-column"}
+                    />
+
+                    <Column
+                        caption={"Total"}
+                        dataField={"total"}
+                        alignment={"left"}
+                        allowSorting={false}
+                        allowFiltering={false}
+                        cellRender={renderTotal} 
                         headerCellRender={renderHeaderCell}
                         cssClass={"project-treelist-column"}
                     />
